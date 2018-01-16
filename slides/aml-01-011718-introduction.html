@@ -23,12 +23,16 @@
 
       .remark-slide-content p, .remark-slide-content li {
         font-size:40px;
-        line-height: 2em;
+        line-height: 1.6;
+      }
+      .remark-slide-content .compact {
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
       }
 
       .larger {
           font-size: 40px;
-          line-height: 150%;
       }
       .largest {
           font-size: 50px;
@@ -240,14 +244,193 @@ class: center, middle
 # Generalization
 
 .left-column[
-Not only </br />
+Not only <br />
 also for new data:
 ]
 
-.right-column[$f(x_i) \approx y_i$,</br />
+.right-column[$f(x_i) \approx y_i$,<br />
 $f(x) \approx y$
 ]
+---
+# Relationship to Statistics
 
+.left-column[
+Statistics
+- model first
+- infence emphasis
+]
+.right-column[
+Machine learning
+- data first
+- prediction emphasiz
+]
+---
+class: middle
+# Guiding Principles in Machine Learning
+---
+class: middle
+# Goal considerations
+---
+class: middle
+# The Cost of Complex Systems
+
+## Data driven first? yes! (or maybe)
+## Machine Learning first: No!
+---
+class: middle
+# Thinking in Context!
+# What is the baseline?
+# What is the benefit?
+---
+class: middle
+# Good and Bad Substitutes
+---
+class: middle
+
+# Communicating Results
+
+---
+class: middle, center
+
+# Explainable Results
+![:scale 60%](images/amazon_explanations.png)
+
+---
+class: middle, center
+
+# Sidebar: Ethical Considerations
+![:scale 30%](images/propublica_compas.png)<br/>
+.compact[https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing]
+---
+class: middle
+
+# Ethics: It’s in the application!
+
+---
+class: middle
+
+# Data and Data Collection
+
+---
+# Free vs Expensive Data 
+
+.left-column[
+## Free
+Predict observable events
+- Stock market
+- Clicks
+- House numbers
+]
+
+.right-column[
+## Expensive
+Automate complex process
+- Dignosis
+- Drug Trial
+- Chip Design
+]
+
+---
+class: middle
+
+# The cost (and benefit?) of BigData
+
+# Subsample to RAM (which can be 512gb)
+
+---
+# Cornerstones of this Course
+
+- Good software engineering practices
+- Problem definition and success measures
+- Feature engineering and data cleaning
+- Strength and weaknesses of different algorithms
+- Model selection best practices
+
+---
+# The Machine Learning Work-Flow
+![:scale 100%](images/ml-workflow.png)
+
+Taken from MAPR https://www.mapr.com/ebooks/spark/08-recommendation-engine-spark.html
+
+---
+# Overview of the course
+---
+
+# Infrastructure and basic tools (Wk 2, 3)
+
+- Python, Jupyter
+- git, github
+- testing, documentation, continuous integration
+- Writing fast Python
+- Numpy, matplotlib, pandas
+
+---
+# Basics of Supervised Learning (Wk 3, 4)
+- Generalization in practice
+- Nearest Neighbors, Nearest Centroid
+- Linear Classification and Regression
+- Penalties and Regularization
+---
+# Data Preparation (Wk 4, 5)
+- Preprocessing
+- Feature engineering
+- Imputation
+- Feature Selection
+---
+# Non-linear machine learning models (Wk 5, 6)
+- Support Vector Machines and Kernels
+- Decision Trees
+- Random Forests
+- Gradient Boosting
+- Model Calibration
+---
+# Model evaluation and imbalanced data (Wk 7)
+- Metrics for binary and multi-class classification
+- Metrics for regression
+- Analyzing predictions
+- Handling imbalanced datasets for classification
+---
+# Decomposition Methods (Wk 10)
+- PCA
+- Discriminant Analysis
+- Manifold Learning
+- Non-negative Matrix Factorization
+---
+# Clustering (Wk 10, 11)
+- K-Means
+- DBScan
+- Agglomerative Clustering
+- Spectral Clustering
+- Supervised evaluation metrics
+- Unsupervised evaluation metrics
+---
+# Outlier Detection (Wk 11)
+- One Class SVM
+- Robust Covariance Estimates
+- Isolation Forests
+---
+# Text Data (Wk 12, 13)
+- n-grams and Bag-of-words models
+- Preprocessing text
+- Text classification
+- Topic models
+- word embeddings and word vectors
+---
+# Neural Networks (Wk 13, 14)
+- Backpropagation
+- Tensorflow
+- Keras
+- Learning Algorithms
+- Image data and convolutional neural networks
+- Best practices for neural networks
+---
+# Time Series Data (Wk 15)
+- The forecasting task
+- Evaluation of forecasting
+- Stationarity
+- ARMA
+- ARIMA
+---
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
