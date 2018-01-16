@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+      }
+
+      .larger {
+          font-size: 30px;
+          line-height: 150%;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Introduction
+
+01/17/18
+
+Andreas C. Müller
+
+---
+
+class: center, middle
+
+# Scikit-learn Development
+
+![sklearn logo](images/sklearn_logo.png)
+
+http://scikit-learn.org/dev/developers/contributing.html
+
+---
+
+# Logistics
+
+### CAs: TBA
+
+## Office Hours
+- Andreas Müller Thursdays 11am-12pm, 410 Mudd
+
+---
+
+# Logistics
+
+.larger[
+- Course website
+http://www.cs.columbia.edu/~amueller/comsw4995s18/<br /><br />
+- Six programming assignments<br /><br />
+- Grade: 60% homeworks, 20% first examp, 20% second exam<br /><br />
+]
+
+---
+
+# Books
+
+.center[
+![:scale 25%](images/imlp.png)&nbsp;&nbsp;&nbsp;
+![:scale 25%](images/apm.png)&nbsp;&nbsp;&nbsp;
+![:scale 25%](images/esl.png)
+]
+
+---
+
+# Slides and course materials
+
+.center[
+![:scale 40%](images/slides_and_notes.png)
+]
+
+---
+
+class: center, middle
+
+# What and Why of Machine Learning
+
+---
+
+class: center, middle
+
+# What is machine learning?
+
+---
+
+.center[
+![:scale 70%](images/fb1.png)
+]
+
+---
+
+.center[
+![:scale 70%](images/fb2.png)
+]
+
+---
+
+.center[
+![:scale 70%](images/fb3.png)
+]
+
+---
+
+.center[
+![:scale 70%](images/spotify.png)
+]
+
+---
+
+.center[
+![:scale 70%](images/amazon1.png)
+]
+
+---
+
+.center[
+![:scale 70%](images/amazon2.png)
+]
+
+---
+# Science!
+.center[
+![:scale 70%](images/exoplanet.png)
+]
+
+---
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'github',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    </script>
+  </body>
+</html>
