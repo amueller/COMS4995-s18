@@ -478,33 +478,167 @@ def test_inc():
 ```
 ]
 
+![:scale 50%](images/pytest_coverage1.png)
 ---
 
-#
+# Test coverage
+
+.left-column[
+```python
+# inc.py
+def inc(x):
+    if x < 0:
+        return 0
+    return x + 1
+
+
+def dec(x):
+     return x - 1
+```
+]
+
+.right-column[
+```python
+# test_inc.py
+from inc import inc
+
+def test_inc():
+     assert inc(3) == 4
+```
+]
+![:scale 50%](images/pytest_coverage2.png)
 
 ---
 
-#
+# HTML report
+
+`$ py.test --cov inc --cov-report=html`
+
+![:scale 50%](images/pytest_html_report1.png)
+![:scale 50%](images/pytest_html_report2.png)
 
 ---
 
-#
+# Continuous integration (with GitHub)
 
 ---
 
-#
+# What is Continuous integration?
+
+- Run command on each commit (or each PR).
+- Unit testing and integration testing.
+- Can act as a build-farm (for binaries or documentation).
+- requires clear declaration of dependencies.
+- Build matrix: Can run on many environments.
+- Standard serviced: TravisCI, Jenkins and CircleCI
 
 ---
 
-#
+# Benefits of CI
+
+- Can run on many systems
+- Can’t forget to run it
+- Contributor doesn’t need to know details
+- Can enforce style
+- Can provide immediate feedback
+- Protects the master branch (if run on PR)
 
 ---
 
-#
+# What does it do?
+
+- Triggered at each commit / push
+- Sets up a virtual machine with your configuration.
+- Pulls the current branch.
+- Runs command. Usually: install, then test.
+- Reports success / Failure to github.
 
 ---
 
-#
+# Setting up TravisCI
+
+- Create account linked to your github account: http://travis-ci.org
+
+# FIXME travis link
+
+- Check out docs at https://docs.travis-ci.com
+
+# FIXME travis yaml
+
+---
+
+# Using Travis
+
+- Triggered any time you push a change
+- Integrated with Pull requests
+- Try a pull request on your own repository!
+
+---
+
+# Documentation
+
+---
+
+# Why document?A
+
+- Your code is harder to understand than you think.
+- Input types and output types are unclear in dynamic languages.
+- Often implicit assumptions about input.
+
+---
+
+# Python documentation standards 
+
+- PEP 257 for docstrings for class, methods and functions
+
+# FIXME type code
+
+- Additional inline documentation
+
+# FIXME type code
+---
+
+# NumpyDoc format
+
+- See https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+
+```python
+"""
+Parameters
+----------
+x : type
+    Description of parameter `x`.
+"""
+```
+
+---
+
+# NumpyDoc example
+
+.left-column[
+![:scale 80%](images/numpydoc_multinomial_nb.png)
+]
+.right-column[
+![:scale 80%](images/numpydoc_fit.png)
+]
+
+---
+
+# Sphinx and reStructured Text
+
+.left-column[
+![:scale 80%](images/sphinx_svm_rst.png)
+]
+.right-column[
+![:scale 80%](images/sphinx_svm_website.png)
+]
+
+
+---
+
+# Autodoc and NumpyDoc
+
+![:scale 80%](images/sphinx_autodoc.png)
 
 ---
 class: middle
