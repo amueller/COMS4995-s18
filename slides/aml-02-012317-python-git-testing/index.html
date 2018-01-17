@@ -559,11 +559,27 @@ def test_inc():
 
 - Create account linked to your github account: http://travis-ci.org
 
-# FIXME travis link
+![:scale 80%](images/travis_activate.png)
 
 - Check out docs at https://docs.travis-ci.com
 
-# FIXME travis yaml
+```yaml
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "nightly"
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+# command to run tests
+script:
+  - pytest # or py.test for Python versions 3.5 and below
+
+```
 
 ---
 
@@ -579,7 +595,7 @@ def test_inc():
 
 ---
 
-# Why document?A
+# Why document?
 
 - Your code is harder to understand than you think.
 - Input types and output types are unclear in dynamic languages.
@@ -591,11 +607,27 @@ def test_inc():
 
 - PEP 257 for docstrings for class, methods and functions
 
-# FIXME type code
+```python
+def inc(x):
+    """Add one to a number.
+
+    This function takes as argument a number, and adds one to it.
+    The result is returned.
+    """
+    if x < 0:
+        return 0
+    return x + 1
+```
 
 - Additional inline documentation
 
-# FIXME type code
+```python
+if x < 0:
+    # x is less than zero
+    return 0
+return x + 1
+```
+
 ---
 
 # NumpyDoc format
