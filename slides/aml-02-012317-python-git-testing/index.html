@@ -78,7 +78,7 @@ class: middle
 
 ---
 
-![:scale 40%](images/torvalds_ducreux.png)
+![:scale 40%](images/torvalds_ducreux.jpg)
 
 ---
 
@@ -157,19 +157,19 @@ puts files from working director into staging area. If not in index, adds them t
 commits files from staging area (index) to repository, moves current branch with HEAD
 
 - ``git checkout [<commit>] [<file>]``
-Set <file> in working directory to state at <commit> and stages it.
+Set ``<file>`` in working directory to state at ``<commit>`` and stages it.
 
 - ``git checkout [-b] <branch>``
-moves HEAD to <branch> (-b creates it), changes content of working dir
+moves HEAD to ``<branch>`` (-b creates it), changes content of working dir
 
 - ``git reset --soft <commit>``
-moves HEAD to <commit> (takes the current branch with it)
+moves HEAD to ``<commit>`` (takes the current branch with it)
 
 - ``git reset --mixed <commit>``
-moves HEAD to <commit>,  changes index to be at <commit> (but not working directory)
+moves HEAD to ``<commit>``,  changes index to be at ``<commit>`` (but not working directory)
 
 - ``git reset --hard <commit>``
-moved HEAD to <commit>, changes index and working tree to <commit>.
+moved HEAD to ``<commit>``, changes index and working tree to ``<commit>``.
 
 ---
 
@@ -265,12 +265,227 @@ https://www.youtube.com/watch?v=1ffBJ4sVUb4
 
 ---
 
-# Programs must be written for people to read, and only incidentally for machines to execute.
+Programs must be written for people to read, and only incidentally for machines to execute.
 - Harold Abelson (wizard book)
 
 ---
 
-# 
+Everyone knows that debugging is twice as hard as writing a program in the first place. So if you're as clever as you can be when you write it, how will you ever debug it? 
+- Brian Kernighan
+
+---
+
+ Don’t be clever!
+Make it readable!
+
+Future you is the most likely person to try to understand your code.
+
+Avoid writing code.
+
+---
+
+# Python basics
+
+---
+
+# Why Python?
+
+- General purpose language
+- Great libraries
+- Easy to learn / use
+- Contenders: R (Scala? Julia?)
+
+---
+
+# The two language problem
+
+Python is sloooow…A
+
+
+- Numpy: C
+- Scipy: C, fortran
+- Pandas: Cython, Python
+- Scikit-learn: Cython, Python
+
+- CPython: C
+
+---
+
+# Python 2 vs Python 3
+
+- “current” : 2.7, 3.4, 3.5, 3.6, 3.7
+
+Changes (that will bite you)
+
+- ``print``
+
+- division
+
+- Iterators (range, zip, map, filter, dictionary keys, values, items)
+
+- Strings / unicode
+
+---
+
+# Python 2 && Python 3
+
+- from __future__ import print_function
+- Six – tools for making 2 and 3 compatible code
+- 2to3 – convert python2 code to python3 code
+
+---
+
+# Python ...
+
+Package management:
+
+- Virtual environments
+
+- pip (and wheels)
+
+- Conda (and anaconda and conda-forge)
+
+---
+
+# Pip and upgrades
+
+Pip upgrade works on dependencies (unless you do –no-dep)
+
+---
+
+# Conda
+
+Conda looks like the best bet.
+Use conda environments!
+
+---
+
+# Dynamically typed, interpreted
+
+- Invalid syntax lying around
+
+- Code is less self-documenting
+
+---
+
+# Editors
+
+- Flake8 / pyflake
+
+- Scripted / weak typing: Have a syntax checker!
+
+- use autopep8 if you have code lying around
+
+---
+
+# Unit Tests and integration tests
+
+---
+
+# Why test?
+
+- Ensure that code works correctly.
+- Ensure that changes don’t break anything.
+- Ensure that bugs are not reintroduced.
+- Ensure robustness to user errors.
+- Ensure code is reachable.
+
+---
+
+# Test-driven development?
+
+---
+
+# Types of tests
+
+- Unit tests – function does the right thing.
+
+- Integration tests – system / process does the right thing.
+
+- Non-regression tests – bug got removed (and will not be reintroduced).
+
+---
+
+# How to test? 
+
+- py.test – http://doc.pytest.org
+
+- Searches for all test_*.py files, runs all test_* methods.
+
+- Reports nice errors!
+
+- Dig deeper: http://pybites.blogspot.com/2011/07/behind-scenes-of-pytests-new-assertion.html
+
+---
+
+# Example
+
+``python
+# content of test_sample.py
+
+def inc(x):
+    return x + 2
+
+
+def test_answer():
+    assert inc(3) == 4
+``
+
+![:scale 50%](images/pytest_failure.png)
+
+---
+
+# Example
+
+``python
+# content of test_sample.py
+
+def inc(x):
+    return x + 1
+
+
+def test_answer():
+    assert inc(3) == 4
+``
+
+![:scale 50%](images/pytest_passed.png)
+
+# Test coverage
+
+.left-column[
+``python
+# inc.py
+def inc(x):
+    if x < 0:
+        return 0
+    return x + 1
+
+
+def dec(x):
+     return x - 1
+``
+
+.right-column[
+``python
+# test_inc.py
+from inc import inc
+
+def test_inc():
+     assert inc(3) == 4
+``
+]
+
+---
+
+#
+
+---
+
+#
+
+---
+
+#
 
 ---
 
