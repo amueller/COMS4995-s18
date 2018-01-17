@@ -68,20 +68,18 @@ Andreas C. Müller
 
 Hey and welcome to my course on Applied Machine Learning. As you can see we
 have a pretty full class so make sure you don’t hog too much space.  I’m
-Andreas Mueller, I’m a lecturer at the DSI and I spend most of my time working
+Andreas Mueller, I’m a lecturer at the DSI and I spend some of my time working
 on scikit-learn development. Also, I decided to go on a first name basis with
-people in the course, so you can call me Andy.  This is the first time I’m
-teaching this class and also the first time I’m teaching at Columbia, so bear
-with me. If you have any feedback about the class, feel free to send me an
-email or drop by my office hours. Also feel free to interrupt me with
-questions. I’m not sure if that’ll work with so big a class but I’m giving it a
-go.  The goal of this class is to provide you with the hands-on knowledge you
-need to be successful in applying machine learning in the real world. It
-complements the Machine Learning course, but doesn’t rely on it.  For those of
-you who have taken a machine learning class, or who are taking it now, some
-things might be a bit redundant, but I promise you there’ll be a lot of new
-stuff in this course.  Who’s taking machine learning this semester, raise your
-hand? And who has taken it before? And who hasn’t?
+people in the course, so you can call me Andy. If you have any feedback about
+the class, feel free to send me an email or drop by my office hours. Also feel
+free to interrupt me with questions. I’m not sure if that’ll work with so big a
+class but I’m giving it a go. The goal of this class is to provide you with
+the hands-on knowledge you need to be successful in applying machine learning
+in the real world. It complements the Machine Learning course, but doesn’t rely
+on it.  For those of you who have taken a machine learning class, or who are
+taking it now, some things might be a bit redundant, but I promise you there’ll
+be a lot of new stuff in this course. Who’s taking machine learning this
+semester, raise your hand? And who has taken it before? And who hasn’t?
 
 ---
 
@@ -96,35 +94,42 @@ http://scikit-learn.org/dev/developers/contributing.html
 ???
 
 A couple of you have approached me asking if I have any projects relating to
-scikit-learn.  Who here is interested in contributing to scikit-learn?  So
+scikit-learn. Who here is interested in contributing to scikit-learn?  So
 answer is yes, there are many many projects. However, currently I don’t have a
 lot of time to mentor you on this. This will probably change during the
 semester. You are very welcome to start contributing to scikit-learn, though,
-and I’m happy to answer questions.  There is a pretty extensive guide to
-contributing, the link is here.
+and I’m happy to answer questions. There is a pretty extensive guide to
+contributing, the link is here. If you want to do a project with me,
+the best way is to start solving some of the easy issues on the issue
+tracker to get familiar with the project and the workflow before working
+on something bigger.
 
 ---
 
 # Logistics
 
-### CAs: TBA
+## Email
+andreas.mueller@columbia.edu
+(NOT amueller who is someone else)
+
+### CAs: Rajath Kumar, Isht Dwivedi, Kevin Raji Cherian, Vinale Kale, tbd
 
 ## Office Hours
 - Andreas Müller Thursdays 11am-12pm, 410 Mudd
+- Kevin Raji Cherian 5pm-7pm
+- TBD
 
 ???
 
 Before we get started, here’s some logistics. There’s four course assistance to
-this class, Akshay, Aarshay, Rohan and Sheallika, who are here to help you.
-They all have office hours in the CS TA Room.  You can find all the dates on
-the course website or piazza. You can also come to my office hours, just before
-the Wednesday lecture.  I’m in the Data Science space in the Mudd building.
-And this week Rohan’s office hours will be on Friday, not on Thursday as
-they’ll be for the rest of the semester.
+this classi so far, Rajath, Isht, Kevin and Vinale, who are here to help you.
+We'll probably have one or two more join by the end of the week.
+They all have office hours in the CS TA Room. I'll post all the dates
+on the course website and piazza. My office hours are Thursdays, and I’m in the
+Data Science space in the Mudd building.
 
 Oh and about enrollment: If you’re not a DSI student, and you haven’t heard
-from us about enrollment, you’ll hear from us today. I’m not sure we have
-enough space for everybody, though.
+from us about enrollment, you’ll hear from us this week.
 
 ---
 
@@ -142,8 +147,7 @@ http://www.cs.columbia.edu/~amueller/comsw4995s18/<br /><br />
 If you haven’t already, please check out the course website which has the
 syllabus and other information. I’ll link to the slides there, too.  The most
 up-to-date material will always be on this website and the github repository,
-which is linked from there.  I won’t produce all the details from the website,
-but here are some key points. There will be five homeworks, all will be
+which is linked from there. There will be 6 homeworks, all will be
 programming, submitted via github. The homeworks will make up 60% of the grade,
 and there’ll be two exams, each making up 20% of the grade. 
 
@@ -159,19 +163,20 @@ and there’ll be two exams, each making up 20% of the grade.
 
 ???
 
-There are four books that I recommend looking into for this course. Definitely
+There are three books that I recommend looking into for this course. Definitely
 check out my book, Introduction to machine learning with Python. You can find
 the PDF on courseworks. My book should be a relatively easy read and it’s quite
 short. The second one is Applied predictive modelling by Max Kuhn, which goes a
 bit deeper. This is about the level I want to go to in this course. You can get
 it for free at springer link, I posted a link in courseworks. These two are
-really the essential ones.  You can also check out “Data Science for Business”
-by one of my colleagues from NYU, Foster Provost and Tom Fawcett. There’s a
-couple of those in the Business library. They emphasize on how to frame
-problems and measuring impact of data science.  Finally, Elements of
-statistical learning, also known as ESL or the stanford book, by Hastie
-Tibshibani and Friedman is a classic for a more theoretical view. You can get
-it for free on the authors website.
+really the essential ones. Finally, there's Elements of statistical learning,
+also known as ESL or the stanford book, by Hastie Tibshibani and Friedman is a
+classic for a more theoretical view. You can get it for free on the authors
+website.
+
+If you want to brush up on your Python skills, I also recommend the Python Data
+Science Handbook by my friend Jake Vanderplas. It's linked on the course page
+under the prerequisits.
 
 ---
 
@@ -181,15 +186,24 @@ it for free on the authors website.
 ![:scale 40%](images/slides_and_notes.png)
 ]
 
+Using markdown with remark. Press "p" for notes.
+
 ???
 
 As I said, you can find the slides on the website or on github. I’ll probably
 publish slides with and without notes. My goal is to write a note for each
 slide that says what I’m gonna say. So it’s like a script for the lecture.
-Here’s what this looks like.  Unfortunately there’ll be no video recording, but
-maybe these notes will be helpful.  I might also publish some Jupyter notebooks
+Here’s what this looks like. I really wanted to have video recording, but I'm
+not sure yet whether this will work out.  I might also publish some Jupyter notebooks
 at some point, if I feel they might help. In general, I’ll mostly do standard
 slides, though.
+The slides are all written in markdown and on github. If you find any errors
+or have suggestions, don't hesitate to send me pull requests.
+In the past I have used libre office impress, but that produces binary
+files that you can't easily version control. Hopefully using Markdown
+will make it easier to provide corrections for the slides.
+If you open the slides in the browser, you can press "P" for presenter mode
+and you'll see my notes.
 
 ---
 
@@ -199,10 +213,10 @@ class: center, middle
 
 ???
 
-Ok, I think I spend enough time on logistics, let’s finally get going. I first
+I think I spend enough time on logistics, let’s finally get going. I first
 want to talk about what is machine learning, and why do we want it. As you’re
 in this course, you’re probably already somewhat convinced that it’s useful,
-but I briefly want to give my own perspective.  In general, today will not be
+but I briefly want to give my own perspective. In general, today will not be
 very meaty and be more a loose collections of ideas and directions. The next
 class we will go down to the metal much more.
 
@@ -215,16 +229,16 @@ class: center, middle
 ???
 
 Machine learning is about extracting knowledge from data. It is closely related
-to statistics and optimization.  What distinguishes machine learning is that it
+to statistics and optimization. What distinguishes machine learning is that it
 is very focused on prediction.
 
-We want to learn from a large dataset how to make decisions based on future
-observations.  You could say that the input to a machine learning program is
+We want to learn from a large dataset how to make decisions for future
+observations. You could say that the input to a machine learning program is
 the dataset, and the output is a program that can make decisions on future
 observations.
 
 Machine learning is really widely used now, and I want to give you some
-examples that you probably all saw already today.
+examples that most of you probably already interacted with today.
 
 ---
 
@@ -247,16 +261,18 @@ topics, apps to connect and people I might now. All ML.
 ---
 
 .center[
-![:scale 70%](images/fb2.png)
+![:scale 70%](images/facebook_gael.png)
 ]
 
 ???
 
-But wait, there’s more. Here’s me uploading a picture. This is an older
-screenshot, they probably change things since then. Can you find more machine
-learning?  It does find the faces on my friend Mao here, but doesn’t recognize
-him. Also, adds to the right. Probably based on the image content and comments
-on the photo. Who doesn’t want a burger with their communism?
+But wait, there’s more. Here’s me uploading a picture. It finds the faces
+of many of the people here, even in odd poses. Not only my friend Gael here,
+one of the creators of scikit-learn, but also Jared Lander there in the background.
+
+I'm pretty sure they could automatically tag the people, and actually describe the photos,
+but that seems to be disabled on my account. My account might still be European,
+where they don't tag faces because of privacy concerns.
 
 ---
 
@@ -284,7 +300,8 @@ What machine learning can we see here?
 There’s popular songs, which in this case are actually in the order of “likes”
 but in fact the algorithm also takes other features into account. And then
 theres Related Artists.  Is there other machine learning in spotify that you
-know of?  the artist radio, and of course, discover weekly.
+know of?  the artist radio, and of course, discover weekly. They also have a
+daily mix now, I think.
 
 ---
 
@@ -309,7 +326,7 @@ there’s an ad at the top, selected via machine learning.
 ???
 
 And if I click on a book, more machine learning.
-There’s an add below for textbooks, targetted to me. There’s paperback as the
+There’s an ad below for textbooks, targetted to me. There’s paperback as the
 default choice, again machine learning. There’s frequently bought together, and
 maybe less obviously, there’s a default seller! The price that is shown on the
 right that’s selected for “add to cart” is also selected from a whole pool of
@@ -317,7 +334,8 @@ possible amazon sellers via machine learning.
 
 Ok, that’s enough websites I think. While I went through all this, you were
 probably on your phone, looking at more output produced by machine learning. My
-point is, it’s everywhere. And often non-obvious.
+point is, it’s everywhere. And often non-obvious, as in the case of selecting
+a seller here.
 
 ---
 
@@ -331,16 +349,18 @@ point is, it’s everywhere. And often non-obvious.
 
 That was some of the flashy, every day live applications. Something that might
 get you VC funding. There’s also a lot of machine learning applications in less
-visible, but equally important applications in science.  There is more and more
-personalized cancer treatment – via machine learning. More medical diagnosis,
-and more drug discovery are using machine learning. The higgs boson couldn’t
-have been found without machine learning, and the same is true for many earth
-like planets in other solar systems. Which is shown using an artists
-illustration here, but in reality you would have a single pixel, containing the
-sun and the planet!  Machine learning is an essential in all data driven
-sciences now!  So no matter where you want to go with data, you need machine
-learning.  But what does that mean?
-Next, I want to give you a little taxonomy of machine learning methods.
+visible, but equally important - or more important - applications in science.
+There is more and more personalized cancer treatment – via machine learning.
+More medical diagnosis, and more drug discovery are using machine learning.
+The higgs boson couldn’t have been found without machine learning, and the same
+is true for many earth like planets in other solar systems.
+Which is shown using an artists illustration here. In reality you would
+have a single pixel, containing the sun and the planet. You can find exoplanets
+by checking whether the star gets periodically slightly darker, in which case you found
+a planet. Of course with machine learning!
+Machine learning is an essential in many data driven sciences now!  So no matter
+where you want to go with data, you need machine learning.  But what does that
+mean?  Next, I want to give you a little taxonomy of machine learning methods.
 
 ---
 class: center, middle
@@ -351,13 +371,6 @@ class: center, middle
 
 There are three main branches of machine learning.
 Who can name them?
-They called supervised learning, unsupervised learning and reinforcement learning.
-What are they?
-This course will heavily focus on supervised learning, but you should be aware
-of the distinction. Supervised learning is also the most commonly used type in
-industry and research right now, though reinforcement learning becomes
-increasingly important.
-
 ---
 
 # Types of Machine Learning
@@ -367,12 +380,11 @@ increasingly important.
 
 ???
 
-There are three main branches of machine learning.
-Who can name them?
 They called supervised learning, unsupervised learning and reinforcement learning.
 What are they?
 This course will heavily focus on supervised learning, but you should be aware
-of the distinction. Supervised learning is also the most commonly used type in
+the other types and their characteristics. We will do some unsupervised learning,
+but no reinforcement learning. Supervised learning is the most commonly used type in
 industry and research right now, though reinforcement learning becomes
 increasingly important.
 
@@ -394,11 +406,12 @@ $$f(x_i) \approx y_i$$
 In supervised learning, the dataset we learn form is input-output pairs (x_i,
 y_i), where x_i is some n_dimensional input, or feature vector, and y_i is the
 desired output we want to learn.  Generally, we assume these samples are drawn
-from some unknown joint distribution p(x, y).
+from some unknown joint distribution p(x, y). In statistics, x_i might be
+called independent variables and y_i dependent variable.
 What does iid mean?
 We say they are drawn iid, which stands for independent identically
 distributed. In other words, the x_i, y_i pairs are independent and all come
-from the same distribution p.  You can think of this as there being some
+from the same distribution p. You can think of this as there being some
 process that goes from x_i to y_i, but that we don’t know. We write this as a
 probability distribution and not as a function since even if there is a real
 process creating y from x, this process might not be deterministic.  The goal
@@ -420,11 +433,9 @@ diabetes.  Given a piece of a satellite image, what is the terrain in this
 image? Here x_i would be the pixels of the image, and y_i would be the terrain
 types.
 
-In your setting, it’s probably good to think of each x_i as an experiment, and
-each entry of x_i as one sensor measurement.  This is often used to automate
-manual labor. For example, you might annotate part of a dataset manually, then
-learn a machine learning model from this annotations, and use the model to
-annotate the rest of your data.
+This is often used to automate manual labor. For example, you might annotate
+part of a dataset manually, then learn a machine learning model from this
+annotations, and use the model to annotate the rest of your data.
 
 ---
 
@@ -463,15 +474,15 @@ class: center, middle
 
 ???
 
-The third kind, reinforcement learning, recently had a great success. Has
-anyone heard of that? Alpha go beat the world champion in go.  Reinforcement
-learning is about an agent learning to interact with an environment, with some
-ultimate goal. The environment could be a go board, and the goal to win the
-game.  For self-driving cars, the the environment could be roads, sensed by
-cameras and laser sensors, and the goal would be to get you somewhere quickly
-and safely.  Or, the environment could be a social media platform, and the goal
-could be to provide you such great content that you never remove your eyes from
-your phone again!
+The third kind, reinforcement learning, has been in the news quite a bit in the
+last year. Has anyone heard of that? Alpha go beat the world champion in go.
+Reinforcement learning is about an agent learning to interact with an
+environment, with some ultimate goal. The environment could be a go board, and
+the goal to win the game. For self-driving cars, the the environment could be
+roads, sensed by cameras and laser sensors, and the goal would be to get you
+somewhere quickly and safely. Or, the environment could be a social media
+platform, and the goal could be to provide you such great content that you
+never remove your eyes from your phone again!
 
 ---
 
@@ -486,8 +497,8 @@ they see and which situations they encounter, and it’s usually impossible to
 look at all possible situations, even for something as limited as a go board.
 This means in reinforcement learning you can not separate data collection and
 learning, which you can do for unsupervised and supervised learning.  There
-will be no reinforcement learning in this class, as  real-world use of this
-technique is still quite limited.
+will be no reinforcement learning in this class, as the techniques are quite different,
+and real-world use of this technique is still quite limited.
 
 ---
 
@@ -507,9 +518,9 @@ reinforcement learning and supervised learning. There are also many kinds of
 supervised learning where the assumption that data points are independent is
 dropped, for example for time series analysis and forecasting.  However, if you
 get the three main concepts, the rest will be easy to understand.  Some people,
-including Yann LeCun think that supervised learning is fundamentally limited.
-In particular it doesn’t seem to be how humans learn. So now you can buy these
-shirts on redbubble
+including the local and famous Yann LeCun think that supervised learning is
+fundamentally limited. In particular it doesn’t seem to be how humans learn.
+So now you can buy these shirts on redbubble
 
 ---
 
@@ -520,8 +531,8 @@ class: center, middle
 ???
 
 This might be true, but as long as we are trying to solve science and business
-problems, I think supervised learning is our best bet, even though it will
-probably not lead us to creating some superhuman general intelligence.
+problems, I think supervised learning is our best bet for now. It's probably
+not going to lead us to creating some superhuman general intelligence.
 
 ---
 
@@ -542,19 +553,25 @@ probably not lead us to creating some superhuman general intelligence.
 ???
 So getting back to supervised learning, there are two basic kinds, called
 classification and regression.
-The difference is quite simple, if y is continuous, then it’s regression, and
+The difference is quite simple: if y is continuous, then it’s regression, and
 if y is discrete, it’s classification.
 
-That’s pretty simple, still let me give an example.
-If I want to predict whether a student will pass the class, it’s a
+While it's simple, let me give an example.
+If I want to predict whether a one of you will pass the class, it’s a
 classification problem. There are two possible answers, “yes” and “no”.  If I
-want to predict how many points a student gets on an exam, it’s a regression
+want to predict how many points you get on an exam, it’s a regression
 problem, there is a continuous, gradual output space.
 
 There are generalizations of this where we try to predict more than one
-variable, but we won’t go into that in this course. The main reason this
-distinction is important is because the way we measure how good a prediction is
-is very different for the two.
+variable, but we won’t go into that in this course. The main reason the distinction
+between classification and regression is important is because the way we
+measure how good a prediction is is very different for the two.
+It's not always entirely clear whether it's best to formulate a problem as classification
+or regression. If you think of predicting a 5-star rating, there's only 5 different possible
+outcomes, so you might think it's classification. But there is also an obvious ordering
+between the outcomes, which would make it a regression problem.
+Both formulations could work, and there are approaches that combine the two for
+this particular problem.
 
 ---
 
@@ -572,13 +589,13 @@ $f(x) \approx y$
 For both regression and classification, it’s important to keep in mind the
 concept of generalization.
 Let’s say we have a regression task. We have features, that is data vectors x_i
-and targets y_i drawn from a joint distribution.  We now want to learn a
+and targets y_i drawn from a joint distribution. We now want to learn a
 function f, such that f(x) is approximately y, not on this training data, but
 on new data drawn from this distribution. This is what’s called generalization,
 and this is a core distinction to function approximation. In principle we don’t
 care about how well we do on x_i, we only care how well we do on new samples
-from the distribution We’ll go into much more detail about generalization in
-two weeks, when we dive into supervised learning. 
+from the distribution. We’ll go into much more detail about generalization in
+about a week, when we dive into supervised learning. 
 
 ---
 
@@ -598,19 +615,21 @@ Machine learning
 ???
 
 Before I’ll go into some general principles, I want to position machine
-learning in relation to statistics.
-There’s really no clear boundary between statistics and machine learning, and
-anyone that tells you otherwise is lying.  But I can tell you how the tools
+learning in relation to statistics. I recently got chewed out by a colleague
+for doing that. My goal here is not to say one is better than the other.
+Actually, there’s really no clear boundary between statistics and machine learning, and
+anyone that tells you otherwise is lying. Two of the books I recommended for the
+course are actually statistics text books. But I can tell you how the tools
 that I’m talking about in this course will differ from what you’d learn in a
-stats course.
+typical stats course.
 
 Statistics is usually about inference, often phrased in terms of hypothesis
-testing.  An example might be a yes-no-question, such as “are women less likely
+testing. An example might be a yes-no-question, such as “are women less likely
 to enroll in a Data Science Program”, and you have a sample population, for
 example this classroom, and you can then try to make an inference about whether
-this statement is true.  Often this includes making assumptions on how your
+this statement is true. Often this includes making assumptions on how your
 sample relates to the general population, say this class vs all of DSI or
-Columbia vs all of US. You might also have a specific model of how the process
+Columbia vs all of the US. You might also have a specific model of how the process
 behind your question works.
 
 ---
@@ -640,13 +659,14 @@ of the process, but we rely on the assumption that our training data is
 generated from the same process as any future data will be.
 
 There are statisticians that do predictions and there are machine learning
-scientists that do inference, but I find this distinction helpful. Even though
-the machine learning book I recommended to you earlier says statistics.
+scientists that do inference, but I find this distinction helpful.
 
-And I’m not saying one or the other is better, I’m just saying that you should
+Again I’m not saying one or the other is better, I’m just saying that you should
 know what kind of problem you are trying to solve, and what the right tool for
 the problem is. And then you can call it machine learning or statistics or
-probabilistic inference or data science.
+probabilistic inference or data science. The tools you learn in this
+class will usually not help you to make yes/no inferences, and they
+will only give you a limited insight into the data generating process.
 
 ---
 
@@ -656,9 +676,9 @@ class: middle
 
 ???
 
-Probably for the rest of todays lecture, I want to talk about some guiding
+For the rest of todays lecture, I want to talk about some guiding
 principles in machine learning applications, and they will hopefully be
-something you’ll come back to later.  We will revisit some of them at the very
+something you’ll come back to later. We will revisit some of them at the very
 end of the semester in more detail.
 
 ---
