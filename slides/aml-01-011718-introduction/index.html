@@ -704,10 +704,12 @@ class: middle
 
 ## Data driven first? yes! (or maybe)
 ## Machine Learning first: No!
+
 ???
+
 My first advice would be, don’t try machine learning. Machine learning systems
 are very complex and often fragile. Whether you’re in research or a startup,
-don’t immediately start with "oh we can apply deep learning to this".  Often
+don’t immediately start with "oh we can apply deep learning to this". Often
 it’s good to collect data, and be able to use data to drive and evaluate
 decisions. But including a complex process like machine learning into whatever
 you’re trying to do will make it much harder to debug and much harder to
@@ -730,11 +732,11 @@ you?
 Let’s go through an example:
 Imagine you had an electronics store, but you realized retail is all digital
 and you’re closing your store with one big sale to move on. You want to do an
-email campaign to tell all your customers about the sale.  Is there a machine
+email campaign to tell all your customers about the sale. Is there a machine
 learning application here? You could try A/B testing the email message. But
 that will only work if you have many many customers. You could use ML to
 predict which customers might respond. How do you get the data? Let’s say you
-have data. What’s the benefit?  None! This is your closing sale. You’ll never
+have data. What’s the benefit? None! This is your closing sale. You’ll never
 email them again. It doesn’t matter if they’ll include you in your spam filter.
 Just email everybody!
 
@@ -753,7 +755,13 @@ to measure, or because the influence is too indirect.  Imagine spotify improved
 their artist radio to be waaay better. The metric they care about is revenue.
 Do you think better radio will increase revenue short-term?
 What would be a good substitute metric?
-[give example of bad substitute!!]
+
+Let's say facebook wants to optimize their ad revenue. What should they measure?
+If people click on ads, that's probably good, right? But you can optimize
+clicks on ads by increasing accidental clicks by putting ads next to things
+people click. But accidental clicks will not yield conversions, and if you sell
+clicks to the ad buyers, and they don't result in conversions, they will
+go somewhere else.
 
 ---
 
@@ -763,15 +771,15 @@ class: middle
 
 ???
 
-Ok, so enough about goals and measurement. Another very important aspect of
-machine learning is to be able to communicate results, and to be able to
-explain methodologies.  If you’re not in computer science and you use machine
-learning in research, you need to be able to explain why it works. If you
-automatically make some decisions in your business applications, you need to
-convince your boss that nothing crazy will happen.  How do you do that? It’s an
-important skill to explain what particular results mean, what their impact will
-be, and how often a method will work or fail.  Only if you can convince your
-manager your approach is sensible will your system go to production.
+Another very important aspect of machine learning is to be able to communicate
+results, and to be able to explain methodologies. If you’re want to use machine learning
+in research that's not computer science, you need to be able to
+explain why it works. If you automatically make some decisions in your business
+applications, you need to convince your boss that nothing crazy will happen.
+How do you do that? It’s an important skill to explain what particular results
+mean, what their impact will be, and how often a method will work or fail.
+Only if you can convince your manager your approach is sensible will your
+system go to production.
 
 ---
 
@@ -786,11 +794,11 @@ class: middle, center
 Sometimes, you even need to explain to the user why you made a decision. People
 found that recommendation engines work much better if the users are shown a
 reason for a particular recommendation. Netflix tells you based on what show it
-recommends another show, Amazon does the same for products.  Interestingly,
+recommends another show, Amazon does the same for products. Interestingly,
 this also works even if the explanation is not true. There are systems that
 make a recommendation, and then provide a believable “explanation” after the
 fact. That gets more engagement than just providing the recommendation, though
-some people might question the ethics of that.  Earlier I said in ML we are
+some people might question the ethics of that. Earlier I said in ML we are
 just interested in good predictions. If you need to be able to explain your
 predictions, this is no longer true.
 
@@ -807,15 +815,15 @@ class: middle, center
 
 There is another area where explainability and transparency matter, and that is
 when people’s lives are at stake.
-One aspect of machine learning that only now gets some more attention is
+One aspect of machine learning that only recently is getting some more attention is
 ethics. There was a recent article in propublica about racial bias in
 risk-assessment used in the criminal justice system. Spoiler alert: it’s bad. I
-recommend reading the article, it’s quite interesting.  This is a black-box
+recommend reading the article, it’s quite interesting. This is a black-box
 machine learning system created by some company. If they had to provide
 explanations, or a more transparent system, the situation would likely be
-better.  But this is not the only place where ethics plays a role in machine
-learning. I’m not sure there’s currently a course in data science ethics at the
-DSI, but there will be.
+better. But this is not the only place where ethics plays a role in machine
+learning. There will be a more focused course on ethics in the DSI next semester,
+and I really recommend looking into it.
 
 ---
 
@@ -825,18 +833,18 @@ class: middle
 
 ???
 
-Some people think that ethics is not something that the technical people care
-about, but I disagree. I think if you build a machine learning system, you
+Some people think that ethics is not something that the technical people should
+care about, but I disagree. I think if you build a machine learning system, you
 should know whether and how it is biased, and whether its application is
-ethical. Sometimes it’s hard to decide that, though.  There’s an example of two
+ethical. Sometimes it’s hard to decide that, though. There’s an example of two
 high-schools, both of whom tried to predict which of their students will
 underperform in the coming year. There is a lot of ways this could be biased
 based on race, financial background and other factors. But that’s not the
-point.  The point is that one of the schools used the predictions, and kicked
+point. The point is that one of the schools used the predictions, and kicked
 out these students before the annual evaluation, so that they got a better
-evaluation score.  The other school used the data to provide these students
+evaluation score. The other school used the data to provide these students
 with targeted support and help. The algorithm could be the same, but the
-outcome is quite different.  Ok, that’s enough about ethics, I hope you’ll keep
+outcome is quite different. Ok, that’s enough about ethics, I hope you’ll keep
 these considerations in mind.
 The next thing I want to talk about is data!
 
@@ -850,12 +858,13 @@ class: middle
 
 Clearly the data you use for building and applying machine learning systems is
 a critical component, and we will talk a lot about handling and transforming
-data this semester.  Clearly, if you don’t have data, you can’t use machine
+data this semester. Clearly, if you don’t have data, you can’t use machine
 learning. Let’s say you have a dataset. A very important question you need to
 ask yourself is: should I get more data? That’s another reason why kaggle
-competitions are bad: usually you can’t get more data.  So what do you think?
+competitions are bad: usually you can’t get more data. So what do you think?
 Should you get more data?
-More data always improves the model if it’s from the right source. Depends:
+More data always improves the model if it’s from the right source.
+So it depends:
 What’s the marginal cost of more data, what’s the marginal benefit to the
 model, what’s the marginal benefit of the model to your end-goal?  We will talk
 about how to assess the benefit to the model later in the course. But the other
@@ -867,35 +876,17 @@ questions are also important.
 
 .left-column[
 ## Free
-Predict observable events
-- Stock market
-- Clicks
-- House numbers
 ]
 
 .right-column[
 ## Expensive
-Automate complex process
-- Dignosis
-- Drug Trial
-- Chip Design
 ]
 
 ???
 
-The cost of data can be very different, and to kinds of data are particularly
+The cost of data can be very different, and two kinds of data are particularly
 common: free data, and very expensive data. What kind of data do you think is
-free?  Free data is data that you’ll just get more of. And that happens a lot.
-If you are running an ad company and want to do click prediction, every day
-you’ll get so much new data, you’ll barely be able to use it all.  The same is
-true for the stock-market. In general, if you want to predict the future, and
-the event is observable, you’ll get more data just by waiting.  This can either
-be because the world just produces the  data, or your business process produces
-them.  You can also be smart, and ensure your business is set up in a way so
-that it does produce the data.
-Google used captchas to do OCR and to read house numbers, then they used the
-results for machine learning.
-
+free? 
 ---
 
 # Free vs Expensive Data 
@@ -917,6 +908,17 @@ Automate complex process
 ]
 
 ???
+
+Free data is data that you’ll just get more of. And that happens a lot.
+If you are running an ad company and want to do click prediction, every day
+you’ll get so much new data, you’ll barely be able to use it all.  The same is
+true for the stock-market. In general, if you want to predict the future, and
+the event is observable, you’ll get more data just by waiting.  This can either
+be because the world just produces the  data, or your business process produces
+them.  You can also be smart, and ensure your business is set up in a way so
+that it does produce the data.
+Google used captchas to do OCR and to read house numbers, then they used the
+results for machine learning.
 
 The other extreme of the spectrum is when you want to automate an expensive
 process with machine learning. This process could be an expert opinion, like a
@@ -934,11 +936,11 @@ class: middle
 ???
 
 There’s another aspect to data collection and dataset size. More data might be
-more expensive to collect, but in particular it might also be more expensive to
-work with. With the available cloud services, storage might not be that much of
-an issue any more. But runtime is. And I’m less concerned about buying a bigger
-cluster, I’m more concerned about your time, the data scientists time and the
-machine learning analysis.
+more expensive to collect, but it might also be more expensive and more
+complicated to work with. With the available cloud services, storage might not
+be that much of an issue any more. But runtime is. And I’m less concerned about
+buying a bigger cluster, I’m more concerned about your time, the data
+scientists time and the machine learning analysis.
 There’s a reason we’ll be using Python in this course. Python is easy to learn,
 has lots of tools and allows very close interactions with the data. If we would
 try to use SPARK instead, this would be whole other story. Working with
@@ -947,6 +949,9 @@ not as good. So what I often do, no matter how big the dataset is, is to work
 with a subset of the data that fits into my RAM. Then I can use python, and
 everything is easy. And with AWS, I can easily get 512GB of RAM, if I really
 need to.
+Arguably I'm a bit biased because I work on scikit-learn. For some applications
+that subsampling might not make sense, or working on very large data is critical.
+But I don't think that should ever be the first step.
 
 ---
 
@@ -986,26 +991,32 @@ Taken from MAPR https://www.mapr.com/ebooks/spark/08-recommendation-engine-spark
 
 ???
 
-We will be working on all of these different aspects of machine learning, but
-it’s good to have the overall picture of the process in mind.
+Here is one possible depiction of the overall machine learning workflow.
+In this class, I attempt to cover as many aspects of this as possible,
+only leaving out the data collection.
 I stole this illustration from a book on recommendation engines, but I mostly
 agree with it.
-Everything starts with the data generating process, here it’s the user. You
-ingest the data, and preprocess it. Some of the preprocessed that is held out
-for model validation. The rest is used for actually building the model. Then,
-there’s the model debugging loop. You get results and you want to improve them.
-That’s what’s shown as the train-test-loop. I would argue sometimes this loop
-goes further back, and maybe you discover an issue as early as in the
-ingestion. In the end, you find a model that you like, and you deploy it.
-However, that’s not the end of the story! If you’re working with a life system,
-the deployed model is likely to change user behavior, which means your input
-data changes, and your model might not be applicable any more! That feedback
-loop is really tricky, and we won’t go into that in this course. It’s good to
-keep in mind for your first startup, though.
+Everything starts with the data generating process, in this diagram it’s the
+user. You ingest the data, and preprocess it. Some of the preprocessed that is
+held out for model validation. The rest is used for actually building the
+model. Then, there’s the model debugging loop. You get results and you want to
+improve them. That’s what’s shown as the train-test-loop. I would argue
+sometimes this loop goes further back, and maybe you discover an issue as early
+as in the ingestion. In the end, you find a model that you like, and you deploy
+it. However, that’s not the end of the story! If you’re working with a life
+system, the deployed model is likely to change user behavior, which means your
+input data changes, and your model might not be applicable any more! That
+feedback loop is really tricky, and we won’t go into that in this course. It’s
+good to keep in mind when you all create your first startup, though.
 
 ---
 
 # Overview of the course
+
+???
+
+I want to end the lecture with discussing the structure of the rest of the course,
+so you have some idea on where we are going.
 
 ---
 
@@ -1017,6 +1028,23 @@ keep in mind for your first startup, though.
 - Writing fast Python
 - Numpy, matplotlib, pandas
 
+???
+
+Starting next week, we'll talk about the basic infrastruture.
+This will be not very specific to machine learning, but it's an important
+foundation for any applied data science. We'll talk about Python and Jupyter,
+about version control with git and github, and about testing and continuous integration.
+
+Who of you has used continuous integration? Many students that I talk to don't
+even know what that means. That's shocking to me, because it's part of any
+software related job you'll get. It's about automatically running tests
+via a service and it's a core piece of infrastructure for any software project.
+
+We'll also talk about how to write efficient python code, and how to work with numpy,
+matplotlib and pandas. I'll spend some time on matplotlib, since some parts
+are not super intuitive, and a lot of it is often sweeped under the rug.
+Visualizing your data and models is really critical to any data analysis, though.
+
 ---
 
 # Basics of Supervised Learning (Wk 3, 4)
@@ -1026,14 +1054,29 @@ keep in mind for your first startup, though.
 - Linear Classification and Regression
 - Penalties and Regularization
 
+???
+
+Once we finished with infrastructure and tools, we'll start working with scikit-learn
+and explore some of the basic machine learning algorithms like neighbors based
+algorithms and linear models, and how to do proper model evaluation and set up
+a basic machine learning workflow.
+
 ---
 
 # Data Preparation (Wk 4, 5)
 
 - Preprocessing
 - Feature engineering
-- Imputation
+- Dealing with missing values
 - Feature Selection
+
+???
+
+Once we covered the basic algorithms, we'll dive more into data preparation,
+in particular preprocessing, feature engineering and missing values.
+For any real-world dataset you usually have to do quite a bit of work before you
+can feed it into a machine learning model. There will be a homework project
+centered around all of these.
 
 ---
 
@@ -1045,6 +1088,13 @@ keep in mind for your first startup, though.
 - Gradient Boosting
 - Model Calibration
 
+???
+
+After we taked about how to prepare data, we'll look into more powerful supervised models.
+We'll look into support vector machines and kernel-based methods, and then dive a bit deeper into
+tree-based models. Tree-based models, in particular gradient boosted trees, have been very
+successful and are some of the best off-the-shelf methods for machine learning.
+
 ---
 
 # Model evaluation and imbalanced data (Wk 7)
@@ -1054,6 +1104,16 @@ keep in mind for your first startup, though.
 - Analyzing predictions
 - Handling imbalanced datasets for classification
 
+???
+
+Knowing all these machine learning models, we come back to the workflow, in particular
+the evaluation. Model evaluation is a tricky beast in practice, and it's often hard
+to decide which model is best, and how to tell.
+We'll also look into methods that are designed for classification with very imbalanced
+classes, something you'll see very frequently in practice.
+
+That concludes the main section on supervised learning.
+
 ---
 
 # Decomposition Methods (Wk 10)
@@ -1062,6 +1122,13 @@ keep in mind for your first startup, though.
 - Discriminant Analysis
 - Manifold Learning
 - Non-negative Matrix Factorization
+
+???
+
+We'll then look into some unsupervised models, starting with decomposition methods.
+These are often useful for exploratory analysis and plotting, but can also be used
+in other situations. We'll stick to the most commonly used methods like
+Principal components, Non-negative matrix factorization and t-SNE.
 
 ---
 
@@ -1074,6 +1141,14 @@ keep in mind for your first startup, though.
 - Supervised evaluation metrics
 - Unsupervised evaluation metrics
 
+???
+
+A second area of unsupervised learning that is often used in practice, mostly
+in exploratory settings, is clustering. We'll discuss some of the standard
+clustering approaches and how to evaluate them.
+As this is unsupervised learning, there's usually no correct answer, and
+picking and tuning algorithms is even harder than for supervised learning.
+
 ---
 
 # Outlier Detection (Wk 11)
@@ -1081,6 +1156,16 @@ keep in mind for your first startup, though.
 - One Class SVM
 - Robust Covariance Estimates
 - Isolation Forests
+
+???
+
+The last class of unsupervised models that we'll look into is outlier detection.
+In Outlier Detection we are trying to find data points that look odd.
+That's helpful if you want to detect rare events, but you don't know what these
+might look like. Applications are fraud detection, network security, hardware failures
+and so on.
+
+That concludes the section on unsupervised methods.
 
 ---
 
@@ -1091,6 +1176,13 @@ keep in mind for your first startup, though.
 - Text classification
 - Topic models
 - word embeddings and word vectors
+
+
+???
+
+The final direction of the course will be about how to work with certain types of data
+that need special treatment. We'll start with text data, and discuss the classical bag-of-word
+approach, as well as the more recent word vectors and embedding approaches.
 
 ---
 
@@ -1103,18 +1195,30 @@ keep in mind for your first startup, though.
 - Image data and convolutional neural networks
 - Best practices for neural networks
 
+???
+
+Then, we'll look at neural networks, and how convolutional neural networks can
+be applied to image data.  Before we go to image data we'll actually go through
+neural networks in some depth, covering libraries and algorithms.
+
 ---
 
 # Time Series Data (Wk 15)
 
 - The forecasting task
 - Evaluation of forecasting
-- Stationarity
 - ARMA
 - ARIMA
 
----
+???
 
+The very last part will be about time series data, and how to work on forecasting problems.
+We'll only briefly cover this topic, and mostly look at classical approaches like Autoregressive models.
+
+---
+class: middle
+
+# Questions ?
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
