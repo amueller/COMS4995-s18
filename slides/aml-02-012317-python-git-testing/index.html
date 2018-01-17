@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:40px;
+        line-height: 1.6;
+      }
+      .remark-slide-content .compact {
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+      }
+
+      .larger {
+          font-size: 40px;
+      }
+      .largest {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+          float: left;
+      }
+      .right-column {
+          float: right;
+      }
+      .left-column {
+          float: left;
+      }
+
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Tools and Infrastructure
+
+01/22/18
+
+Andreas C. Müller
+
+???
+
+---
+
+class: middle
+
+# So you think you know git?
+
+---
+
+![:scale 40%](images/git_xkcd.png)
+
+---
+
+![:scale 40%](images/torvalds_ducreux.png)
+
+---
+
+# Git Basics
+
+- Repository
+
+``$ git init``
+
+``$ rm .git``
+
+- Commit
+
+- Remote
+
+---
+
+# Typical Workflow
+
+- Clone
+
+- Branch
+
+- Add, commit, add, commit, add, commit, ...
+
+- Merge / rebase
+
+- Push
+
+---
+
+# Some tips
+
+- ``$ git status``
+
+- Install shell plugins for status and branch (``oh-my-zsh``)
+
+![:scale 40%](images/git_shell_extension.png)
+
+- Set editor, pager and diff-tool
+
+- Use ``.gitignore``
+
+---
+
+# Git log
+
+![:scale 40%](images/git_log.png)
+
+---
+
+![:scale 40%](images/git_adog.png)
+
+---
+
+# Understanding Git
+
+- Working directory
+
+- Index
+
+- Staging Area
+
+- Branches
+
+- Head
+
+---
+
+# Commands - And what they do
+
+- ``git add``
+puts files from working director into staging area. If not in index, adds them to tracked files.
+
+- ``git commit``
+commits files from staging area (index) to repository, moves current branch with HEAD
+
+- ``git checkout [<commit>] [<file>]``
+Set <file> in working directory to state at <commit> and stages it.
+
+- ``git checkout [-b] <branch>``
+moves HEAD to <branch> (-b creates it), changes content of working dir
+
+- ``git reset --soft <commit>``
+moves HEAD to <commit> (takes the current branch with it)
+
+- ``git reset --mixed <commit>``
+moves HEAD to <commit>,  changes index to be at <commit> (but not working directory)
+
+- ``git reset --hard <commit>``
+moved HEAD to <commit>, changes index and working tree to <commit>.
+
+---
+
+# Merge
+
+- Fast-forward merge:
+
+![scale:80%](images/git_fast_forward_merge.png)
+
+- Merge-commits:
+
+![scale:80%](images/git_merge_commit.png)
+
+---
+
+# Rebase
+
+- Rebase
+
+![scale:80%](images/git_rebase1.png)
+
+- Rebase onto
+.left-column[
+![scale:80%](images/git_rebase2.png)
+]
+.right-column[
+![scale:80%](images/git_rebase3.png)
+]
+``git rebase --onto master next``
+
+---
+
+# Squash before Rebase
+
+---
+
+# Interactive rebase
+
+``git rebase -i <commit>``
+
+![scale:80%](images/git_interactive_rebase.png)
+
+---
+# Interactive adding
+
+![scale:80%](images/git_interactive_add.png)
+
+---
+
+# git gui
+
+![scale:80%](images/git_interactive_add.png)
+
+---
+
+# gitk
+
+![scale:80%](images/git_interactive_add.png)
+
+---
+
+# reflog
+
+![scale:80%](images/git_reflog.png)
+
+---
+
+# Git for ages 4 and up:
+
+https://www.youtube.com/watch?v=1ffBJ4sVUb4
+
+(with play-doh!)
+
+---
+
+# Github - just another remote
+
+---
+
+# Github pull request workflow
+
+---
+
+# Github pull request workflow
+
+---
+
+# End version control – but github will come back later ;)
+
+---
+
+# General coding guidelines
+
+---
+
+# Programs must be written for people to read, and only incidentally for machines to execute.
+- Harold Abelson (wizard book)
+
+---
+
+# 
+
+---
+
+#
+
+---
+
+#
+
+---
+
+#
+
+---
+
+#
+
+---
+class: middle
+
+# Questions ?
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'github',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
