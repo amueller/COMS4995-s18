@@ -86,9 +86,9 @@ class: middle
 
 - Repository
 
-``$ git init``
+`$ git init`
 
-``$ rm .git``
+`$ rm .git`
 
 - Commit
 
@@ -112,15 +112,15 @@ class: middle
 
 # Some tips
 
-- ``$ git status``
+- `$ git status`
 
-- Install shell plugins for status and branch (``oh-my-zsh``)
+- Install shell plugins for status and branch (`oh-my-zsh`)
 
 ![:scale 40%](images/git_shell_extension.png)
 
 - Set editor, pager and diff-tool
 
-- Use ``.gitignore``
+- Use `.gitignore`
 
 ---
 
@@ -150,26 +150,26 @@ class: middle
 
 # Commands - And what they do
 
-- ``git add``
+- `git add`
 puts files from working director into staging area. If not in index, adds them to tracked files.
 
-- ``git commit``
+- `git commit`
 commits files from staging area (index) to repository, moves current branch with HEAD
 
-- ``git checkout [<commit>] [<file>]``
-Set ``<file>`` in working directory to state at ``<commit>`` and stages it.
+- `git checkout [<commit>] [<file>]`
+Set `<file>` in working directory to state at `<commit>` and stages it.
 
-- ``git checkout [-b] <branch>``
-moves HEAD to ``<branch>`` (-b creates it), changes content of working dir
+- `git checkout [-b] <branch>`
+moves HEAD to `<branch>` (-b creates it), changes content of working dir
 
-- ``git reset --soft <commit>``
-moves HEAD to ``<commit>`` (takes the current branch with it)
+- `git reset --soft <commit>`
+moves HEAD to `<commit>` (takes the current branch with it)
 
-- ``git reset --mixed <commit>``
-moves HEAD to ``<commit>``,  changes index to be at ``<commit>`` (but not working directory)
+- `git reset --mixed <commit>`
+moves HEAD to `<commit>`,  changes index to be at `<commit>` (but not working directory)
 
-- ``git reset --hard <commit>``
-moved HEAD to ``<commit>``, changes index and working tree to ``<commit>``.
+- `git reset --hard <commit>`
+moved HEAD to `<commit>`, changes index and working tree to `<commit>`.
 
 ---
 
@@ -198,7 +198,7 @@ moved HEAD to ``<commit>``, changes index and working tree to ``<commit>``.
 .right-column[
 ![scale:80%](images/git_rebase3.png)
 ]
-``git rebase --onto master next``
+`git rebase --onto master next`
 
 ---
 
@@ -208,7 +208,7 @@ moved HEAD to ``<commit>``, changes index and working tree to ``<commit>``.
 
 # Interactive rebase
 
-``git rebase -i <commit>``
+`git rebase -i <commit>`
 
 ![scale:80%](images/git_interactive_rebase.png)
 
@@ -221,13 +221,13 @@ moved HEAD to ``<commit>``, changes index and working tree to ``<commit>``.
 
 # git gui
 
-![scale:80%](images/git_interactive_add.png)
+![scale:80%](images/git_gui.png)
 
 ---
 
 # gitk
 
-![scale:80%](images/git_interactive_add.png)
+![scale:80%](images/gitk.png)
 
 ---
 
@@ -317,7 +317,7 @@ Python is sloooow…A
 
 Changes (that will bite you)
 
-- ``print``
+- `print`
 
 - division
 
@@ -420,7 +420,7 @@ Use conda environments!
 
 # Example
 
-``python
+```python
 # content of test_sample.py
 
 def inc(x):
@@ -429,7 +429,7 @@ def inc(x):
 
 def test_answer():
     assert inc(3) == 4
-``
+```
 
 ![:scale 50%](images/pytest_failure.png)
 
@@ -437,7 +437,7 @@ def test_answer():
 
 # Example
 
-``python
+```python
 # content of test_sample.py
 
 def inc(x):
@@ -446,14 +446,16 @@ def inc(x):
 
 def test_answer():
     assert inc(3) == 4
-``
+```
 
 ![:scale 50%](images/pytest_passed.png)
+
+---
 
 # Test coverage
 
 .left-column[
-``python
+```python
 # inc.py
 def inc(x):
     if x < 0:
@@ -463,16 +465,17 @@ def inc(x):
 
 def dec(x):
      return x - 1
-``
+```
+]
 
 .right-column[
-``python
+```python
 # test_inc.py
 from inc import inc
 
 def test_inc():
      assert inc(3) == 4
-``
+```
 ]
 
 ---
