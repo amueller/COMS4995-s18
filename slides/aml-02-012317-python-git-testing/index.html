@@ -52,10 +52,10 @@
           font-size: 30px;
       }
 
-      .larger {
+      .larger, .larger .remark-code {
           font-size: 40px;
       }
-      .largest {
+      .largest, .largest .remark-code {
           font-size: 50px;
       }
       .left-column, .right-column {
@@ -888,10 +888,14 @@ There are several ways to figure out which lines we missed, I like the html repo
 
 # HTML report
 
-`$ py.test --cov inc --cov-report=html`
+.larger[
+```bash
+$ py.test --cov inc --cov-report=html
+```
+]
 
-![:scale 50%](images/pytest_html_report1.png)
-![:scale 50%](images/pytest_html_report2.png)
+.left-column[![:scale 100%](images/pytest_html_report1.png)]
+.right-column[![:scale 100%](images/pytest_html_report2.png)]
 
 ???
 So we specify –cov-report=html, and py.test will create a html report for us. We get an overview, that contains the same information as before, but we’ll also get a detailed view of inc.py, which shows us which lines we covered and which lines we missed.
@@ -903,6 +907,7 @@ If you look at projects on github, you can often see a badge that says “covera
 
 
 ---
+class: center, middle
 
 # Continuous integration (with GitHub)
 
@@ -968,13 +973,10 @@ Then some commands are run that you can specify. Usually these are installing th
 After the test-suite runs, it will report back to github.
 
 ---
-
 # Setting up TravisCI
 
-- Create account linked to your github account: http://travis-ci.org
-
-![:scale 80%](images/travis_activate.png)
-
+- Create account linked to your github account: http://travis-ci.org<br />
+![:scale 60%](images/travis_activate.png)
 - Check out docs at https://docs.travis-ci.com
 
 ```yaml
@@ -1018,6 +1020,7 @@ Travis is run automatically each time you push a change, so in the homework, pus
 You can also do a pull request on your own repository, so you can see the pull request integration. It’s pretty cool and you should try it out.
 
 ---
+class: center, middle
 
 # Documentation
 
@@ -1106,10 +1109,10 @@ This format is a bit idiosyncratic with a space before the colon, but it’s imp
 # NumpyDoc example
 
 .left-column[
-![:scale 80%](images/numpydoc_multinomial_nb.png)
+![:scale 95%](images/numpydoc_multinomial_nb.png)
 ]
 .right-column[
-![:scale 80%](images/numpydoc_fit.png)
+![:scale 95%](images/numpydoc_fit.png)
 ]
 
 ???
@@ -1126,10 +1129,10 @@ You might ask why we’re using this specific format and why we’re using restr
 # Sphinx and reStructured Text
 
 .left-column[
-![:scale 80%](images/sphinx_svm_rst.png)
+![:scale 95%](images/sphinx_svm_rst.png)
 ]
 .right-column[
-![:scale 80%](images/sphinx_svm_website.png)
+![:scale 95%](images/sphinx_svm_website.png)
 ]
 
 
@@ -1140,10 +1143,11 @@ RST is similar to markdown but it also allows internal references, figures and s
 Sphinx can also automatically generate html and pdf documentation from the docstrings itself, using a module called autodoc. That’s how the API documentation is generated, and that’s where numpydoc comes in.
 
 ---
+class: center, middle
 
 # Autodoc and NumpyDoc
 
-![:scale 80%](images/sphinx_autodoc.png)
+![:scale 50%](images/sphinx_autodoc.png)
 
 ???
 Here is the documentation of the DummyClassifier that we saw earlier as rendered by Sphinx using autodoc.
