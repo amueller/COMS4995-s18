@@ -15,6 +15,8 @@
       h1, h2 {
         font-family: 'Garamond';
         font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
       }
       .remark-slide-content h1 {
         font-size: 70px;
@@ -23,12 +25,23 @@
 
       .remark-slide-content p, .remark-slide-content li {
         font-size:40px;
-        line-height: 1.6;
+        line-height: 1.4;
+      }
+      .remark-slide-content p {
+          margin: 5px;
       }
       .remark-slide-content .compact {
           font-size: 30px;
           line-height: 1.1;
           display: block;
+      } 
+
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li{
+          font-size: 20px;
+      }
+
+      .normal {
+          font-size: 30px;
       }
 
       .larger {
@@ -86,6 +99,8 @@ So you all have used git, but who of you thinks they understand git? Ok I’ll k
 
 ---
 
+class: center, middle
+
 ![:scale 40%](images/git_xkcd.png)
 
 ???
@@ -94,6 +109,8 @@ Who of you have done that? I certainly have.
 The goal of today is that you never have to throw your hands up ever again.
 
 ---
+
+class: center, middle
 
 ![:scale 40%](images/torvalds_ducreux.jpg)
 
@@ -164,7 +181,7 @@ I want to give some basic tips that will help you even with these simple workflo
 
 - Install shell plugins for status and branch (`oh-my-zsh`)
 
-![:scale 40%](images/git_shell_extension.png)
+![:scale 90%](images/git_shell_extension.png)
 
 - Set editor, pager and diff-tool (check out meld!)
 
@@ -180,7 +197,7 @@ You should also set your editor and pager to something that is familiar to you. 
 
 # Git log
 
-![:scale 40%](images/git_log.png)
+![:scale 80%](images/git_log.png)
 
 ???
 You should also become friends with git log. Git log allows you to view the history of your repository. It has a couple of very helpful options. Plain git log will have very long output and show full commit messages.
@@ -192,7 +209,9 @@ You might want to alias a command like that because it’s rather long to type, 
 
 ---
 
-![:scale 40%](images/git_adog.png)
+class: center, middle
+
+![:scale 50%](images/git_adog.png)
 
 ???
 
@@ -224,26 +243,28 @@ The state of you repository is really much more than the state of the directory,
 
 # Commands - And what they do
 
-- `git add`
+.smaller[
+- .normal[`git add`]<br />
 puts files from working director into staging area. If not in index, adds them to tracked files.
 
-- `git commit`
+- .normal[`git commit`]<br />
 commits files from staging area (index) to repository, moves current branch with HEAD
 
-- `git checkout [<commit>] [<file>]`
+- .normal[`git checkout [<commit>] [<file>]`]<br />
 Set `<file>` in working directory to state at `<commit>` and stages it.
 
-- `git checkout [-b] <branch>`
+- .normal[`git checkout [-b] <branch>`]<br />
 moves HEAD to `<branch>` (-b creates it), changes content of working dir
 
-- `git reset --soft <commit>`
+- .normal[`git reset --soft <commit>`]<br />
 moves HEAD to `<commit>` (takes the current branch with it)
 
-- `git reset --mixed <commit>`
+- .normal[`git reset --mixed <commit>`]<br />
 moves HEAD to `<commit>`,  changes index to be at `<commit>` (but not working directory)
 
-- `git reset --hard <commit>`
+- .normal[`git reset --hard <commit>`]<br />
 moved HEAD to `<commit>`, changes index and working tree to `<commit>`.
+]
 
 ???
 Ok so now, let’s got through some of the commands and talk about what they do in terms of these five concepts
@@ -256,11 +277,11 @@ Ok so now, let’s got through some of the commands and talk about what they do 
 
 - Fast-forward merge:
 
-![scale:80%](images/git_fast_forward_merge.png)
+![:scale 90%](images/git_fast_forward_merge.png)
 
 - Merge-commits:
 
-![scale:80%](images/git_merge_commit.png)
+![:scale 90%](images/git_merge_commit.png)
 
 ???
 And then there’s the more complex operations to the index, merging and rebasing. They change the index, and possibly the working tree. I find it most helpful to think of them as graph operations on the index.
@@ -273,18 +294,17 @@ However, if one isn’t a descendant of the other, git will create a “merge co
 
 # Rebase
 
-- Rebase
+- Rebase<br/>
+![:scale 50%](images/git_rebase1.png)
 
-![scale:80%](images/git_rebase1.png)
-
-- Rebase onto
+- Rebase onto<br />
+`git rebase --onto master next`
 .left-column[
-![scale:80%](images/git_rebase2.png)
+![:scale 80%](images/git_rebase2.png)
 ]
 .right-column[
-![scale:80%](images/git_rebase3.png)
+![:scale 80%](images/git_rebase3.png)
 ]
-`git rebase --onto master next`
 
 ???
 Rebase is a whole different beast. It allows more or less arbitrary modifications of the graph, and therefore rewriting history.
@@ -311,7 +331,7 @@ One way to squash commits is using interactive rebase
 
 `git rebase -i <commit>`
 
-![scale:80%](images/git_interactive_rebase.png)
+![:scale 66%](images/git_interactive_rebase.png)
 
 ???
 You can make any rebase interactive, but it’s most common to rebase on an ancestor with interactive – a non-interactive rebase would have no consequences.
@@ -321,7 +341,7 @@ Interactive can be useful for cleaning up your history after you worked on a fea
 ---
 # Interactive adding
 
-![scale:80%](images/git_interactive_add.png)
+![:scale 55%](images/git_interactive_add.png)
 
 ???
 What I find even more important is interactive adding. With git add, you usually add whole files to the staging area. I rarely ever do that. Usually I want to check line by line what changes I made and what changes I want to commit.
@@ -330,10 +350,11 @@ However, the command line interface is a bit clumsy for my taste. Or maybe I’m
 I prefer a gui, which you can summon with git gui
 
 ---
+class: center, middle
 
 # git gui
 
-![scale:80%](images/git_gui.png)
+![:scale 80%](images/git_gui.png)
 
 ???
 Git gui is basically an interface for git add and git commit. You can also use it to push, but not much more.
@@ -341,10 +362,11 @@ This is the way I create most of my commits. You can see very easily which files
 Then you enter the commit message here, and click commit.
 
 ---
+class: center, middle
 
 # gitk
 
-![scale:80%](images/gitk.png)
+![:scale 80%](images/gitk.png)
 
 ???
 Another tool that I use all the time is gitk.
@@ -358,7 +380,7 @@ You can also use gitk to search commit messages, and there are many option on wh
 
 # reflog
 
-![scale:80%](images/git_reflog.png)
+![:scale 80%](images/git_reflog.png)
 
 ???
 The last command I want to mention is reflog.
