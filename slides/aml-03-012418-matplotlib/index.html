@@ -123,13 +123,16 @@ class: center, middle
 Andreas C. Müller
 
 ???
-
+For the rest of today I want to talk about visualization and matplotlib. I thought a bit about it and I think numpy and pandas are better learned by doing, and there’s some interesting bits about matplotlib and visualization that I think are worth going through.
+I was hoping to go into visualization techniques and practices a bit more, but unfortunately I don’t think we have the time and I really want to get going with machine learning next week.
 ---
 
 class: center, middle
 
 # Principles of Data Visualization
 
+???
+I want to briefly talk about some very basics of data visualization. I’ll post references to great books as references if you’re curious.
 ---
 class: center, padding-top, spacious
 
@@ -140,6 +143,11 @@ class: center, padding-top, spacious
 # Explore
 # Communicate
 
+???
+So first, I want to ask why we might want to visualize data. And I think there are two main reasons.
+The first is for ourselves, to explore the data, make hypothesis and find interesting trends.
+The other is to communicate either the whole data, or particular aspects or findings about the data. I think both are important, but for the matter of this class, I think the exploration is more important.
+In general, you should think about what the point of any visualization is, and whether the method you chose is the best for this purpose.I want to briefly talk about some very basics of data visualization. I’ll post to great books as references if you’re curious.
 ---
 class: padding-top, spacious
 
@@ -152,12 +160,24 @@ Maximize the data-ink ratio.
 Tools matter.
 .quote_author[W. S. Cleveland]
 
+???
+So here are more quotes, from the two books I mentioned. The first two are from Edward Tufte, the godfather of statistical visualization. He says “above else, show the data”. So the data should be in focus, and not any fancy method you use to show it.
+He also says “Maximize the data-ink ratio”. What he means here is that all the ink you’re using (even if it’s virtual ink) should show the data, and should vary with the data. You want fewer static elements in your graphic, and more elements that are actually important to show the data.
+
+The other quote, from William Cleveland is: Tools matter. I think for him the tools are more the visualization methods, but I think also the software tools matter, which is why I want to talk about them.
 ---
 class: center, middle
 
 # Visual Channels
 ![:scale 60%](images/visual_channels.png)
 
+???
+Before we start with plotting, here’s a quick summary of visual channels that I took from the thesis “Systematising glyph design for visualization” that I posted on courseworks.
+These are ways in which you can show information.
+There is obviously length, as in bar-charts, angle, curvature, shape as in graphs and scatter plots.
+There’s area, which is often useful, but it’s important to say whether you’re using area or distance to show information. For circles that’s often unclear.
+There is 3d volume, which I really try to avoid. Then there’s color. There’s lightness, saturation, transparency and hue, and they all work very differently. It’s generally accepted that using hues for quantitative changes is not a great idea, and lightness or saturation works much better.
+Textures are something I also try to avoid, position is clearly one of the most important channels, while the rest are not something I use very often - though containment and connection can be helpful. 
 ---
 class: center, middle
 
@@ -169,6 +189,12 @@ class: center, middle
 ![:scale 100%](images/visual_channels3.png)
 ]
 
+???
+There have been studies of which of these are good ways to relate quantities. The winner is position, closely followed by length. These are clearly the most accurate ways to depict a value. Then angle, area, volume, texture, saturation and finally hue.
+So hue is basically the worst way to encode any quantitative information. Unfortunately these studies didn’t include brightness.
+
+It’s also good to be aware of which of these channels have pop-out effect, which allows you to find particular items very quickly. Here you can see color, orientation, curvature, size, symbol, movement, blur and contrast all working well - actually you can’t see the movement, but I think you would agree.
+It’s important to know that the number of different values are important to how much something pops out, and if you use too many orientations or sizes or colors, this effect is lost.
 ---
 class: center, middle
 
@@ -187,6 +213,18 @@ class: center, middle
 .reset-column[
 ![:scale 50%](images/perceptually_uniform_colormaps.png)
 ]
+???
+But let’s talk more about color, in particular color maps.
+Color maps are ways to map quantities from a continuous number to a color, and they are used whenever you plot something with color - or even with gray scale.
+There are several different types that are important to distinguish. Sequential colormaps usually go from one hue or saturation to another, while also changing lightness. The have two extremes and interpolate between them. That works well if you’re particularly interested in the extreme values, but they might not offer a lot of contrast in the middle. There’s also diverging colormaps, which have a focus point in the middle, these here have either grey or white, and then have different hues going in either direction. This is great if you have a neutral point and then deviations for that, like profits that can be zero or positive and negative, and you can easily see which side of the zero any point is on.
+
+--
+???
+Quantitative colormaps are mean to not show a continuum, but just some discrete values, and they are designed in such a way to have optimum contrast for a particular number of discrete values.
+
+Finally, there are the miscellaneous colormaps shown here, and you can see them really everywhere, in particular rainbow colormaps like jet and rainbow. Don’t use them. Really, never ever use them. I’ll explain why in a second, but if I see it in this course, not only will I take points of your homework, I’ll also look at you really disappointedly.
+And there are other colormaps that have more than two hues, but that don’t have the problems that these very colorful ones have.
+
 ---
 class: center, middle
 
@@ -200,10 +238,29 @@ class: center, middle
 ![:scale 40%](images/colormap_evaluation_gray.png)
 ]
 
+???
+So what’s the problem with these other colormaps. This is an evaluation of the grey color map. Please focus on the parts to the right. There are three heat maps here. So each pixel here represents a floating point value on some scale.
+Now let’s look at this in the jet color map. you see that green ring that looks like it has some boundary? Or the red core? Where are these in the greyscale? They are not there, because the are not in the data.
+So why does it look like there are edges? here is the color map, and this shows the differences in perceived color. You see these spikes? that’s where we perceive edges, because the color map has edges! Also here is the colormap converted to greyscale, say if someone printed it. and below are the brightness deltas. Do you see something?
+It’s not monotonous. It doesn’t go from dark to bright, it backs up on itself….
+--
+???
+And here’s one of the perceptual uniform colormaps In comparison.
+You can see that there’s a bit more detail then in the gray one, but no artificial contours appear. That’s because there are no perceptual edges. Also, the change in brightness is constant, so if you convert it to greyscale, you just got the greyscale colormap back.
+The other plots here show how it looks for various forms of color-blindness, and the path of the colormap  in a perceptual 3d color space.
+I posted a cool video explaining way more details on this on the course website.
+
 ---
 class: center, middle
 
 # matplotlib
+
+???
+Which brings us to matplotlib.
+So matplotlib is the python plotting library on which basically all python plotting libraries build, and because it’s so important, we’re gonna go through it in some detail.
+Matplotlib was designed as a general plotting library and not really with data analysis in mind, which is why it is a bit cumbersome in some cases, and not as elegant for data science as you might be used to coming from R.
+But I think it’s still good to know how to effectively create graphics in python if you’re gonna work with python, which we will.
+Matplotlib is very powerful, and any figure you can imagine, you can create with matplotlib. Unfortunately sometimes it takes a bit of code, though.
 
 ---
 class: center, middle
@@ -212,6 +269,8 @@ class: center, middle
 
 update now!
 (you can enable classic style if your really want)
+
+???
 
 ---
 
@@ -223,12 +282,27 @@ update now!
 - several ggplot translations / interfaces
 - plotly
 
+???
+There are some other interface you should look into which I won’t discuss in class.
+Pandas has some built-in plotting on top of matplotlib. It’s basically shortcuts to do some operations more easily on dataframes, and I highly encourage you to use it. You’ll get the most out of it if you actually understand matplotlib, though.
+Similarly seaborn has many tools for statistical analysis and visualization, also using pandas dataframes, also based on matplotlib.
+There is a completely separate project, bokeh, which uses javascript (but not d3) to do visualizations in the browser. I’m not entirely convinced yet, though.
+There’s also several reimplementations and interfaces to ggplot, if that’s what you’re into.
 ---
 
 # Imports
 
 FIXME
 
+???
+So before we start, a word on imports.
+What do you think about these imports?
+Why are they bad?
+They hide where functionality came from. Is this squareroot from numpy or math or your own function? Is this plot from seaborne or pandas or matplotlib or something else?
+Never use import *. It makes your code less readable. And we don’t want that, right?
+
+Always use explicit imports and standard naming conventions.
+I haven’t decided if I’ll subtract points for that, but if I see that I will know that I failed.
 ---
 
 # matplotlib & Jupyter
@@ -248,6 +322,11 @@ FIXME
 - doesn't work with jupyter lab (right now)
 ]
 
+???
+I highly recommend that you use jupyter to play around with matplotlib figures and visualizations.
+To show matplotlib figures embedded in jupyter, you have to call one of two magics. Jupyter magics are those that start with a percentage.
+There’s matplotlib inline and matplotlib notebook, and you should run one of them, and only one of them, at the very start of the notebook.
+Both will allow you to show the figures inside the the browser, but they are quite different. [read/explain table]
 ---
 
 # Figures and Axes
@@ -259,6 +338,13 @@ axes = one drawing area with coordinate system
 ![:scale 40%](images/figure_axis.png)
 
 by default: each figure has one axis
+
+???
+Now let’s start with the actual matplotlib.
+The most basic concepts in matplotlib are Figures and axes. A figure is a single window or a single output file. A figure can contain multiple axes, which are basically subplots. Axes are the things you actually draw on, and usually each one has a single coordinate system.
+
+By default, each figure has one axes.
+So her is a figure with two axes from the scikit-learn examples.
 
 ---
 class: some-space
@@ -280,6 +366,14 @@ of n x m axes.
 ![:scale 100%](images/subplots.png)
 ]
 ]
+???
+There’s several ways to create figures and axes.
+The first one is that you don’t. With your first plotting command, matplotlib will automatically create a figure, and that figure will contain axes and that’s what you’ll draw on.
+Once you created a figure, each subsequent plot command will apply to the current axes, which is usually the last axes you created.
+So if you want a second figure, you’ll have to create it explicitly, for example using the plt.figure command. That creates the single default axes, but you can also add more later.
+
+You can also create a figure with a grid of axes by using the subplots command (note the s in the end).
+You can see how that looks on the right for a 2 by 2 grid. I use that a lot. fig is an object representing the figure and ax is a numpy array of size n time m, with each entry being one axes object.
 ---
 class: spacious
 
@@ -305,6 +399,8 @@ ax11, ax21, ax12, ax22 = axes.ravel()
 .narrow-right-column[
 ![:scale 100%](images/subplots2.png)
 ]]
+???
+
 ---
 
 # More axes via subplots
@@ -325,6 +421,13 @@ ax2 = plt.subplot(2, 1, 2)
 .right-column[
 ![:scale 90%](images/complex_subplots.png)
 ]
+???
+If you just created a figure but you want more axes, you can also add them one subplot at a time with the subplot command, this time without the s.
+The subplot command takes three numbers - you can leave out the comma between them if they are single digits, but please dont.
+The first two numbers specify a imaginary grid for the whole figure, let’s say I want a 2 by 2 grid.
+The third number is at which position in that grid I want my figure created. The numbers start with one and go column by column. I created the 2 by 2 grid here and labeled the axes according to the variable name.
+
+you could create all of them at the same time with the subplot commands, but there are two reason why you might choose not to.
 ---
 
 # Two Interfaces
@@ -350,6 +453,9 @@ axes[0, 0].plot(sin)
 ![:scale 70%](images/subplots_sin_first.png)
 ]
 
+???
+The first one is that the grid you specify doesn’t need to be the actual grid. It just tells the single subplot about where it should be. So you can create all kinds of different layouts. For example, I can create a 2 by 2 plot where the second row is a single axes, by telling it it should be at the second position for a 2 by 1 plot.
+This allows me to create irregular grids, which is often quite useful.
 ---
 
 # Differences Between the Interfaces
@@ -381,6 +487,14 @@ fig = plt.gcf()  # get current figure
 ```
 ]
 
+???
+The formatting options in the object oriented interface all have a “set_” in front of them, while they don’t in the stateful interface.
+Also, for setting the tick marks, there are separate commands for the locations and the labels in the object oriented interface, but not in the stateful interface.
+In general, the object oriented interface provides more functionality and is more explicit and powerful, but the stateful interface is a bit terser.
+
+If you started plotting but then you want to use something that’s only part of the object oriented interface, you can always get the current axes or current figure with the gca or gcf commands.
+I use the stateful interface if I have a single axes and I don’t need any of the advanced functionality of the object oriented interface, so basically for simple plots.
+Whenever I have more than one axes objects, so for any grid, I always use the object oriented interface - but that’s just my personal preference.
 ---
 
 # Plotting commands
@@ -392,6 +506,12 @@ http://matplotlib.org/gallery.html
 http://matplotlib.org/api/pyplot_summary.html
 
 
+???
+I hope that sufficiently obfuscated everything.
+
+So lets finally start with the plotting.
+matplotlib has two pages that are helpful for figuring out how to plot something: the gallery and the plotting commands summary.
+I will go through only some of the commands from the summary that I think are particular important and their most important aspects.
 ---
 class: center
 
@@ -399,12 +519,18 @@ class: center
 
 ![:scale 70%](images/matplotlib_plot.png)
 
+???
+Clearly plot it the most important one.
+Plot allows you to do line plots and scatter plots.
+If you give a single variable, it will plot it against it’s index, if you provide two, it will plot them against each other. By default, plot creates a line-plot, but you can also use “o” to create a scatterplot. You can change the appearance of the line in many ways, including width, color, dashing and markers.
 ---
 class: center
 
 # plot
 
 ![:scale 70%](images/matplotlib_plot_figsize_why.png)
+
+???
 
 ---
 class: center, middle
@@ -413,6 +539,10 @@ class: center, middle
 
 ![:scale 60%](images/matplotlib_scatter.png)
 
+???
+While plot can create scatter plots, those are quite limited. the scatter function allows you to do scatter plots that not only encode the position of the points, but visualizes additional variables via color or size.
+In the bottom left, I colored the points by their distance to the diagonal, in the bottom right, I also added random size variations.
+Here I also used “subplot_kw” which allows you to specify some arguments for all subplots in a figure. I use it here to remove the ticks.
 ---
 class: center, middle
 
@@ -420,6 +550,9 @@ class: center, middle
 
 ![:scale 90%](images/matplotlib_histogram.png)
 
+???
+Histograms are clearly also important. By default, histograms have ten bins, which is never right. You can adjust the number of bins, and I usually try to find the point when it will be too fine.
+There’s also a heuristic for finding the binsize which you can use with bins=”auto”
 ---
 class: center, middle
 
@@ -431,6 +564,10 @@ class: center, middle
 ![:scale 100%](images/matplotlib_barh.png)
 ]
 
+???
+For barcharts, you always need to provide the position of the bar as well as the length. Usually that’s done via a range.
+If you use ticklabels, it’s usually a good idea to rotate them so you can actually read them. But I don’t really like tilting my head, so I often prefer horizontal bar-charts, which work the same way.
+The way I specified the positions here, the first bar is at the bottom. We could flip the axes or change the position if we wanted it at the top.
 ---
 class: center, middle
 
@@ -438,17 +575,30 @@ class: center, middle
 
 ![:scale 50%](images/matplotlib_heatmap.png)
 
+???
+You can plot heatmaps with the imshow command.
+Previous to matplotlib v2 this automatically enabled interpolation, which you can see at the top right. Interpolation might hide data or might give the impression of more data then there is, by showing a smooth transition. You should always disable interpolation for heatmaps.
+At the bottom you can see some results with a gray colormap and with a diverging color map. Here, the background is zero and it makes sense to represent the neutral differently. So I ensured that white is mapped to zero, and we can clearly distinguish positive from negative entries, which is much harder with the other color maps.
+Doing colorbars on multiple axes can be tricky. You need to store the matplotlib image that is returned by imshow in an object, and then call the colorbar command with the image and the axes to which you want to attach the colorbar.
 ---
 class: center
 # &nbsp;
 ![:scale 35%](images/matplotlib_overplotting.png)
 
+???
+A command that I discovered way too late is the hexgrid. Hexgrids basically allow two-dimensional density maps.
+If you have a lot of points, a scatterplot can become too crowded to understand what’s going on.
+You can work around that a bit by using the alpha value, but that often throws away a lot of information.
+A better way is to use a hexgrid and plot the density in each grid cell directly. That also allows the use of arbitrary colormaps.
+Using hexgrids also allows you to map the density, for example using a logarithm, if the differences in density are very large between different regions.
 ---
 class: center
 # hexgrids
 ![:scale 35%](images/matplotlib_overplotting.png)
 
 ![:scale 35%](images/matplotlib_hexgrid.png)
+
+???
 
 ---
 class: center, middle
@@ -457,6 +607,11 @@ class: center, middle
 
 ![:scale 60%](images/matplotlib_twinx.png)
 
+???
+The last thing I want to mention is twin axes.
+Here I show two time series, the number of math PhDs awarded in the us and the revenue made by arcades in the US.
+If I plot them both in the same coordinate system, the number of PhDs will look just flat, because it lives on a completely different scale.
+Using the object oriented interface, I can create a twin x axis for the revenue to show both time series with their own scales.
 ---
 class: middle
 
