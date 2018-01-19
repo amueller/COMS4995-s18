@@ -27,6 +27,9 @@
         font-size:40px;
         line-height: 1.4;
       }
+      .remark-code {
+        font-size:30px;
+      }
       .remark-slide-content p {
           margin: 5px;
       }
@@ -38,14 +41,15 @@
           width: 100%;
       }
 
-      .remark-slide-content .compact {
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre{
           font-size: 30px;
-          line-height: 1.1;
+          line-height: 1.2;
           display: block;
-      }
+          margin: 10px 0;
+      } 
 
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li{
-          font-size: 20px;
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li, .remark-slide-content .smaller .remark-code{
+          font-size: 25px;
       }
 
       .normal {
@@ -1040,8 +1044,9 @@ can read up on here, if you’re into rewriting the AST.
 
 
 ---
-
 # Example
+
+.smaller[
 
 ```python
 # content of test_sample.py
@@ -1049,12 +1054,12 @@ can read up on here, if you’re into rewriting the AST.
 def inc(x):
     return x + 2
 
-
 def test_answer():
     assert inc(3) == 4
 ```
+]
 
-![:scale 70%](images/pytest_failure.png)
+![:scale 60%](images/pytest_failure.png)
 
 ???
 So here I have a slightly modified version of the example from their
@@ -1102,7 +1107,7 @@ The actual implementation should be completely separate from the tests.
 ---
 
 # Test coverage
-
+.smaller[
 .left-column[
 ```python
 # inc.py
@@ -1125,6 +1130,7 @@ from inc import inc
 def test_inc():
      assert inc(3) == 4
 ```
+]
 ]
 
 .reset-column[
@@ -1143,7 +1149,7 @@ That’s where test coverage tools come in handy.
 ---
 
 # Test coverage
-
+.smaller[
 .left-column[
 ```python
 # inc.py
@@ -1166,7 +1172,7 @@ from inc import inc
 def test_inc():
      assert inc(3) == 4
 ```
-]
+]]
 
 .reset-column[
 ![:scale 50%](images/pytest_coverage2.png)
@@ -1309,6 +1315,7 @@ After the test-suite runs, it will report back to github.
 ---
 # Setting up TravisCI
 
+.smaller[
 - Create account linked to your github account: http://travis-ci.org<br />
 ![:scale 60%](images/travis_activate.png)
 - Check out docs at https://docs.travis-ci.com
@@ -1330,6 +1337,7 @@ script:
   - pytest # or py.test for Python versions 3.5 and below
 
 ```
+]
 
 ???
 So in general to set up travis you have to create an account that is
@@ -1396,11 +1404,10 @@ class, often you make assumptions about the content of this object that
 are not obvious from the code.
 
 ---
-
 # Python documentation standards
-
+.compact[
+.smaller[
 - PEP 257 for docstrings for class, methods and functions
-
 ```python
 def inc(x):
     """Add one to a number.
@@ -1412,16 +1419,14 @@ def inc(x):
         return 0
     return x + 1
 ```
-
 - Additional inline documentation
-
 ```python
 if x < 0:
     # x is less than zero
     return 0
 return x + 1
 ```
-
+]]
 ???
 Python has some standards for documentation, described in pep  257.
 Every class, method or function should have a docstring, at the very
