@@ -284,10 +284,12 @@ of n x m axes.
 class: spacious
 
 # More axes via subplots
+.smaller[
 .wide-left-column[
 ```python
 ax = plt.subplot(n, m, i) # or plt.subplot(nmi)
-# places ax at position “i” in n x m grid (1-based index)
+# places ax at position i in n x m grid
+# (1-based index)
 
 ax11 = plt.subplot(2, 2, 1)
 ax21 = plt.subplot(2, 2, 2)
@@ -302,17 +304,17 @@ ax11, ax21, ax12, ax22 = axes.ravel()
 ]
 .narrow-right-column[
 ![:scale 100%](images/subplots2.png)
-]
+]]
 ---
 
 # More axes via subplots
 
 ```python
 ax = plt.subplot(n, m, i) # or plt.subplot(nmi)
+# places ax at position i in n x m grid
+# (1-based index)
 ```
-places `ax` at position `i` in n x m grid (1-based index)
 
-Example:
 .left-column[
 ```python
 ax11 = plt.subplot(2, 2, 1)
@@ -351,21 +353,27 @@ axes[0, 0].plot(sin)
 ---
 
 # Differences Between the Interfaces
-
+.smaller[
 .left-column[
-plt.title
-plt.xlim, plt.ylim
-plt.xlabel, plt.ylabel
-plt.xticks, plt.yticks
+`plt.title`
+
+`plt.xlim, plt.ylim`
+
+`plt.xlabel, plt.ylabel`
+
+`plt.xticks, plt.yticks`
                              
 ]
 .right-column[
-ax.set_title
-ax.set_xlim, ax.set_ylim
-ax.set_xlabel, ax.set_ylabel
-ax.set_xticks, ax.set_yticks
-(& ax.set_xtick_labels)
-]
+`ax.set_title`
+
+`ax.set_xlim, ax.set_ylim`
+
+`ax.set_xlabel, ax.set_ylabel`
+
+`ax.set_xticks, ax.set_yticks
+(& ax.set_xtick_labels)`
+]]
 .reset-column[
 ```python
 ax = plt.gca()   # get current axes
@@ -385,42 +393,42 @@ http://matplotlib.org/api/pyplot_summary.html
 
 
 ---
-class: center, middle
+class: center
 
 # plot
 
-![:scale 40%](images/matplotlib_plot.png)
+![:scale 70%](images/matplotlib_plot.png)
 
 ---
-class: center, middle
+class: center
 
 # plot
 
-![:scale 40%](images/matplotlib_plot_figsize_why.png)
+![:scale 70%](images/matplotlib_plot_figsize_why.png)
 
 ---
 class: center, middle
 
 # scatter
 
-![:scale 40%](images/matplotlib_scatter.png)
+![:scale 60%](images/matplotlib_scatter.png)
 
 ---
 class: center, middle
 
 # histogram
 
-![:scale 40%](images/matplotlib_histogram.png)
+![:scale 90%](images/matplotlib_histogram.png)
 
 ---
 class: center, middle
 
 # bars
 .left-column[
-![:scale 40%](images/matplotlib_bar.png)
+![:scale 100%](images/matplotlib_bar.png)
 ]
 .right-column[
-![:scale 40%](images/matplotlib_barh.png)
+![:scale 100%](images/matplotlib_barh.png)
 ]
 
 ---
@@ -428,21 +436,26 @@ class: center, middle
 
 # heatmaps
 
-![:scale 40%](images/matplotlib_heatmaps.png)
+![:scale 50%](images/matplotlib_heatmap.png)
 
 ---
-class: center, middle
+class: center
+# &nbsp;
+![:scale 35%](images/matplotlib_overplotting.png)
 
+---
+class: center
 # hexgrids
+![:scale 35%](images/matplotlib_overplotting.png)
 
-![:scale 40%](images/matplotlib_hexgrids.png)
+![:scale 35%](images/matplotlib_hexgrid.png)
 
 ---
 class: center, middle
 
 # twinx, twiny
 
-![:scale 40%](images/matplotlib_twinx.png)
+![:scale 60%](images/matplotlib_twinx.png)
 
 ---
 class: middle
