@@ -86,9 +86,9 @@ class: center, middle
 
 ### W4995 Applied Machine Learning
 
-# Tools and Infrastructure
+# Visualization and Matplotlib
 
-01/22/18
+01/24/18
 
 Andreas C. Müller
 
@@ -98,19 +98,306 @@ Andreas C. Müller
 
 class: center, middle
 
-![:scale 40%](images/git_xkcd.png)
+# Principles of Data Visualization
+
+---
+class: center, middle
+
+# Why?
+--
+# Explore
+# Communicate
 
 ---
 
-# Sphinx and reStructured Text
+class: middle
+Above else, show the data.<br />
+Maximize the data-ink ratio.
+.quote_author[E. Tufte]
 
+Tools matter.
+.quote_author[W. S. Cleveland]
+
+---
+
+# Visual Channels
+![:scale 40%](images/visual_channels.png)
+
+---
+
+# Picking Channels
 .left-column[
-![:scale 95%](images/sphinx_svm_rst.png)
+![:scale 40%](images/visual_channels2.png)
 ]
 .right-column[
-![:scale 95%](images/sphinx_svm_website.png)
+![:scale 40%](images/visual_channels3.png)
 ]
 
+---
+
+# Colormaps
+.left-column[
+![:scale 40%](images/sequential_color_maps.png)
+![:scale 40%](images/qualitative_color_maps.png)
+]
+.right-column[
+![:scale 40%](images/diverging_color_maps.png)
+![:scale 40%](images/misc_color_maps.png)
+]
+.reset-column[
+![:scale 40%](images/perceptually_uniform_colormaps.png)
+]
+---
+
+.left-column[
+![:scale 40%](images/colormap_evaluation_jet.png)
+]
+.right-column[
+![:scale 40%](images/colormap_evaluation_viridis.png)
+]
+.reset-column[
+![:scale 40%](images/colormap_evaluation_gray.png)
+]
+
+---
+class: center, middle
+
+# matplotlib
+
+---
+class: center, middle
+
+# matplotlib v2
+
+update now!
+(you can enable classic style if your really want)
+
+---
+
+# Other libs
+
+- pandas plotting - convenience 
+- seaborn - ready-made stats plots
+- bokeh - alternative to matplotlib for in-browser
+- several ggplot translations / interfaces
+- plotly
+
+---
+
+# Imports
+
+FIXME
+
+---
+
+# matplotlib & Jupyter
+.left-column[
+`%matplotlib inline`
+- sends png to browser
+- no panning or zooming
+- new figure for each cell
+- no changes to previous figures
+]
+.right-column[
+`%matplotlib notebook`
+- interactive widget
+- all figure features
+- need to create separate figures explicitly
+- ability to update figures
+- doesn't work with jupyter lab (right now)
+]
+
+---
+
+# Figures and Axes
+
+figure = one window or one image file
+
+axes = one drawing area with coordinate system
+
+![:scale 40%](images/figure_axis.png)
+
+by default: each figure has one axis
+
+---
+
+# Creating Figures and Axes
+.left-column[
+1st way: don’t.
+Creates figure with axes on plot command
+
+2nd way: `fig = plt.figure()`
+Creates a figure with axes, sets current figure.
+Can add more / different axes later.
+
+3rd way: `fig, ax = plt.subplots(n, m)`
+Creates a figure with a regular grid
+of n x m axes.
+]
+.right-column[
+![:scale 40%](images/subplots.png)
+]
+---
+
+# More axes via subplots
+.left-column[
+```python
+ax = plt.subplot(n, m, i) # or plt.subplot(nmi)
+# places ax at position “i” in n x m grid (1-based index)
+
+ax11 = plt.subplot(2, 2, 1)
+ax21 = plt.subplot(2, 2, 2)
+ax12 = plt.subplot(2, 2, 3)
+ax22 = plt.subplot(2, 2, 4)
+```
+equivalent:
+```python
+fig, axes = plt.subplots(2, 2)
+ax11, ax21, ax12, ax22 = axes.ravel()
+```
+]
+.right-column[
+![:scale 40%](images/subplots2.png)
+]
+---
+
+# More axes via subplots
+
+```python
+ax = plt.subplot(n, m, i) # or plt.subplot(nmi)
+```
+places ax at position “i” in n x m grid (1-based index)
+.left-column[
+Example:
+```python
+ax11 = plt.subplot(2, 2, 1)
+ax21 = plt.subplot(2, 2, 2)
+ax2 = plt.subplot(2, 1, 2)
+```
+]
+.right-column[
+![:scale 40%](images/complex_subplots.png)
+]
+---
+
+# Two Interfaces
+
+Stateful interface - applies to current figure and axes
+
+object oriented interface - explicitly use object
+
+.left-column[
+```python
+sin = np.sin(np.linspace(-4, 4, 100))
+fig, axes = plt.subplots(2, 2)
+plt.plot(sin)
+
+
+fig, axes = plt.subplots(2, 2)
+axes[0, 0].plot(sin)
+```
+]
+.right-column[
+![:scale 40%](images/subplots_sin_last.png)
+
+![:scale 40%](images/subplots_sin_first.png)
+]
+
+---
+
+# Differences Between the Interfaces
+
+.left-column[
+plt.title
+plt.xlim, plt.ylim
+plt.xlabel, plt.ylabel
+plt.xticks, plt.yticks
+                             
+]
+.right-column[
+ax.set_title
+ax.set_xlim, ax.set_ylim
+ax.set_xlabel, ax.set_ylabel
+ax.set_xticks, ax.set_yticks
+(& ax.set_xtick_labels)
+]
+.reset-column[
+```python
+ax = plt.gca()   # get current axes
+fig = plt.gcf()  # get current figure
+```
+]
+
+---
+
+# Plotting commands
+
+- Gallery:
+http://matplotlib.org/gallery.html
+
+- Plotting commands summary:
+http://matplotlib.org/api/pyplot_summary.html
+
+
+---
+class: center, middle
+
+# plot
+
+![:scale 40%](images/matplotlib_plot.png)
+
+---
+class: center, middle
+
+# plot
+
+![:scale 40%](images/matplotlib_plot_figsize_why.png)
+
+---
+class: center, middle
+
+# scatter
+
+![:scale 40%](images/matplotlib_scatter.png)
+
+---
+class: center, middle
+
+# histogram
+
+![:scale 40%](images/matplotlib_histogram.png)
+
+---
+class: center, middle
+
+# bars
+.left-column[
+![:scale 40%](images/matplotlib_bar.png)
+]
+.right-column[
+![:scale 40%](images/matplotlib_barh.png)
+]
+
+---
+class: center, middle
+
+# heatmaps
+
+![:scale 40%](images/matplotlib_heatmaps.png)
+
+---
+class: center, middle
+
+# hexgrids
+
+![:scale 40%](images/matplotlib_hexgrids.png)
+
+---
+class: center, middle
+
+# twinx, twiny
+
+![:scale 40%](images/matplotlib_twinx.png)
 
 ---
 class: middle
