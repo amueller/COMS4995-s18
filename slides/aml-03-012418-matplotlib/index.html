@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:40px;
+        line-height: 1.4;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p, .remark-slide-container .spacious li{
+          margin: 50px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+
+      .remark-slide-content .compact {
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+      } 
+
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li{
+          font-size: 20px;
+      }
+
+      .normal {
+          font-size: 30px;
+      }
+
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+          float: left;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .right-column {
+          float: right;
+      }
+      .left-column {
+          float: left;
+      }
+
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Tools and Infrastructure
+
+01/22/18
+
+Andreas C. Müller
+
+???
+
+---
+
+class: center, middle
+
+![:scale 40%](images/git_xkcd.png)
+
+---
+
+# Sphinx and reStructured Text
+
+.left-column[
+![:scale 95%](images/sphinx_svm_rst.png)
+]
+.right-column[
+![:scale 95%](images/sphinx_svm_website.png)
+]
+
+
+---
+class: middle
+
+# Questions ?
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'github',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
