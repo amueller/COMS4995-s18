@@ -116,17 +116,16 @@ Andreas C. Müller
 Hey. Welcome to the second lecture on applied machine learning. Last
 week we talked a bit about very general and high-level issues in machine
 learning. Today, we’ll go right down to the metal. Actually, things we
-will talk about today are more generally about software engineering. If
+will talk about today are more generally about software engineering and less
+specifically about machine learning. If
 you want to build real-world systems, software engineering practices
 are really incredibly important.
-For those of you from CS, I hope this is a repetition, for  those of
-you from DSI, this is probably new.
+For those of you from CS, I hope this is a reminder, for those of
+you from DSI, some this is maybe new.
 We’ll talk about version control, in particular git, about some basic
 python, about testing, continuous integration and about documentation.
 Also, I apologize in advance for the slides. There’s a lot of bullet
-points and few diagrams and I don’t like that, but I didn’t have a
-lot of time.
-
+points and few diagrams and I don’t really like that.
 ---
 
 class: middle
@@ -184,16 +183,12 @@ what’s going on.
 
 `$ rm .git`
 
-- Commit
-
-- Remote
-
 ???
 There are some basic units of git that I want to go through. The first
 is a repository. What’s a repository?
 A folder who’s content we want to track with version control.
 And how can you create one?
-Run git init in a folder, right
+Run git init in a folder.
 And how can you make a folder not a repository any more?
 By removing the .git subfolder. That’s it.
 A repository is entirely self-contained. There is no service or database
@@ -201,19 +196,25 @@ or anything like that, it’s all plain files within that folder. That
 also means if you remove the folder, you lose everything if you don’t
 have a backup.
 
---
-???
 The next basic concept is a commit. What’s that?
 It’s a snapshot of the state of the folder, with a message attached,
 and identified with an ID. It’s also a node in a graph that describes
 the history of the snapshot, and usually has one or two parents, and
 can have arbitrary many children.
 The ID is a hash of the state and all the parents, so if you change
-anything, you change the hash.
+anything, you change the hash and therefore the commit.
 
 The last basic concept I want to talk about is the remote. That’s just
-a pointer to another repository, often github. You can synchronize with
-that by pushing or pulling changes.
+a pointer to another repository, often github, but it could also just be
+another folder on your computer.
+You can synchronize with that by pushing or pulling changes. 
+--
+
+- Commit
+
+--
+
+- Remote
 
 ---
 
@@ -270,7 +271,13 @@ options out there.
 You should also set your editor and pager to something that is familiar
 to you. The default editor is vim, and if you’re not a vim user, you
 might want to change that. It’s also helpful to set up a diff program
-that you like.
+that you like. I like meld for example, that allows you to compare whole
+folders in a nice way.
+
+You should also use gitignore. It's a simple text file that allows you to
+ignore certain files or folders or file types. For example, you could ignore
+all .pyc files. Or you could ignore all .ipynb-checkpoints or your dataset
+folder.
 
 ---
 
@@ -283,14 +290,19 @@ You should also become friends with git log. Git log allows you to
 view the history of your repository. It has a couple of very helpful
 options. Plain git log will have very long output and show full commit
 messages.
+
 If you want short summaries, use oneline.
+
 Often, it’s also useful to annotate branches, which you can do with
+A
 the decorate option.
 If you want to show more than just the branch you’re on, you can use
-the all option
+the all option.
+
 Now it’s a bit hard to track the relations of the different commits,
 though, and you might want to use the graph option to show the structure
 of the history.
+
 You might want to alias a command like that because it’s rather long
 to type, but very informative. I’ll show you an alternative in a bit.
 
@@ -309,9 +321,9 @@ class: center, middle
 
 - Working directory
 
-- Index
+- Repository (Commit graph, history)
 
-- Staging Area
+- Index (Staging Area)
 
 - Branches
 
@@ -321,12 +333,13 @@ class: center, middle
 So now, I want to work towards really understanding git, and here
 are some lower level concepts that are important. First, the working
 directory. That’s the actual current content of the folder on disk.
-Then the index. The index is the graph of all the commits that we just
-saw. Creating a commit means writing to the index.
-Slightly less obvious is the staging area. That’s a sort of purgatory
-in which you can accumulate changes to write them to the index in a
-single commit.
-Branches are quite simple. They are just pointers into the index. They
+Then there is a graph of commits, also known as the history. Formally that's called
+the repository, though usually I think of the repository as the whole thing. It's a directed
+acyclic graph that contains all the changes and contains the information
+about the parents of a commit.
+Then the index. The index is what's also called the staging area,
+it's an intermediate space in which you accumulate changes you want to put in a commit.
+Branches are quite simple. They are just pointers to particular commits. They
 point to certain commits.
 Head is another pointer. Head points to the current active branch. That
 is the branch that will be updated if you make a commit. (unless you’re
@@ -336,15 +349,13 @@ directory, it’s the state of all of these five things together. And
 if you think about commands, you should think about them in terms of
 what they do to each of these five.
 
-
 ---
 
 # git Commands
 
 .smaller[
 - .normal[`git add`]<br />
-puts files from working director into staging area. If not in index,
-adds them to tracked files.
+puts files from working director into staging area (index) If not tracked so far, adds them to tracked files.
 
 - .normal[`git commit`]<br />
 commits files from staging area (index) to repository, moves current
@@ -372,6 +383,16 @@ Ok so now, let’s got through some of the commands and talk about what
 they do in terms of these five concepts
 [read slide]
 
+---
+class: center
+
+![:scale 60%](images/git_data_transport.png)
+
+???
+I found this data flow diagram online and I think it's quite helpful for a subset of the commands.
+It shows how you can propagate changes from the working directory to a remote repository and back.
+This is only a small part of all the commands, though. For example reset is missing, and generally
+nothing that moves branches or head is here.
 
 ---
 
@@ -386,16 +407,20 @@ they do in terms of these five concepts
 ![:scale 90%](images/git_merge_commit.png)
 
 ???
-And then there’s the more complex operations to the index, merging
-and rebasing. They change the index, and possibly the working tree. I
-find it most helpful to think of them as graph operations on the index.
 
+Now let's talk about the  the more complex operations to the repository or
+history, merging and rebasing. They change the commit graph, and possibly the working
+tree. I find it most helpful to think of them as graph operations on the repository.
+
+Let's start with merges.
 There’s two kinds of merging: feed-forward merges, and merges that
 require a commit. If one commit is a descendants of the other and you
 merge them, it will be a feed-forward, and just move the branch.
+That happens for example if you just pull new changes from a remote
+repository that you cloned, if you haven't made any local changes.
 
 However, if one isn’t a descendant of the other, git will create a
-“merge commit” that will unite the two, and have both as it’s
+“merge commit” that will unite the two, and have both as its
 parent. Git will attempt its best but if there’s conflicting changes,
 you might need to resolve the conflicts by hand.
 
@@ -418,10 +443,10 @@ you might need to resolve the conflicts by hand.
 ???
 Rebase is a whole different beast. It allows more or less arbitrary
 modifications of the graph, and therefore rewriting history.
-You should be aware that if you use rebase, you will change a commits
+You should be aware that if you use rebase, you will change a commit's
 hash because the hash depends on the history.
 Basically what rebase does is place a range of commits on top of another
-commit. If your on branch A and you do git rebase B (or any other commit),
+commit. If you're on branch A and you do git rebase B (or any other commit),
 what will happen is that it will find the common ancestor, take everything
 up to that ancestor, and place it on branch B.
 You can change the commit that it puts the changes on top of by using
@@ -440,8 +465,8 @@ place it onto B.
 
 ???
 You can make rebase even more complicated - and powerful, by making it
-interactive.  While you could make any rebase interactive, it’s most common to
-rebase on an ancestor with interactive – a non-interactive rebase would have no
+interactive. While you could make any rebase interactive, it’s most common to
+rebase on an ancestor with interactive – in this case a non-interactive rebase would have no
 consequences.
 For each commit in the range that you want to rebase, interactive rebase
 allows you to pick the commit, which is leave it alone, squash it,
@@ -455,7 +480,7 @@ class: center, middle
 # Squash before Rebase
 
 ???
-Rebasing can also create conflicts, that need to be resolved the same way
+Rebasing can also create conflicts that need to be resolved the same way
 as merge conflicts. However, rebasing “plays back” all the commits
 that you moved on top of the target commit. That means that you might
 have to resolve conflicts on the same file multiple times – which you
@@ -483,7 +508,7 @@ Git add -i allows me to through all the different hunks or lines
 I changed.
 However, the command line interface is a bit clumsy for my taste. Or
 maybe I’m just not as used to it.
-I prefer a gui, which you can summon with git gui
+I prefer a gui, which you can summon with git gui on the command line.
 
 ---
 class: center, middle
@@ -564,7 +589,7 @@ go through these slides again, and also watch this video. It’s pretty
 good, but it’s also pretty long.
 And for those of you who though this was wayyy to much detail: this
 was still not all the important parts. There’s also tags, and bare
-repositories and the stash…
+repositories and the stash and cherries...
 
 ---
 class: center, middle
@@ -581,7 +606,7 @@ great, but not really central what we’re talking about here. The main
 thing that’s different in using github from using any other remote,
 is the use of pull requests, and the ability to integrate with remote
 services.
-For now we’ll only talk about pull requests.
+For now lets talk about pull requests, we'll come back to the services later.
 
 ---
 class: center
@@ -594,9 +619,9 @@ class: center
 So what are pull requests for?
 Basically they allow you to contribute to a repository to which you
 don’t have write permissions.
-Let’s say you want to contribute to scikit-learn. Or to my slides.
+Let’s say you want to contribute to scikit-learn. Or to the lecture slides.
 
-There’s the main repository, which we usually call “upstream”,
+There’s the main repository, which we usually call "upstream",
 scikit-learn/scikit-learn. You want to change something there, but you
 don’t have write permissions.
 
@@ -608,8 +633,10 @@ class: center
 ![:scale 50%](images/forks2.png)
 ???
 
-What you can do is “fork” it on github – that’s a github concept,
-not a git concept. It’s just a clone that also lives on github.---
+What you can do is "fork" it on github – that’s a github concept,
+not a git concept. It’s just a clone that also lives on github.
+
+---
 class: center
 
 # Github pull request workflow
@@ -646,9 +673,9 @@ class: center
 Usually you pull the current status from the master branch,
 and make some changes that you want to include. So you always pull master
 and push feature branches.
-So obviously thing in the upstream repository change. How do you get
+But the code in the upstream repository changes. How do you get
 these changes onto your laptop? 
-If the original repository gets updated, there is way to directly update your fork.
+If the original repository gets updated, there is no way to directly update your fork.
 
 ---
 class: center
@@ -657,13 +684,13 @@ class: center
 <br />
 ![:scale 60%](images/forks_master_feature2.png)
 ???
-You have to add upstream as an additional
-remote, and then you can pull from there.
-You can create new features on top, and push the feature branches to
+You have to add upstream as an additional remote, and then you can pull from
+there. You can create new features on top, and push the feature branches to
 your fork (which is usually the “origin” remote).
 But what happens with the master branch on your fork? It never gets
 updated and there is no point in pushing to it, so it will just sit there
-and rot. I think that’s kind of weird, but that’s how github works.
+and rot, staying at the state of the original repository at the time of your fork.
+I think that’s kind of weird, but that’s how github works.
 So you always pull from upstream to get their changes, and push to
 your fork.
 ---
@@ -716,17 +743,17 @@ how will you ever debug it?
 ???
 This one is from Brian Kernighan, who wrote the first book on C together
 with Dennis Richie. Kernighan is also the creator of awk and many other
-parts of unix, in particular the name. Anyhow…
+parts of unix, in particular the name. He says
 [read]
 This is another call for simplicity. Make code easy to understand. For
 yourself now to debug, for your future self to know what the hell you were
 thinking, and for others that might want to use this code in the future.
 Hopefully all the code you write will be read again. Otherwise, what’s
-the point. That might not be true for your assignments in most classes,
+the point? That might not be true for your assignments in most classes,
 but the point of the assignments it to practice for the real world. So I
 want to make sure that the code that you write in class is on the same
 standard that it needs to be out there on your job. Also, think of the
-poor course assitants.
+poor course assistants.
 
 ---
 class: middle
@@ -740,11 +767,18 @@ class: middle
 - Future you is the most likely person to try to understand your code.
 
 
-- Avoid writing code.
 
 ???
 So to summarize:
 [read]
+
+And there's one more trick to making your code readable and understandable.
+Don't write code. The more you write, the more you need to read. If you can
+avoid writing code, do it! If you can get a 10% speedup by making your code
+three times as long, usually it's not worth it.
+
+--
+- Avoid writing code.
 
 ---
 class: center, middle
