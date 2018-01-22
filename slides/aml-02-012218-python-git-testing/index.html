@@ -52,6 +52,11 @@
           font-size: 25px;
       }
 
+      .remark-slide-content .smallest p, .remark-slide-content .smallest li, .remark-slide-content .smallest .remark-code{
+          font-size: 22px;
+      }
+
+
       .normal {
           font-size: 30px;
       }
@@ -883,6 +888,7 @@ If you want to convert a codebase from python2 to python3, there’s an
 automatic converter called 2to3, which can do that for you.
 
 ---
+class: spacious
 
 # Python ...
 
@@ -932,11 +938,17 @@ In practice I use both conda and pip. But never try to upgrade a package
 you installed with one with the other! That’s certain doom.
 
 ---
+class: spacious
 
-# Pip and upgrades
+# Pip and conda and upgrades
 
-Pip upgrade works on dependencies (unless you do –no-dep)
-FIXME caveats! (pip and conda ...)
+- Pip upgrade works on dependencies (unless you do –no-dep)
+
+- pip has no dependency resolution!
+
+- conda has dependency resolution
+
+- updgrading a conda package with pip (or vice versa) will break stuff!
 
 ???
 Oh and one word of warning: if you do pip upgrade somepackage, it will
@@ -945,14 +957,32 @@ particular if you are using it in a conda environment or if you installed
 a particular version of numpy or scipy that you don’t want upgraded.
 
 ---
+class: spacious
 
-# Conda
+# Conda Environments
 
-Conda looks like the best bet.
-Use conda environments!
+- Conda looks like the best bet.
+- Use conda environments!
 
 ???
 
+---
+class: spacious
+
+# Environments and Jupyter Kernels
+
+- Environment != kernels
+- Use nb_conda_kernels or add environment kernels manually:
+
+.smallest[
+```bash
+source activate myenv
+python -m ipykernel install --user --name myenv --display-name "Python (myenv)"
+source activate other-env
+python -m ipykernel install --user --name other-env --display-name "Python (other-env)"
+```
+]
+???
 
 ---
 class: spacious
