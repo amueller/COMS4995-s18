@@ -28,7 +28,7 @@ def main():
     directory = os.getcwd()
     fnames = [fname for fname in sorted(os.listdir(directory))
               if fname not in EXCLUDED and os.path.isdir(fname)]
-    header = directory
+    header = "https://amueller.github.io/COMS4995-s18/slides/"
     with open("index.html", "w") as f:
         f.write(Template(INDEX_TEMPLATE).render(names=fnames, header=header))
 
