@@ -80,6 +80,16 @@
           float: left;
       }
 
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+
+
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
     </style>
   </head>
@@ -417,7 +427,26 @@ place it onto B.
 
 
 ---
+# Interactive rebase
 
+`git rebase -i <commit>`
+
+![:scale 66%](images/git_interactive_rebase.png)
+
+???
+You can make rebase even more complicated - and powerful, by making it
+interactive.  While you could make any rebase interactive, it’s most common to
+rebase on an ancestor with interactive – a non-interactive rebase would have no
+consequences.
+For each commit in the range that you want to rebase, interactive rebase
+allows you to pick the commit, which is leave it alone, squash it,
+which means incorporating it into the previous commit, removing it or
+amending it.
+Interactive can be useful for cleaning up your history after you worked
+on a feature, so that the remaining commits are logical units.
+
+---
+class: center, middle
 # Squash before Rebase
 
 ???
@@ -431,28 +460,11 @@ A good way to get around that is to squash all the commits you want to
 rebase into a single one, and then rebase that single commit. That means
 you only have to do conflict resolution once.
 
-One way to squash commits is using interactive rebase
+So before you do a rebase on a different branch, you might do an
+interactive rebase to squash some commits and make conflict resolution easier.
 
 ---
 
-# Interactive rebase
-
-`git rebase -i <commit>`
-
-![:scale 66%](images/git_interactive_rebase.png)
-
-???
-You can make any rebase interactive, but it’s most common to rebase
-on an ancestor with interactive – a non-interactive rebase would have
-no consequences.
-For each commit in the range that you want to rebase, interactive rebase
-allows you to pick the commit, which is leave it alone, squash it,
-which means incorporating it into the previous commit, removing it or
-amending it.
-Interactive can be useful for cleaning up your history after you worked
-on a feature, so that the remaining commits are logical units.
-
----
 # Interactive adding
 
 ![:scale 55%](images/git_interactive_add.png)
@@ -508,9 +520,14 @@ some branches that I’m interested in.
 ---
 
 # reflog
-
-![:scale 80%](images/git_reflog.png)
-
+.left-column[
+`$ git reflog`
+![:scale 100%](images/git_reflog.png)
+]
+.right-column[
+<br \>
+![:scale 100%](images/git_simple_merge_graph.png)
+]
 ???
 The last command I want to mention is reflog.
 Reflog is a very powerful tool that allows you to go through the history
@@ -562,9 +579,51 @@ services.
 For now we’ll only talk about pull requests.
 
 ---
+class: center
 
 # Github pull request workflow
+<br />
+![:scale 50%](images/forks1.png)
+???
 
+---
+class: center
+
+# Github pull request workflow
+<br />
+![:scale 50%](images/forks2.png)
+???
+
+
+---
+class: center
+
+# Github pull request workflow
+<br />
+![:scale 50%](images/forks3.png)
+???
+
+---
+class: center
+
+# Github pull request workflow
+<br />
+![:scale 50%](images/forks.png)
+???
+
+---
+class: center
+
+# Github pull request workflow
+<br />
+![:scale 60%](images/forks_master_feature.png)
+???
+---
+class: center
+
+# Github pull request workflow
+<br />
+![:scale 60%](images/forks_master_feature2.png)
 ???
 What are pull requests for?
 Basically they allow you to contribute to a repository to which you
