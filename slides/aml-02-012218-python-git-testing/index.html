@@ -334,7 +334,7 @@ what they do to each of these five.
 
 ---
 
-# Commands - And what they do
+# git Commands
 
 .smaller[
 - .normal[`git add`]<br />
@@ -586,6 +586,15 @@ class: center
 ![:scale 50%](images/forks1.png)
 ???
 
+So what are pull requests for?
+Basically they allow you to contribute to a repository to which you
+don’t have write permissions.
+Let’s say you want to contribute to scikit-learn. Or to my slides.
+
+There’s the main repository, which we usually call “upstream”,
+scikit-learn/scikit-learn. You want to change something there, but you
+don’t have write permissions.
+
 ---
 class: center
 
@@ -594,14 +603,17 @@ class: center
 ![:scale 50%](images/forks2.png)
 ???
 
-
----
+What you can do is “fork” it on github – that’s a github concept,
+not a git concept. It’s just a clone that also lives on github.---
 class: center
 
 # Github pull request workflow
 <br />
 ![:scale 50%](images/forks3.png)
 ???
+To actually make any changes, you
+can then clone this fork locally, add a feature branch, make changes
+and push them.
 
 ---
 class: center
@@ -611,6 +623,13 @@ class: center
 ![:scale 50%](images/forks.png)
 ???
 
+Then you can ask the owner of the repository if they want to merge your
+changes. That's a pull request and allows the owner to "pull" in your
+changes into the main repository.
+
+So far, so good. Makes mostly sense, I think.
+There is a slight oddity in this workflow, though.
+
 ---
 class: center
 
@@ -618,6 +637,14 @@ class: center
 <br />
 ![:scale 60%](images/forks_master_feature.png)
 ???
+
+Usually you pull the current status from the master branch,
+and make some changes that you want to include. So you always pull master
+and push feature branches.
+So obviously thing in the upstream repository change. How do you get
+these changes onto your laptop? 
+If the original repository gets updated, there is way to directly update your fork.
+
 ---
 class: center
 
@@ -625,28 +652,7 @@ class: center
 <br />
 ![:scale 60%](images/forks_master_feature2.png)
 ???
-What are pull requests for?
-Basically they allow you to contribute to a repository to which you
-don’t have write permissions.
-Let’s say you want to contribute to scikit-learn.
-There’s the main repository, which we usually call “upstream”,
-scikit-learn/scikit-learn. You want to change something there, but you
-don’t have write permissions.
-What you can do is “fork” it on github – that’s a github concept,
-not a git concept. It’s just a clone that also lives on github. You
-can then clone this fork locally, add a feature branch, make changes
-and push them.
-Then you can ask the owners of the repository if they want to merge your
-changes with a pull request.
-
-
---
-
-???
-
-There is a bit of a weird asymmetry here, though.
-So obviously thing in the upstream repository change. How do you get
-these changes onto your laptop? You have to add upstream as an additional
+You have to add upstream as an additional
 remote, and then you can pull from there.
 You can create new features on top, and push the feature branches to
 your fork (which is usually the “origin” remote).
@@ -655,7 +661,6 @@ updated and there is no point in pushing to it, so it will just sit there
 and rot. I think that’s kind of weird, but that’s how github works.
 So you always pull from upstream to get their changes, and push to
 your fork.
-
 ---
 class: center, middle
 
