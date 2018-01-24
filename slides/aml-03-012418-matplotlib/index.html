@@ -1036,7 +1036,7 @@ python plotting libraries build, and because it’s so important,
 we’re gonna go through it in some detail.
 Matplotlib was designed as a general plotting library and not really with
 data analysis in mind, which is why it is a bit cumbersome in some cases,
-and not as elegant for data science as you might be used to coming from R.
+and not as elegant for data science as you might be used to if you're coming from R.
 But I think it’s still good to know how to effectively create graphics
 in python if you’re gonna work with python, which we will.
 Matplotlib is very powerful, and any figure you can imagine, you can
@@ -1052,7 +1052,13 @@ update now!
 (you can enable classic style if your really want)
 
 ???
-
+So matplotlib version 2 has been out for about a year now,
+though I still see people using matplotlib v1. I would really highly
+encourage you to upgrade. version two changes some of the default
+styles, but you can still enable the classic styles if you want.
+In particular version two uses virids as the default color map.
+If you create plots in version 1.X and show them in 2.X, they might
+look very differently or might not be comprehensible at all.
 ---
 
 # Other libs
@@ -1061,6 +1067,7 @@ update now!
 - seaborn - ready-made stats plots
 - bokeh - alternative to matplotlib for in-browser
 - several ggplot translations / interfaces
+- bqplot
 - plotly
 
 ???
@@ -1072,11 +1079,16 @@ encourage you to use it. You’ll get the most out of it if you actually
 understand matplotlib, though.
 Similarly seaborn has many tools for statistical analysis and
 visualization, also using pandas dataframes, also based on matplotlib.
+Seaborn is really great for more complex statistical plots.
+
 There is a completely separate project, bokeh, which uses javascript
 (but not d3) to do visualizations in the browser. I’m not entirely
 convinced yet, though.
 There’s also several reimplementations and interfaces to ggplot,
-if that’s what you’re into.
+if that’s what you’re into, and bq plot, a tool for time series
+visualization in the jupyter notebook.
+And finally there's a startup
+called plotly that also provides a plotting interface.
 ---
 
 # Imports
@@ -1377,6 +1389,9 @@ class: center
 ![:scale 70%](images/matplotlib_plot_figsize_why.png)
 
 ???
+One thing that I find slightly annoying and that always trips me off
+is that in subplots, it's rows, then columns, while the figure size is width,
+then height.
 
 ---
 class: center, middle
