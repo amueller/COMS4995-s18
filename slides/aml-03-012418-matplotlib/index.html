@@ -64,7 +64,8 @@
           padding-top: 100px;
       } 
 
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li, .remark-slide-content .smaller .remark-code{
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
           font-size: 25px;
       }
 
@@ -104,6 +105,9 @@
       .wide-left-column {
           float: left;
           width: 65%
+      }
+      .invisible {
+          visibility: hidden
       }
 
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
@@ -194,7 +198,7 @@ However, I do test-driven debugging. If I find a bug, I first write a test
 that fails if the bug is present. I need to do that later anyhow, because
 I need a non-regression test, and it usually makes debugging much easier.
 I often do example driven development, where I write down some simple
-use-cases and then develop to fullfil them.
+use-cases and then write implementations to fullfil them.
 
 ---
 
@@ -266,13 +270,16 @@ def test_answer():
 So here I have a slightly modified version of the example from the pytest
 website. We have a function called inc that’s supposed to increment
 a number. But there’s a bug: it adds two instead of one.
-And we have a test, which is called test_answer, that calls the
+And we have a test, which is called `test_answer`, that calls the
 inc function with the number three and checks if three is correctly
 incremented.
 If we call py.test on this file, or on the folder of this file, py.test
-will run the test_answer function – because it starts with `test_`.
+will run the `test_answer` function - because it starts with `test_`.
 It tells us it ran one test, and that test failed. We also get a traceback
 showing us the line and what the actual value was. We got 5 instead of 4.
+Depending on how much you know about programming, this error message should
+come as a bit of a surprise to you. The assert only gets a boolean,
+but pytest actually unpacks the `False` and gives us more information.
 
 ---
 
@@ -380,7 +387,7 @@ def test_inc():
 ]
 
 ???
-So instead of just calling py.test, we specify –cov inc, which means
+So instead of just calling py.test, we specify --cov inc, which means
 we want to test the coverage of the inc module or file.
 Now we get a coverage report that tells us that out of the 6 statements
 in inc.py, two were not covered, resulting in 67% coverage.
@@ -402,7 +409,7 @@ $ py.test --cov inc --cov-report=html
 .right-column[![:scale 100%](images/pytest_html_report2.png)]
 
 ???
-So we specify –cov-report=html, and py.test will create a html report
+So we specify --cov-report=html, and py.test will create a html report
 for us. We get an overview that contains the same information as before,
 but we’ll also get a detailed view of inc.py, which shows us which
 lines we covered and which lines we missed.
@@ -433,6 +440,11 @@ I want to talk about it in particular in the context of github, because
 that’s what you’ll likely be using, both here and later in industry
 – at least in a startup. If you go to google or facebook of amazon,
 they all have their own frameworks, but the same principles apply.
+
+They often have even more involved systems, like continuous deployment,
+which actually automattically puts new code into production if it passes
+tests. We're not gonna talk about that here. Continuous deployment gets
+somewhat trickier with machine learning algorithms.
 
 ---
 
@@ -545,8 +557,7 @@ linked to your github account, and enable travis-ci on the repository
 you want.
 For public repositories and students its free, otherwise you have to
 pay for the service.
-For the homework, I already set this up for the github classroom
-organization.
+For the homework you'll need to enable this for your repo.
 
 There a docs online at this website, and the only thing you need to do
 is create a .travis.yml file with the configuration.
@@ -576,25 +587,35 @@ class: center, middle
 # Documentation
 
 ???
-So now, we come to the last part of todays lecture, documentation. We
-talked earlier about how important it is to write readable code.
-But no code is perfectly documenting itself. You definitely need to
+So now, we come to the last bit that is about general software development,
+documentation. We talked earlier about how important it is to write readable
+code.  But no code is perfectly documenting itself. You definitely need to
 write additional documentation.
 Also, many people don’t like digging through code, so some documentation
 that’s more easily accessible is helpful.
+
+I decided to take this off the homework this year, because people were struggling
+a lot with setting up the infrastructure last year. That's a bit
+unfortunate, because it's really cool once you see all the pieces coming together.
 
 ---
 
 # Why document?
 
+- Allow people to use the code without reading it.
 - Your code is harder to understand than you think.
 - Input types and output types are unclear in dynamic languages.
 - Often implicit assumptions about input.
 
 ???
 So why do we document?
-To make reading the code easier. Others will thank you, including your
-future self.
+The most obvious reason is that you want other people to use your code,
+and most people don't want to read the full implementation of a function
+before they can use it. You can document the functionality, interface
+and assumptions, and anyone can use your code, without having to dig
+through all the details.
+Even if someone wants to read the code, documentation makes reading the code
+easier. Others will thank you, including your future self.
 While you should document any function or class in any language, in
 dynamically typed languages in particular, it’s often unclear what the
 assumptions about the input are, and what the type of the output is. So
@@ -636,7 +657,7 @@ a python session or with Jupyter Notebook.
 For docstrings we use triple quotes, with a single line
 Explanation in the first line, then an empty line, then a more detailed
 explanation.
-This docstring is stored in the __doc__ attribute of the object.
+This docstring is stored in the `__doc__` attribute of the object.
 
 In addition to that, you can use inline documentation when you think it
 might be useful, using the pound.
@@ -645,15 +666,16 @@ might be useful, using the pound.
 
 # NumpyDoc format
 
-- See
-https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt
+See
+
+.smaller[https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt]
 
 ```python
 """
 Parameters
 -----------
 x : type
-    Description of parameter `x`.
+    Description of parameter x.
 """
 ```
 
@@ -715,7 +737,7 @@ using restructured text. And the answer to this is sphinx.
 ???
 So what’s this sphinx? It’s basically a static page generator that
 takes restructured text and produces HTML and pdf output.
-This is how the scikit-learn documentation is generated for example. You
+This is how the scikit-learn or numpy or pandas documentation is generated for example. You
 can see the rst code on the left and the generated website on the
 right. Obviously there’s also a theme file that governs the layout.
 RST is similar to markdown but it also allows internal references,
@@ -732,12 +754,10 @@ class: center, middle
 ![:scale 50%](images/sphinx_autodoc.png)
 
 ???
-Here is the documentation of the DummyClassifier that we saw earlier as
-rendered by Sphinx using autodoc.
-You can see the different sections here.
-There’s more sections, and also documentation for the methods down
-below.
-Sphinx also adds in links to the source code on github if you like.
+Here is the documentation of the DummyClassifier as rendered by Sphinx using
+autodoc. You can see the different sections here.  There’s more sections, and
+also documentation for the methods down below.  Sphinx also adds in links to
+the source code on github if you like.
 
 So now obviously you want to show this to people interested in your
 project, and you don’t want them to install sphinx and build the docs
@@ -747,34 +767,32 @@ host the site.
 That’s fine, but also a little cumbersome.
 
 ---
-???
-For the rest of today I want to talk about visualization and matplotlib. I
-thought a bit about it and I think numpy and pandas are better learned
-by doing, and there’s some interesting bits about matplotlib and
-visualization that I think are worth going through.
-I was hoping to go into visualization techniques and practices a bit
-more, but unfortunately I don’t think we have the time and I really
-want to get going with machine learning next week.
----
 
 class: center, middle
 
 # Principles of Data Visualization
 
 ???
-I want to briefly talk about some very basics of data
-visualization. I’ll post references to great books as references if
-you’re curious.
+For the rest of today I want to talk about visualization and matplotlib.
+We will not talk about numpy and pandas, even though they are very important
+for doing data science with python. There are two reasons:
+I find it easier to talk about visualization in the abstract, while
+pandas usage is often very case specific. 
+Also, there is not a lot of material out there about matplotlib, unfortunately,
+while there is a lot of great material out there on pandas.
+I highly recommend the book by Wes McKinney on "Python data analysis",
+which is just a pandas handbook. The best guide to all the python libraries
+that we need, including matplotlib, is the "Python Data Science Handbook" that
+I mentioned earlier, and you should really check it out.
+
+In terms of visualization, all the DSI folks in this course are also taking
+the Exploratory data analysis and visualization course, which will go into
+way more detail than we will here - and we'll focus a bit more on the
+python interfaces.
 ---
 class: center, padding-top, spacious
 
 # Why?
-
---
-
-# Explore
-# Communicate
-
 ???
 So first, I want to ask why we might want to visualize data. And I think
 there are two main reasons.
@@ -784,9 +802,24 @@ The other is to communicate either the whole data, or particular aspects
 or findings about the data. I think both are important, but for the
 matter of this class, I think the exploration is more important.
 In general, you should think about what the point of any visualization is,
-and whether the method you chose is the best for this purpose.I want to
-briefly talk about some very basics of data visualization. I’ll post
-to great books as references if you’re curious.
+and whether the method you chose is the best for this purpose.
+
+In many of my capstone reports last semester I had people show all kinds of
+charts and graphs and often the description was "here is a bar-plot of 
+quantity X". So what? Why are you showing me this? What's the conclusion?
+Ideally a visualization should answer a question. In exploratory analysis,
+the answer might be "there's nothing interesting here", but you should
+still have some idea what you're looking for.
+
+So I want to briefly talk about some very basics of data visualization. I’ll post
+two great books as references if you’re curious, and I linked to a PhD
+thesis which has a great introduction, and from which I stole some illustrations.
+
+--
+
+# Explore
+# Communicate
+
 ---
 class: padding-top, spacious
 
@@ -794,13 +827,8 @@ Above else, show the data.<br />
 Maximize the data-ink ratio.
 .quote_author[E. Tufte]
 
---
-
-Tools matter.
-.quote_author[W. S. Cleveland]
-
 ???
-So here are more quotes, from the two books I mentioned. The first two
+Here two quotes I want to start with. The first two
 are from Edward Tufte, the godfather of statistical visualization. He
 says “above else, show the data”. So the data should be in focus,
 and not any fancy method you use to show it.
@@ -813,6 +841,12 @@ the data.
 The other quote, from William Cleveland is: Tools matter. I think for
 him the tools are more the visualization methods, but I think also the
 software tools matter, which is why I want to talk about them.
+
+--
+
+Tools matter.
+.quote_author[W. S. Cleveland]
+
 ---
 class: center, middle
 
@@ -822,18 +856,20 @@ class: center, middle
 ???
 Before we start with plotting, here’s a quick summary of visual
 channels that I took from the thesis “Systematising glyph design for
-visualization” that I posted on courseworks.
+visualization”.
 These are ways in which you can show information.
 There is obviously length, as in bar-charts, angle, curvature, shape as
 in graphs and scatter plots.
 There’s area, which is often useful, but it’s important to say whether
 you’re using area or distance to show information. For circles that’s
 often unclear.
-There is 3d volume, which I really try to avoid. Then there’s
+
+There is 3d volume, which is really something you probably want to avoid. Then there’s
 color. There’s lightness, saturation, transparency and hue, and they
 all work very differently. It’s generally accepted that using hues for
 quantitative changes is not a great idea, and lightness or saturation
 works much better.
+
 Textures are something I also try to avoid, position is clearly one of
 the most important channels, while the rest are not something I use very
 often - though containment and connection can be helpful.
@@ -899,7 +935,24 @@ if you have a neutral point and then deviations for that, like profits
 that can be zero or positive and negative, and you can easily see which
 side of the zero any point is on.
 
---
+---
+class: center, middle
+
+# Colormaps
+
+.left-column[
+![:scale 90%](images/sequential_color_maps.png)<br \>
+![:scale 90%](images/qualitative_color_maps.png)
+]
+
+.right-column[
+![:scale 90%](images/diverging_color_maps.png)<br \>
+![:scale 90%](images/misc_color_maps.png)
+]
+
+.reset-column[
+![:scale 50%](images/perceptually_uniform_colormaps.png)
+]
 ???
 Quantitative colormaps are mean to not show a continuum, but just some
 discrete values, and they are designed in such a way to have optimum
@@ -910,27 +963,44 @@ see them really everywhere, in particular rainbow colormaps like jet and
 rainbow. Don’t use them. Really, never ever use them. I’ll explain
 why in a second, but if I see it in this course, not only will I take
 points of your homework, I’ll also look at you really disappointedly.
+
 And there are other colormaps that have more than two hues, but that
-don’t have the problems that these very colorful ones have.
+don’t have the problems that these very colorful ones have, and these
+are the perceptually uniform ones down here. These are carefully
+designed to ideally show quantitative information.
+So let's talk about how they are different.
 
 ---
-class: center, middle
-
-.left-column[
-![:scale 90%](images/colormap_evaluation_jet.png)
-]
-.right-column[
-![:scale 90%](images/colormap_evaluation_viridis.png)
-]
-.reset-column[
-![:scale 40%](images/colormap_evaluation_gray.png)
-]
+class: center
+![:scale 35%](images/colormap_evaluation_gray.png)
 
 ???
 So what’s the problem with these other colormaps. This is an evaluation
-of the grey color map. Please focus on the parts to the right. There
+of the grey color map. Let's look at the panels on the right first. There
 are three heat maps here. So each pixel here represents a floating point
-value on some scale.
+value on some scale. 
+On the left you see at the top the perceived changes in the color map,
+using a model of the human visual system. You can see that it's pretty
+constant. And at the bottom left you can see the the color map as a path
+in the 3d color space. This space is not RGB, it's a CIE color space
+that corresponds more to how humans perceive color. In the RGB space,
+humans can detect finer nuances in green than in red, for example.
+
+Each color map is a path in this 3d space. And ideally, you'd like
+this to be a smooth path, and you'd like the speed to be constant.
+The perceptual contrast at the top is something like the derivative,
+or speed, of the color map going through the perceptual space.
+---
+class: center
+![:scale 35%](images/colormap_evaluation_gray.png)
+.left-column[
+![:scale 80%](images/colormap_evaluation_jet.png)
+]
+.right-column[
+![:scale 80%](images/colormap_evaluation_viridis.png)
+]
+
+???
 Now let’s look at this in the jet color map. you see that green ring
 that looks like it has some boundary? Or the red core? Where are these
 in the greyscale? They are not there, because the are not in the data.
@@ -940,7 +1010,7 @@ where we perceive edges, because the color map has edges! Also here
 is the colormap converted to greyscale, say if someone printed it. and
 below are the brightness deltas. Do you see something?
 It’s not monotonous. It doesn’t go from dark to bright, it backs up
-on itself….
+on itself.
 --
 ???
 And here’s one of the perceptual uniform colormaps In comparison.
