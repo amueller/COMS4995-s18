@@ -642,10 +642,10 @@ def inc(x):
 ```
 - Additional inline documentation
 ```python
-if x < 0:
-    # x is less than zero
-    return 0
-return x + 1
+    if x < 0:
+        # x is less than zero
+        return 0
+    return x + 1
 ```
 ]]
 ???
@@ -1233,6 +1233,18 @@ ax11, ax21, ax12, ax22 = axes.ravel()
 ![:scale 100%](images/subplots2.png)
 ]]
 ???
+If you just created a figure but you want more axes, you can also add them
+one subplot at a time with the subplot command, this time without the s.
+The subplot command takes three numbers - you can leave out the comma
+between them if they are single digits, but please dont.
+The first two numbers specify a imaginary grid for the whole figure,
+let’s say I want a 2 by 2 grid.
+The third number is at which position in that grid I want my figure
+created. The numbers start with one and go column by column. I created
+the 2 by 2 grid here and labeled the axes according to the variable name.
+
+you could create all of them at the same time with the subplot commands,
+but there are two reason why you might choose not to.
 
 ---
 
@@ -1255,18 +1267,12 @@ ax2 = plt.subplot(2, 1, 2)
 ![:scale 90%](images/complex_subplots.png)
 ]
 ???
-If you just created a figure but you want more axes, you can also add them
-one subplot at a time with the subplot command, this time without the s.
-The subplot command takes three numbers - you can leave out the comma
-between them if they are single digits, but please dont.
-The first two numbers specify a imaginary grid for the whole figure,
-let’s say I want a 2 by 2 grid.
-The third number is at which position in that grid I want my figure
-created. The numbers start with one and go column by column. I created
-the 2 by 2 grid here and labeled the axes according to the variable name.
-
-you could create all of them at the same time with the subplot commands,
-but there are two reason why you might choose not to.
+The first one is that the grid you specify doesn’t need to be the actual grid.
+It just tells the single subplot about where it should be. So you can create
+all kinds of different layouts. For example, I can create a 2 by 2 plot where
+the second row is a single axes, by telling it it should be at the second
+position for a 2 by 1 plot.  This allows me to create irregular grids, which is
+often quite useful.
 ---
 
 # Two Interfaces
@@ -1278,12 +1284,15 @@ object oriented interface - explicitly use object
 .wide-left-column[
 ```python
 sin = np.sin(np.linspace(-4, 4, 100))
-fig, axes = plt.subplots(2, 2)
+plt.subplot(2, 2, 1)
 plt.plot(sin)
+plt.subplot(2, 2, 2)
+plt.plot(sin, c='r')
 
 
 fig, axes = plt.subplots(2, 2)
 axes[0, 0].plot(sin)
+axes[0, 1].plot(sin, c='r')
 ```
 ]
 .narrow-right-column[
@@ -1293,12 +1302,20 @@ axes[0, 0].plot(sin)
 ]
 
 ???
-The first one is that the grid you specify doesn’t need to be the
-actual grid. It just tells the single subplot about where it should
-be. So you can create all kinds of different layouts. For example,
-I can create a 2 by 2 plot where the second row is a single axes, by
-telling it it should be at the second position for a 2 by 1 plot.
-This allows me to create irregular grids, which is often quite useful.
+So now is the part where things become a bit tricky. There’s basically two
+different ways to use matplotlib, two interfaces if you want, one is the
+stateful one, and one is the object oriented interface.  If you’re using the
+stateful interface, you just call the module-level plot functions like plt.plot
+here, and it will plot in the current axes. What do you think will happen here?
+
+In the object based interface, you are explicit about which axes you want to
+draw into, so you hold onto your axes objects, and call the plotting commands
+on those! What do you think will happen here?
+
+This is another reason why some people like to add subplots one by one: they
+use the stateful interface. They add a subplot, plot into it, then add the next
+one and so on. So the plot commands are exactly the same for both interfaces,
+but there are some differences.
 ---
 
 # Differences Between the Interfaces
