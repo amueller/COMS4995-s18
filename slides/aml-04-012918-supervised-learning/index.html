@@ -140,6 +140,8 @@ class: middle
 # Nearest Neighbors
 
 ![:scale 50%](images/knn_boundary_dataset.png)
+
+FIXME FORMULA
 ---
 class: middle
 
@@ -159,61 +161,429 @@ class: middle
 
 # Nearest Neighbors
 
-![:scale 50%](images/knn_model_complexity.png)
+![:scale 50%](images/train_test_set_2d_classification.png)
 
 ---
-#
+# KNN with scikit-learn
+
+```python
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=1)
+knn.fit(X_train, y_train)
+print("accuracy: {:.2f}".format(knn.score(X_test, y_test)))
+```
+accuracy: 0.77
 
 ---
-#
+# More neighbors
+
+![:scale 50%](images/knn_boundary_k1.png)
 
 ---
-#
+# More neighbors
+
+![:scale 50%](images/knn_boundary_k3.png)
 
 ---
-#
+# Influence of n_neighbors
+
+![:scale 50%](images/knn_boundary_varying_k.png)
 
 ---
-#
+# Model complexity
+
+![:scale 50%](images/knn_boundary_varying_k.png)
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_train.png)
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_generalization.png)
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_full.png)
 
 ---
-#
+# Nearest Centroid
+
+![:scale 50%](images/nearest_centroid_boundary.png)
 
 ---
-#
+# Nearest Centroid with scikit-learn
+
+```python
+from sklearn.neighbors import NearestCentroid
+plt.figure()
+nc = NearestCentroid()
+nc.fit(X, y)
+plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor='k')
+plot_2d_classification(nc, X, alpha=.5)
+plt.gca().set_aspect("equal")
+plt.scatter(nc.centroids_[:, 0], nc.centroids_[:, 1], c=['b', 'r'], s=100, marker='x')
+```
 
 ---
-#
+# Nearest Shrunken Centroid
+
+![:scale 50%](images/nearest_shrunken_centroid_boundary.png)
+
+![:scale 50%](images/nearest_shrunken_centroid_thresholding.png)
 
 ---
-#
+# Computational Properties Centroids
+
+- fit: O(n * p)
+- memory: O(n_classes * p)
+- predict: O(n_classes * p)
+
+n = n_samples
+p = n_features
 
 ---
-#
+# Computational Properties Neighbors
+.left-column[
+## Naive
+- fit: no time
+- memory: O(n * p)
+- predict: O(n * p)
+]
+.right-column[
+## Kd-tree
+- fit: O(p * n log n)
+- memory: O(n * p)
+- predict:
+- O(k * log(n))
+  FOR FIXED p!
+]
+.reset-column[
+n=n_samples
+p=n_features
+]
 
 ---
-#
+# Parametric and non-parametric models
+
+- Parametric model:
+Number of “parameters” (degrees of freedom) independent of data.
+
+- Non-parametric model:
+Degrees of freedom increase with more data.
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_train.png)
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_generalization.png)
 
 ---
-#
+# Overfitting and Underfitting
+
+![:scale 50%](images/overfitting_underfitting_cartoon_full.png)
+
+---
+class: center, middle
+
+![:scale 100%](images/knn_vs_nearest_centroid.png)
+---
+class: center, middle
+
+![:scale 100%](images/train_test_set_2d_classification.png)
+
+---
+# Overfitting the validation set
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import scale
+
+data = load_breast_cancer()
+X, y = data.data, data.target
+X = scale(X)
+
+X_trainval, X_test, y_trainval, y_test = train_test_split(X, y)
+X_train, X_val, y_train, y_val = train_test_split(X_trainval, y_trainval)
+
+knn = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
+
+print("Validation: {:.3f}".format(knn.score(X_val, y_val)))
+print("Test: {:.3f}".format(knn.score(X_test, y_test)))
+```
+
+Validation: 0.972
+Test: 0.951
+
+---
+# Overfitting the validation set
+
+```python
+val = []
+test = []
+
+for i in range(1000):
+    rng = np.random.RandomState(i)
+    noise = rng.normal(scale=.1, size=X_train.shape)
+    knn = KNeighborsClassifier(n_neighbors=5).fit(X_train + noise, y_train)
+    val.append(knn.score(X_val, y_val))
+    test.append(knn.score(X_test, y_test))
+
+print("Validation: {:.3f}".format(np.max(val)))
+print("Test: {:.3f}".format(test[np.argmax(val)]))
+```
+
+```
+Validation: 1.000
+Test: 0.958
+```
 
 ---
 
+# Threefold split
+
+![:scale 100%](images/threefold_split.png)
+
+--
+pro: fast, simple
+
+con: high variance, bad use of data
+
+---
+# Implementing threefold split
+
+```python
+X_trainval, X_test, y_trainval, y_test = train_test_split(X, y)
+X_train, X_val, y_train, y_val = train_test_split(X_trainval, y_trainval)
+
+val_scores = []
+neighbors = np.arange(1, 15, 2)
+for i in neighbors:
+    knn = KNeighborsClassifier(n_neighbors=i)
+    knn.fit(X_train, y_train)
+    val_scores.append(knn.score(X_val, y_val))
+print("best validation score: {:.3f}".format(np.max(val_scores)))
+best_n_neighbors = neighbors[np.argmax(val_scores)]
+print("best n_neighbors: {}".format(best_n_neighbors))
+
+knn = KNeighborsClassifier(n_neighbors=best_n_neighbors)
+knn.fit(X_trainval, y_trainval)
+print("test-set score: {:.3f}".format(knn.score(X_test, y_test)))
+```
+
+```
+best validation score: 0.991
+best n_neighbors: 11
+test-set score: 0.951
+```
+
+---
+class: center, middle
+# Cross-validation
+
+![:scale 100%](images/kfold_cv.png)
+--
+pro: more stable, more data
+con: slower
+
+---
+
+class: center, middle
+# Cross-validation + test set
+
+![:scale 100%](images/grid_search_cross_validation.png)
+
+---
+# Implementing Grid-Search with Cross-Validation
+
+```python
+from sklearn.model_selection import cross_val_score
+
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+cross_val_scores = []
+
+for i in neighbors:
+    knn = KNeighborsClassifier(n_neighbors=i)
+    scores = cross_val_score(knn, X_trainval, y_trainval, cv=10)
+    cross_val_scores.append(np.mean(scores))
+    
+print("best cross-validation score: {:.3f}".format(np.max(cross_val_scores)))
+best_n_neighbors = neighbors[np.argmax(cross_val_scores)]
+print("best n_neighbors: {}".format(best_n_neighbors))
+
+knn = KNeighborsClassifier(n_neighbors=best_n_neighbors)
+knn.fit(X_train, y_train)
+print("test-set score: {:.3f}".format(knn.score(X_test, y_test)))
+```
+
+```
+best cross-validation score: 0.967
+best n_neighbors: 9
+test-set score: 0.965
+```
+
+---
+![:scale 100%](images/gridsearch_workflow.png)
+
+---
+# Nested Cross-Validation
+
+- Replace outer split by CV loop
+- Doesn’t yield single model
+(inner loop might have different best parameter settings)
+- Takes a long time, not that useful in practice
+
+---
+class: center, middle
+# Cross-Validation Strategies
+
+---
+# StratifiedKFold
+
+![:scale 100%](images/stratified_cv.png)
+
+Stratified:
+Ensure relative class frequencies in each fold reflect relative class frequencies on the whole dataset.
+
+---
+# Defaults in scikit-learn
+
+- Three-fold is default number of folds
+- For classification cross-validation is stratified
+- train_test_split has stratify option:
+train_test_split(X, y, stratify=y)
+
+- No shuffle by default!
+
+---
+# Repeated KFold and LeaveOneOut
+
+- LeaveOneOut : KFold(n_folds=n_samples)
+High variance, takes a long time
+
+- Better: repeated KFold.
+Apply KFold or StratifiedKFold multiple times with shuffled data. Reduces variance!
+
+---
+# ShuffleSplit / StratifiedShuffleSplit
+
+![:scale 100%](images/shuffle_split_cv.png)
+
+---
+# GroupKFold
+
+![:scale 100%](images/group_kfold.png)
+
+---
+# TimeSeriesSplit
+
+![:scale 100%](images/time_series_cv.png)
+
+---
+# Using Cross-Validation Generators
+
+```python
+from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit
+kfold = KFold(n_splits=5)
+skfold = StratifiedKFold(n_splits=5, shuffle=True)
+ss = ShuffleSplit(n_splits=20, train_size=.4, test_size=.3)
+
+print("KFold:\n{}".format(
+      cross_val_score(KNeighborsClassifier(), X, y, cv=kfold)))
+
+print("StratifiedKFold:\n{}".format(
+      cross_val_score(KNeighborsClassifier(), X, y, cv=skfold)))
+
+print("ShuffleSplit:\n{}".format(
+      cross_val_score(KNeighborsClassifier(), X, y, cv=ss)))
+```
+
+```
+KFold:
+[ 0.93  0.96  0.96  0.98  0.96]
+StratifiedKFold:
+[ 0.97  0.95  0.98  0.96  0.96]
+ShuffleSplit:
+[ 0.93  0.96  0.95  0.98  0.95  0.98  0.97  0.95  0.96  0.96  0.99  0.96
+  0.96  0.96  0.98  0.96  0.95  0.95  0.96  0.96]
+```
+
+---
+![:scale 100%](images/gridsearch_workflow.png)
+
+---
+# GridSearchCV
+
+```
+from sklearn.model_selection import GridSearchCV
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y)
+
+
+param_grid = {'n_neighbors':  np.arange(1, 15, 2)}
+grid = GridSearchCV(KNeighborsClassifier(), param_grid=param_grid, cv=10)
+grid.fit(X_train, y_train)
+print("best mean cross-validation score: {:.3f}".format(grid.best_score_))
+print("best parameters: {}".format(grid.best_params_))
+
+print("test-set score: {:.3f}".format(grid.score(X_test, y_test)))
+```
+
+```
+best mean cross-validation score: 0.967
+best parameters: {'n_neighbors': 9}
+test-set score: 0.993
+```
+
+---
+# GridSearchCV Results
+```python
+import pandas as pd
+results = pd.DataFrame(grid.cv_results_)
+results.columns
+```
+```
+Index(['mean_fit_time', 'mean_score_time', 'mean_test_score',
+       'mean_train_score', 'param_n_neighbors', 'params', 'rank_test_score',
+       'split0_test_score', 'split0_train_score', 'split1_test_score',
+       'split1_train_score', 'split2_test_score', 'split2_train_score',
+       'split3_test_score', 'split3_train_score', 'split4_test_score',
+       'split4_train_score', 'split5_test_score', 'split5_train_score',
+       'split6_test_score', 'split6_train_score', 'split7_test_score',
+       'split7_train_score', 'split8_test_score', 'split8_train_score',
+       'split9_test_score', 'split9_train_score', 'std_fit_time',
+       'std_score_time', 'std_test_score', 'std_train_score'],
+      dtype='object')
+```
+
+```python
+results.params
+```
+```
+0     {'n_neighbors': 1}
+1     {'n_neighbors': 3}
+2     {'n_neighbors': 5}
+3     {'n_neighbors': 7}
+4     {'n_neighbors': 9}
+5    {'n_neighbors': 11}
+6    {'n_neighbors': 13}
+Name: params, dtype: object
+```
+
+---
+![:scale 100%](images/grid_search_n_neighbors.png)
+---
 
 class: middle
 
