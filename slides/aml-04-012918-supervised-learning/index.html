@@ -68,6 +68,10 @@
           font-size: 25px;
       }
 
+      .remark-slide-content .smallest p, .remark-slide-content .smallest li, .remark-slide-content .smallest .remark-code{
+          font-size: 18px;
+      }
+
       .normal {
           font-size: 30px;
       }
@@ -434,13 +438,13 @@ class: center, some-space
 ![:scale 70%](images/grid_search_cross_validation.png)
 
 ---
-# Implementing Grid-Search with Cross-Validation
+# Grid-Search with Cross-Validation
 
+.smaller[
 ```python
 from sklearn.model_selection import cross_val_score
 
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-
 cross_val_scores = []
 
 for i in neighbors:
@@ -462,9 +466,11 @@ best cross-validation score: 0.967
 best n_neighbors: 9
 test-set score: 0.965
 ```
+]
 
 ---
-![:scale 100%](images/gridsearch_workflow.png)
+class: center, middle
+![:scale 80%](images/gridsearch_workflow.png)
 
 ---
 # Nested Cross-Validation
@@ -497,6 +503,7 @@ train_test_split(X, y, stratify=y)
 - No shuffle by default!
 
 ---
+class: spacious
 # Repeated KFold and LeaveOneOut
 
 - LeaveOneOut : KFold(n_folds=n_samples)
@@ -507,22 +514,24 @@ Apply KFold or StratifiedKFold multiple times with shuffled data. Reduces varian
 
 ---
 # ShuffleSplit / StratifiedShuffleSplit
-
-![:scale 100%](images/shuffle_split_cv.png)
+.padding-top[
+![:scale 100%](images/shuffle_split_cv.png)]
 
 ---
 # GroupKFold
 
-![:scale 100%](images/group_kfold.png)
+.padding-top[
+![:scale 100%](images/group_kfold.png)]
 
 ---
 # TimeSeriesSplit
-
-![:scale 100%](images/time_series_cv.png)
+.padding-top[
+![:scale 100%](images/time_series_cv.png)]
 
 ---
 # Using Cross-Validation Generators
 
+.smaller[
 ```python
 from sklearn.model_selection import KFold, StratifiedKFold, ShuffleSplit
 kfold = KFold(n_splits=5)
@@ -548,22 +557,25 @@ ShuffleSplit:
 [ 0.93  0.96  0.95  0.98  0.95  0.98  0.97  0.95  0.96  0.96  0.99  0.96
   0.96  0.96  0.98  0.96  0.95  0.95  0.96  0.96]
 ```
-
+]
 ---
-![:scale 100%](images/gridsearch_workflow.png)
+class: center, middle
+![:scale 80%](images/gridsearch_workflow.png)
 
 ---
 # GridSearchCV
-
-```
+.smaller[
+```python
 from sklearn.model_selection import GridSearchCV
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y)
 
 
 param_grid = {'n_neighbors':  np.arange(1, 15, 2)}
+
 grid = GridSearchCV(KNeighborsClassifier(), param_grid=param_grid, cv=10)
 grid.fit(X_train, y_train)
+
 print("best mean cross-validation score: {:.3f}".format(grid.best_score_))
 print("best parameters: {}".format(grid.best_params_))
 
@@ -575,9 +587,11 @@ best mean cross-validation score: 0.967
 best parameters: {'n_neighbors': 9}
 test-set score: 0.993
 ```
-
+]
 ---
+
 # GridSearchCV Results
+.smallest[
 ```python
 import pandas as pd
 results = pd.DataFrame(grid.cv_results_)
@@ -610,9 +624,13 @@ results.params
 6    {'n_neighbors': 13}
 Name: params, dtype: object
 ```
+]
 
 ---
-![:scale 100%](images/grid_search_n_neighbors.png)
+class: center
+# n_neighbors Search Results
+
+![:scale 70%](images/grid_search_n_neighbors.png)
 ---
 
 class: middle
