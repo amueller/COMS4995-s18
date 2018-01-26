@@ -133,35 +133,37 @@ $$ (x_i, y_i) \propto p(x, y) \text{ i.i.d.}$$
 $$ x_i \in \mathbb{R}^p$$
 $$ y_i \in \mathbb{R}$$
 $$f(x_i) \approx y_i$$
+$$f(x) \approx y$$
 ]
 ---
-class: middle
+class: center
 
 # Nearest Neighbors
 
-![:scale 50%](images/knn_boundary_dataset.png)
-
-FIXME FORMULA
----
-class: middle
-
-# Nearest Neighbors
-
-![:scale 50%](images/knn_boundary_test_points.png)
+![:scale 40%](images/knn_boundary_dataset.png)
+$$f(x) = y_i, i = \text{argmin}_j || x_j - x||$$
 
 ---
-class: middle
+class: center
 
 # Nearest Neighbors
 
-![:scale 50%](images/knn_boundary_k1.png)
+![:scale 40%](images/knn_boundary_test_points.png)
+$$f(x) = y_i, i = \text{argmin}_j || x_j - x||$$
 
 ---
-class: middle
+class: center
 
 # Nearest Neighbors
 
-![:scale 50%](images/train_test_set_2d_classification.png)
+![:scale 40%](images/knn_boundary_k1.png)
+
+$$f(x) = y_i, i = \text{argmin}_j || x_j - x||$$
+
+---
+class: center
+
+![:scale 60%](images/train_test_set_2d_classification.png)
 
 ---
 # KNN with scikit-learn
@@ -178,65 +180,81 @@ print("accuracy: {:.2f}".format(knn.score(X_test, y_test)))
 accuracy: 0.77
 
 ---
+class: center
+
 # More neighbors
 
 ![:scale 50%](images/knn_boundary_k1.png)
 
 ---
+class: center
+
 # More neighbors
 
 ![:scale 50%](images/knn_boundary_k3.png)
 
 ---
+class: center, some-space
+
 # Influence of n_neighbors
 
-![:scale 50%](images/knn_boundary_varying_k.png)
+![:scale 45%](images/knn_boundary_varying_k.png)
 
 ---
+class: center, spacious
+
 # Model complexity
 
-![:scale 50%](images/knn_boundary_varying_k.png)
+![:scale 75%](images/knn_model_complexity.png)
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_train.png)
+![:scale 80%](images/overfitting_underfitting_cartoon_train.png)
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_generalization.png)
+![:scale 80%](images/overfitting_underfitting_cartoon_generalization.png)
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_full.png)
+![:scale 80%](images/overfitting_underfitting_cartoon_full.png)
 
 ---
+class: center, spacious
 # Nearest Centroid
 
-![:scale 50%](images/nearest_centroid_boundary.png)
+![:scale 40%](images/nearest_centroid_boundary.png)
 
 ---
 # Nearest Centroid with scikit-learn
 
 ```python
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
 from sklearn.neighbors import NearestCentroid
-plt.figure()
 nc = NearestCentroid()
-nc.fit(X, y)
-plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor='k')
-plot_2d_classification(nc, X, alpha=.5)
-plt.gca().set_aspect("equal")
-plt.scatter(nc.centroids_[:, 0], nc.centroids_[:, 1], c=['b', 'r'], s=100, marker='x')
+nc.fit(X_train, y_train)
+print("accuracy: {:.2f}".format(nc.score(X_test, y_test)))
+```
+
+```
+accuracy: 0.62
 ```
 
 ---
+class: center
 # Nearest Shrunken Centroid
 
-![:scale 50%](images/nearest_shrunken_centroid_boundary.png)
+![:scale 70%](images/nearest_shrunken_centroid_boundary.png)
 
-![:scale 50%](images/nearest_shrunken_centroid_thresholding.png)
+![:scale 30%](images/nearest_shrunken_centroid_thresholding.png)
 
 ---
 # Computational Properties Centroids
@@ -279,32 +297,34 @@ Number of “parameters” (degrees of freedom) independent of data.
 Degrees of freedom increase with more data.
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_train.png)
+![:scale 80%](images/overfitting_underfitting_cartoon_train.png)
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_generalization.png)
+![:scale 80%](images/overfitting_underfitting_cartoon_generalization.png)
 
 ---
+class: center, spacious
 # Overfitting and Underfitting
 
-![:scale 50%](images/overfitting_underfitting_cartoon_full.png)
-
+![:scale 80%](images/overfitting_underfitting_cartoon_full.png)
 ---
 class: center, middle
 
-![:scale 100%](images/knn_vs_nearest_centroid.png)
+![:scale 80%](images/knn_vs_nearest_centroid.png)
 ---
 class: center, middle
 
-![:scale 100%](images/train_test_set_2d_classification.png)
+![:scale 80%](images/train_test_set_2d_classification.png)
 
 ---
 # Overfitting the validation set
-
+.smaller[
 ```python
 from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import scale
@@ -314,17 +334,19 @@ X, y = data.data, data.target
 X = scale(X)
 
 X_trainval, X_test, y_trainval, y_test = train_test_split(X, y)
-X_train, X_val, y_train, y_val = train_test_split(X_trainval, y_trainval)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_trainval, y_trainval)
 
 knn = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
 
 print("Validation: {:.3f}".format(knn.score(X_val, y_val)))
 print("Test: {:.3f}".format(knn.score(X_test, y_test)))
 ```
-
+```
 Validation: 0.972
 Test: 0.951
-
+```
+]
 ---
 # Overfitting the validation set
 
@@ -335,7 +357,8 @@ test = []
 for i in range(1000):
     rng = np.random.RandomState(i)
     noise = rng.normal(scale=.1, size=X_train.shape)
-    knn = KNeighborsClassifier(n_neighbors=5).fit(X_train + noise, y_train)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(X_train + noise, y_train)
     val.append(knn.score(X_val, y_val))
     test.append(knn.score(X_test, y_test))
 
@@ -351,10 +374,13 @@ Test: 0.958
 ---
 
 # Threefold split
-
+.padding-top[
 ![:scale 100%](images/threefold_split.png)
+]
 
 --
+<br />
+
 pro: fast, simple
 
 con: high variance, bad use of data
@@ -362,6 +388,7 @@ con: high variance, bad use of data
 ---
 # Implementing threefold split
 
+.smaller[
 ```python
 X_trainval, X_test, y_trainval, y_test = train_test_split(X, y)
 X_train, X_val, y_train, y_val = train_test_split(X_trainval, y_trainval)
@@ -386,22 +413,25 @@ best validation score: 0.991
 best n_neighbors: 11
 test-set score: 0.951
 ```
-
+]
 ---
-class: center, middle
 # Cross-validation
+.padding-top[
+![:scale 100%](images/kfold_cv.png)]
 
-![:scale 100%](images/kfold_cv.png)
 --
+<br \>
+
 pro: more stable, more data
+
 con: slower
 
 ---
 
-class: center, middle
+class: center, some-space 
 # Cross-validation + test set
 
-![:scale 100%](images/grid_search_cross_validation.png)
+![:scale 70%](images/grid_search_cross_validation.png)
 
 ---
 # Implementing Grid-Search with Cross-Validation
