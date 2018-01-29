@@ -800,10 +800,13 @@ For each number of neighbors that we want to try, we build a model on
 the training set, and evaluate it on the validation set.
 We then pick the best validation set score, here that’s 97.2%, achieved
 when using three neighbors.
-We then retrain the model with this parameter, and evaluate on the
-test set.
+We then retrain the model with this parameter, and evaluate on the test set.
+The retraining step is somewhat optional. We could also just use the best
+model. But retraining allows us to make better use of all the data.
 
-Do you have any idea how to make this more robust?
+Still, depending on the test-set size we might be using only 70% or 80%
+of the data, and our results depend on how exactly we split the datasets.
+So how can we make this more robust?
 ---
 # Cross-validation
 .padding-top[
@@ -858,7 +861,7 @@ cross_val_scores = []
 
 for i in neighbors:
     knn = KNeighborsClassifier(n_neighbors=i)
-    scores = cross_val_score(knn, X_trainval, y_trainval, cv=10)
+    scores = cross_val_score(knn, X_train, y_train, cv=10)
     cross_val_scores.append(np.mean(scores))
     
 print("best cross-validation score: {:.3f}".format(np.max(cross_val_scores)))
@@ -981,7 +984,7 @@ class: spacious
 - LeaveOneOut : KFold(n_folds=n_samples)
 High variance, takes a long time
 
-- Better: repeated KFold.
+- Better: RepeatedKFold.
 Apply KFold or StratifiedKFold multiple times with shuffled data. Reduces
 variance!
 
@@ -1080,6 +1083,7 @@ ShuffleSplit:
 ```
 ]
 ???
+FIXME: repeated kfold
 Ok, so how do we use these cross-validation generators? We can simply
 pass the object to the cv parameter of the cross_val_score function,
 instead of passing a number. Then that generator will be used.
