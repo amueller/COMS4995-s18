@@ -109,6 +109,9 @@
           float: left;
           width: 65%
       }
+      .invisible {
+          visibility: hidden
+      }
 
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
     </style>
@@ -256,6 +259,7 @@ from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors=1)
 knn.fit(X_train, y_train)
 print("accuracy: {:.2f}".format(knn.score(X_test, y_test)))
+y_pred = knn.predict(X_test)
 ```
 accuracy: 0.77
 
@@ -274,16 +278,23 @@ such as here saying that we only want to look at the neirest neighbor.
 
 Then we can call the fit method to build the model, here knn.fit(X_train,
 y_train)
-All models in scikit-learn have a fit-method, and all the supervised
-ones take the data X and the outcomes y. The fit method builds the
-model and stores any estimated quantities in the model object, here knn.
-
+All models in scikit-learn have a fit-method, and all the supervised ones take
+the data X and the outcomes y. The fit method builds the model and stores any
+estimated quantities in the model object, here knn.  In the case of nearest
+neighbors, the `fit` methods simply remembers the whole training set.
 
 Then, we can use knn.score to make predictions on the test data, and
 compare them against the true labels y_test.
 
 For classification models, the score method will always compute
-accuracy. Who here has not seen this before?
+accuracy. 
+
+Just for illustration purposes, I also call the predict method here.
+The predict method is what's used to make predictions on any dataset.
+If we use the score method, it calls predict internally and then
+compares the outcome to the ground truth that's provided.
+
+Who here has not seen this before?
 ---
 class: center
 
@@ -349,8 +360,6 @@ If we increase the number of neighbors, the boundary between red and
 blue simplifies, and with 40 neighbors we mostly end up with a line.
 This also means that now many of the training data points would be
 labeled incorrectly.
-
-This is a very typical behavior, that I sketched in a schematic for you.
 ---
 class: center, spacious
 
@@ -368,6 +377,8 @@ You can see that for a single neighbor, the training score is 1 so perfect
 accuracy, but the test score is only 70%.  If we increase the number of
 neighbors we consider, the training score goes down, but the test score
 goes up, with an optimum at 19 and 21, but then both go down again.
+
+This is a very typical behavior, that I sketched in a schematic for you.
 ---
 class: center, spacious
 # Overfitting and Underfitting
@@ -375,7 +386,7 @@ class: center, spacious
 ![:scale 80%](images/overfitting_underfitting_cartoon_train.png)
 
 ???
-There is a cartoon version of how this chart looks in general, though
+here is a cartoon version of how this chart looks in general, though
 it's horizontally flipped to the one with saw for knn.
 This chart has accuracy on the y axis, and the abstract concept of model
 complexity on the x axis.
@@ -412,10 +423,12 @@ So going back to nearest neighbors, what parameters correspond to high
 model complexity and what to low model complexity? high n_neighbors =
 low complexity!
 ---
-class: center, spacious
+class: center
 # Nearest Centroid
 
-![:scale 40%](images/nearest_centroid_boundary.png)
+![:scale 35%](images/nearest_centroid_boundary.png)
+
+$$f(x) = \text{argmin}_{i \in Y} ||\bar{x}_i - x||$$
 
 ???
 Before we go to more techniques to find the right hyper parameters,
@@ -450,6 +463,8 @@ We use the train_test_split function to split the data into 75% training
 and 25% test data,
 import the nearest centroid model, fit it on the training set, and
 compute the accuracy on the test set.
+In this case, the fit method computes the mean or centroid of each class
+and stores it in the nc object, while for prediction 
 
 Questions so far?
 ---
@@ -474,21 +489,13 @@ makes sense ;)
 What that means is that if the centroids have an entry that is close to
 zero, this direction gets ignored.
 Here you can see different settings of the shrinking threshold. No
-shrinking, a threshold of .3 and a threshold of .5.
+shrinking, a threshold of .4 and a threshold of .8.
 Because the centers are less than .5 apart from the data mean, the last
 panel has a perfectly horizontal line.
 
 When do you think NC works better than KNN? High dimensions!
 ---
 # Computational Properties Centroids
-
-- fit: O(n * p)
-- memory: O(n_classes * p)
-- predict: O(n_classes * p)
-
-n = n_samples
-p = n_features
-
 ???
 I want to compare some computational properties of the nearest shrunken
 centroid and k nearest neighbors.
@@ -505,6 +512,51 @@ is computing the distance to each of them, which is the same. When is
 this slow? Basically never - in high dim with only few important, maybe
 trees could be better, but we could also shrink those dimensions away.
 
+--
+
+- fit: O(n * p)
+- memory: O(n_classes * p)
+- predict: O(n_classes * p)
+
+n = n_samples
+p = n_features
+
+---
+# Computational Properties Neighbors
+.left-column[
+## Naive
+- fit: no time
+- memory: O(n * p)
+- predict: O(n * p)
+]
+.invisible[.right-column[
+## Kd-tree
+- fit: O(p * n log n)
+- memory: O(n * p)
+- predict:
+- O(k * log(n))<br />
+  FOR FIXED p!
+]]
+.reset-column[
+n=n_samples
+p=n_features
+]
+
+???
+Ok, now for the k nearest neighbors. How would you implement this? (brute
+force or neighbors structure)
+When not using a structure: fit no time, memory is the whole dataset,
+and prediction requires comparing against all data points.
+If we create a kd-tree or ball tree?
+Fit takes O(n log n), memory is the same. Prediction might be faster in
+low dimensions.
+
+What’s bad about this?
+memory scales with data, prediction speed scales with data :-/
+
+Can have high complexity models though.
+When would you use one vs the other? Large datasets , high dimensions:
+use nearest centroid maybe.
 ---
 # Computational Properties Neighbors
 .left-column[
@@ -518,7 +570,7 @@ trees could be better, but we could also shrink those dimensions away.
 - fit: O(p * n log n)
 - memory: O(n * p)
 - predict:
-- O(k * log(n))
+- O(k * log(n))<br />
   FOR FIXED p!
 ]
 .reset-column[
@@ -562,7 +614,7 @@ Non-parametric models scale their complexity with data, such as nearest
 neighbors. More data here means more complex decision boundaries, and
 more numbers to store.
 Examples?
-Trees and forests and SVMs non-parametric, linear models parametric,
+Trees and forests and kernel SVMs are non-parametric, linear models parametric,
 neural nets parametric (arguably, since they have sooo many parameters).
 
 ---
@@ -627,7 +679,7 @@ print("Test: {:.3f}".format(knn.score(X_test, y_test)))
 ```
 ```
 Validation: 0.972
-Test: 0.951
+Test: 0.965
 ```
 ]
 ???
@@ -667,19 +719,24 @@ print("Test: {:.3f}".format(test[np.argmax(val)]))
 Validation: 1.000
 Test: 0.958
 ```
+
+???
 So now let me propose a silly way to tune my classifier.
 I add random noise to my training set for fitting.
 And I repeat that 1000 times, and I check which of these thousand runs
 has the best performance on the validation set. That particular run has
-99.1% percent accuracy, much better than before.
-If I test the same set on the test set, I get a much lower accuracy then
+100% percent accuracy, quite a bit better than before.
+If I would use the same set to estimate how well my model is, I would think
+I created a perfect model and I should write a paper about building much
+better models by using noise.
+
+But if I test the same model on the test set, I get a lower accuracy then
 before: the noise I added was good for the validation set, but not the
 test set.
-If I try this often enough, I can find noise that will give me 100% on the
-validation set, but that doesn’t mean it will be good for any new data.
+The lesson is: If I try something often enough, be it parameters or noise, at some point I'll
+get better performance on the validation set, but that doesn’t mean it will be good for any new data.
 By selecting the best among many you introduce a bias, and the validation
 accuracy is not a good measure of generalization performance any more.
-???
 
 ---
 
@@ -690,7 +747,7 @@ accuracy is not a good measure of generalization performance any more.
 ???
 The simplest way to combat this overfitting to the test set is by using
 a three-fold split of the data, into a training, a validation and a
-test set.
+test set as we just did.
 We use the training set for model building, the validation set for
 parameter selection and the test set for a final evaluation of the model.
 So how many models should you try out on the test set? Only one! Ideally
