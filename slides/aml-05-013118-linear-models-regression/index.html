@@ -169,9 +169,9 @@ Has tuning parameter alpha
 ???
 FIXME pointers data fitting / regularization!
 ---
-# Reminder underfitting / overfitting
+# Reminder on model complexity
 
-???
+![:scale 80%](images/overfitting_underfitting_cartoon_full.png)
 
 ---
 # Boston Housing Dataset
@@ -214,11 +214,13 @@ np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 ???
 
 ---
-# R^2
+# Coefficient of determination R^2
 
-FIXME definition
+`$$ R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n - 1} (y_i - \hat{y}_i)^2}{\sum_{i=0}^{n - 1} (y_i - \bar{y})^2} $$`
 
+`$$ \bar{y} =  \frac{1}{n} \sum_{i=0}^{n - 1} y_i$$`
 
+Can be negative for biased estimators - or the test set!
 
 ???
 
@@ -490,7 +492,7 @@ class: middle
 ![:scale 100%](images/ransac_algorithm2.png)
 
 ???
-
+FIXME WTF is this slide about?
 ---
 
 ???
