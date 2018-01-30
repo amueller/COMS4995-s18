@@ -132,6 +132,8 @@ Andreas C. Müller
 ???
 
 ---
+class:center
+
 # Linear Models for Regression
 
 ![:scale 50%](images/linear_regression_1d.png)
@@ -142,16 +144,19 @@ $$\hat{y} = w^T \mathbf{x} + b = \sum_{i=1}^p w_i x_i +b$$
 
 ---
 # Ordinary Least Squares
-$$hat{y} = w^T \mathbf{x} + b = \sum_{i=1}^p w_i x_i +b $$
 
-$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^p ||w^T\mathbf{x}_i - y_i||^2$$
+$$\hat{y} = w^T \mathbf{x} + b = \sum_{i=1}^p w_i x_i +b $$
+
+`$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^p ||w^T\mathbf{x}_i - y_i||^2$$`
 
 Unique solution if $\mathbf{X} = (\mathbf{x}_1, ... \mathbf{x}_n)^T$ has full rank.
 ???
 
 ---
 # Ridge Regression
-\min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^Tx_i - y_i||^2 + \alpha ||w||^2
+
+`$$ \min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^Tx_i - y_i||^2 + \alpha ||w||^2 $$`
+
 ???
 Always has a unique solution.
 Has tuning parameter alpha
@@ -159,7 +164,8 @@ Has tuning parameter alpha
 ---
 # (regularized) Empirical Risk Minimization
 
-$$ min_{f \in F} \sum_{i=1}^n L(f(\mathbf{x}_i), y_i) + \alpha R(f) $$
+`$$ min_{f \in F} \sum_{i=1}^n L(f(\mathbf{x}_i), y_i) + \alpha R(f) $$`
+
 ???
 FIXME pointers data fitting / regularization!
 ---
@@ -170,9 +176,9 @@ FIXME pointers data fitting / regularization!
 ---
 # Boston Housing Dataset
 
-![:scale 80%](images/boston_housing_scatter.png)
-
-``python
+![:scale 70%](images/boston_housing_scatter.png)
+.smaller[
+```python
 print(X.shape)
 print(y.shape)
 ```
@@ -180,15 +186,17 @@ print(y.shape)
 (506, 13)
 (506,)
 ```
-
+]
 ???
 
 ---
-
+class: middle, spacious
 ```python
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, random_state=42)
 
 np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 ```
@@ -196,13 +204,13 @@ np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 0.651
 ```
 
+
 ```python
 np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 ```
 ```
 0.649
 ```
-
 ???
 
 ---
@@ -215,6 +223,7 @@ FIXME definition
 ???
 
 ---
+.smallest[
 ```python
 from sklearn.model_selection import GridSearchCV
 param_grid = {'alpha': np.logspace(-3, 3, 13)}
@@ -229,8 +238,10 @@ print(param_grid)
 grid = GridSearchCV(Ridge(), param_grid, cv=10)
 grid.fit(X_train, y_train)
 ```
-
-![:scale 80%](images/ridge_alpha_search.png)
+]
+.center[
+![:scale 60%](images/ridge_alpha_search.png)
+]
 
 ???
 
@@ -239,9 +250,10 @@ grid.fit(X_train, y_train)
 
 ```python
 from sklearn.preprocessing import PolynomialFeatures, scale
-X_poly = PolynomialFeatures(include_bias=False).fit_transform(scale(X))
+poly = PolynomialFeatures(include_bias=False)
+X_poly = poly.fit_transform(scale(X))
 print(X_poly.shape)
-X_train, X_test, y_train, y_test = train_test_split(X_poly, y, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y)
 ```
 ```
 (506, 104)
@@ -262,9 +274,10 @@ np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 ???
 
 ---
-
-![:scale 80%](images/ridge_alpha_search_poly.png)
-
+.center[
+![:scale 60%](images/ridge_alpha_search_poly.png)
+]
+.smaller[
 ```python
 print(grid.best_params_)
 print(grid.best_score_)
@@ -273,6 +286,7 @@ print(grid.best_score_)
 {'alpha': 10.0}
 0.86
 ```
+]
 ???
 
 ---
@@ -280,10 +294,12 @@ print(grid.best_score_)
 
 ```python
 lr = LinearRegression().fit(X_train, y_train)
-plt.scatter(range(X_poly.shape[1]), lr.coef_, c=np.sign(lr.coef_), cmap="bwr_r")
+plt.scatter(range(X_poly.shape[1]),
+            lr.coef_, c=np.sign(lr.coef_), cmap="bwr_r")
 ```
-
-![:scale 80%](images/lr_coefficients_large.png)
+.center[
+![:scale 55%](images/lr_coefficients_large.png)
+]
 
 ???
 
@@ -292,10 +308,12 @@ plt.scatter(range(X_poly.shape[1]), lr.coef_, c=np.sign(lr.coef_), cmap="bwr_r")
 
 ```python
 ridge = grid.best_estimator_
-plt.scatter(range(X_poly.shape[1]), ridge.coef_, c=np.sign(ridge.coef_), cmap="bwr_r")
+plt.scatter(range(X_poly.shape[1]), ridge.coef_,
+            c=np.sign(ridge.coef_), cmap="bwr_r")
 ```
-
-![:scale 80%](images/ridge_coefficients.png)
+.center[
+![:scale 60%](images/ridge_coefficients.png)
+]
 
 ???
 
@@ -311,30 +329,34 @@ plt.plot(ridge100.coef_, 'o', label="alpha=100")
 plt.legend()
 ```
 
-![:scale 80%](images/ridge_coefficients_alpha.png)
+.center[
+![:scale 60%](images/ridge_coefficients_alpha.png)
+]
 
 ???
 
 ---
 # Coefficient Paths
 
-![:scale 80%](images/ridge_coefficient_paths.png)
+![:scale 90%](images/ridge_coefficient_paths.png)
 
 ???
 
 ---
 # Learning Curves
 
-![:scale 80%](images/ridge_learning_curve.png)
+![:scale 90%](images/ridge_learning_curve.png)
 
 ???
 
 ---
 # Lasso Regression
-$$ \min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha ||w||_1 $$
 
-Shrinks w towards zero like Ridge
-Sets some w exactly to zero - automatic feature selection!
+`$$ \min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha ||w||_1 $$`
+
+- Shrinks w towards zero like Ridge
+
+- Sets some w exactly to zero - automatic feature selection!
 
 ???
 
@@ -371,13 +393,14 @@ print(grid.best_score_)
 
 ---
 
-![:scale 80%](images/lasso_alpha_search.png)
+![:scale 90%](images/lasso_alpha_search.png)
 
 ???
 
 ---
-
-![:scale 80%](images/lasso_coef.png)
+.center[
+![:scale 60%](images/lasso_coef.png)
+]
 
 ```python
 print(X_poly.shape)
@@ -391,6 +414,7 @@ np.sum(lasso.coef_ != 0)
 ???
 
 ---
+.smaller[
 ```python
 from sklearn.linear_model import lars_path
 # lars_path computes the exact regularization path which is piecewise linear.
@@ -400,9 +424,10 @@ alphas, active, coefs = lars_path(X_train, y_train, eps=0.00001, method="lasso")
 plt.plot(alphas, coefs.T, alpha=.5)
 plt.xscale("log")
 ```
-
-![:scale 80%](images/lars_path.png)
-
+]
+.center[
+![:scale 55%](images/lars_path.png)
+]
 ???
 
 ---
@@ -413,7 +438,7 @@ plt.xscale("log")
 - two parameters to tune.
 
 
-$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha_1 ||w||_1 +  \alpha_2 ||w||^2_2 $$
+`$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha_1 ||w||_1 +  \alpha_2 ||w||^2_2 $$`
 
 ???
 
@@ -423,9 +448,7 @@ $$\min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha_1 
 
 ---
 # Robust Regression
-
-![:scale 80%](images/robust_regression.png)
-
+![:scale 85%](images/robust_regression.png)
 ???
 
 ---
@@ -463,8 +486,8 @@ FIXME formula
 ???
 
 ---
-
-![:scale 80%](images/ransac_algorithm2.png)
+class: middle
+![:scale 100%](images/ransac_algorithm2.png)
 
 ???
 
@@ -500,14 +523,9 @@ class: middle
     MathJax.Hub.Config({
     tex2jax: {
         inlineMath: [['$','$'], ['\\(','\\)']],
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style'] /* removed 'code' entry*/
     }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i = 0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
     });
     </script>
   </body>
