@@ -486,7 +486,18 @@ plt.xscale("log")
 ???
 
 ---
-# FIXME parametrization of elastic net in sklearn, grid search etc
+class: center
+# Comparing unit balls
+
+![:scale 70%](images/l1l2_elasticnet.png)
+
+???
+
+---
+# Parametrization in scikit-learn
+`$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha \eta ||w||_1 +  \alpha (1 - \eta) ||w||^2_2 $$`
+
+Where $\eta$ is the relative amount of l1 penalty (`l1_ratio` in the code).
 ???
 
 ---
