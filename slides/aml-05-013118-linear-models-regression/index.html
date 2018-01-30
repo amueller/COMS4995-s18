@@ -364,8 +364,49 @@ plt.legend()
 
 ---
 
-# FIXME lasso intuition
+# Understanding L1 and L2 Penalties
+.wide-left-column[
+![:scale 100%](images/l2_l1_l0.png)
+]
 
+.narrow-right-column[
+.smaller[
+`$$ \ell_2(w) = \sum_i \sqrt{w_i ^ 2}$$`
+`$$ \ell_1(w) = \sum_i |w_i|$$`
+`$$ \ell_0(w) = \sum_i 1_{w_i != 0}$$`
+]]
+???
+
+---
+
+# Understanding L1 and L2 Penalties
+
+.wide-left-column[
+![:scale 100%](images/l1_kink.png)
+]
+.narrow-right-column[
+.padding-top[
+.smaller[
+`$ f(x) = (2 x - 1)^2 $`
+
+`$ f(x) + L2 = (2 x - 1)^2 + \alpha x^2$`
+
+`$ f(x) + L1= (2 x - 1)^2 + \alpha |x|$`
+]]]
+???
+
+---
+class: center
+# Understanding L1 and L2 Penalties
+
+![:scale 70%](images/l1l2ball.png)
+???
+
+---
+class: center
+# Understanding L1 and L2 Penalties
+
+![:scale 70%](images/l1l2ball_intersect.png)
 ???
 
 ---
