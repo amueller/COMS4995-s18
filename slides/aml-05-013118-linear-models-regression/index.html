@@ -64,7 +64,7 @@
           padding-top: 100px;
       } 
 
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li, .remark-slide-content .smaller .remark-code{
+      .remark-slide-container .smaller p, .remark-slide-container .smaller li, .remark-slide-container .smaller .remark-code{
           font-size: 25px;
       }
 
@@ -614,12 +614,18 @@ Where $\eta$ is the relative amount of l1 penalty (`l1_ratio` in the code).
 ???
 
 ---
-
+class: smaller
 # Huber loss
+.padding-top[
+.left-column[
+![:scale 100%](images/huber_loss.png)
+]
+.right-column[
+`$$min_{w, \sigma} \sum_{i=1}^n \left (\sigma + H\left ( \frac{X_iw - y_i}{\sigma}\right) \sigma \right ) + \alpha ||w||_2^2$$`
 
-FIXME formula
-
-![:scale 80%](images/huber_loss.png)
+`$$H(z) = \begin{cases} z^2, &if |z| < \epsilon, \\ 2\epsilon|z| & else\end{cases}$$`
+]
+]
 
 ???
 
