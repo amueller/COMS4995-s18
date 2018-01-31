@@ -2,3 +2,4 @@
 *.odp
 *.swp
 *.~lock*
+*.DS_Store
