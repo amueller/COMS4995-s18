@@ -130,6 +130,10 @@ class: center, middle
 Andreas C. Müller
 
 ???
+So today we'll talk about linear models for regression. You're probably
+familiar with some of the basics, and that's where we'll start. But we'll also
+look into how to tune these models, what the trade-offs are, and some more
+complex techniques.
 
 ---
 class:center
@@ -141,6 +145,18 @@ class:center
 $$\hat{y} = w^T \mathbf{x} + b = \sum_{i=1}^p w_i x_i +b$$
 
 ???
+Predictions in all linear models for regression are of the form shown here:
+It's an inner product of the features with some coefficient or weight vector w, and some
+bias or intercept b. In other words, the output is a weighted sum of the inputs, possibly
+with a shift. here i runs over the features and x_i is one feature of the data point x.
+These models are called linear models because they are linear in the parameters w.
+The way I wrote it down here they are also linear in the features x_i. However,
+you can replace the features by any non-linear function of the inputs, and it'll
+still be a linear model.
+
+There are many differnt linear models for regression, and they all share this
+formula for making predictions. The difference between them is in how they
+find w and b based on the training data.
 
 ---
 # Ordinary Least Squares
@@ -149,17 +165,50 @@ $$\hat{y} = w^T \mathbf{x} + b = \sum_{i=1}^p w_i x_i +b $$
 
 `$$\min_{w \in \mathbb{R}^p} \sum_{i=1}^p ||w^T\mathbf{x}_i - y_i||^2$$`
 
-Unique solution if $\mathbf{X} = (\mathbf{x}_1, ... \mathbf{x}_n)^T$ has full rank.
+Unique solution if $\mathbf{X} = (\mathbf{x}_1, ... \mathbf{x}_n)^T$ has full column rank.
 ???
+The most straight-forward solution that goes back to Gauss is ordinary least squares.
+In ordinary least squares, find w and b such that the predictions on the training set
+are as accurate as possible according the the squared error.
+That intuitively makes sense: we want the predictions to be good on the training set.
+If there is more samples than features (and the samples span the whole feature space),
+then there is a unique solution. The problem is what's called a least squares problem,
+which is particularly easy to optimize and get the unique solution to.
+
+However, if there are more features than samples, there are usually many perfect solutions
+that lead to 0 error on the training set. Then it's not clear which solution to pick.
+Even if there are more samples than features, if there are strong correlations among features
+the results might be unstable, and we'll see some examples of that soon.
+
+Before we look at examples, I want to introduce a popular alternative.
 
 ---
 # Ridge Regression
 
-`$$ \min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^Tx_i - y_i||^2 + \alpha ||w||^2 $$`
+`$$ \min_{w \in \mathbb{R}^p} \sum_{i=1}^n ||w^T\mathbf{x}_i - y_i||^2 + \alpha ||w||^2 $$`
+
+Always has a unique solution.
+
+Tuning parameter alpha.
 
 ???
-Always has a unique solution.
-Has tuning parameter alpha
+In Ridge regression we add another term to the optimization problem. Not only do we want
+to fit the training data well, we also want w to have a small squared l2 norm or squared euclidean norm.
+The idea here is that we're decreasing the "slope" along each of the feature by
+pushing the coefficients towards zero. This constraings the model to be more simple.
+
+So there are two terms in this optimization problem, which is also called the objective function
+of the model: the data fitting term here that wants to be close to the training data
+according to the squared norm, and the prenalty or regularization term here that wants w to
+have small norm, and that doesn't depend on the data.
+
+Usually these two goals are somewhat opposing. If we made w zero, the second term would be zero,
+but the predictions would be bad. So we need to trade off between these two. The trade off is problem
+specific and is specified by the user. If we set alpha to zero, we get linear regression, if we set
+alpha to infinity we get a constant model. Obviously usually we want something in between.
+
+This is a very typical example of a general principle in machine learning, called
+regularized empirical risk minimization.
 
 ---
 # (regularized) Empirical Risk Minimization
@@ -168,10 +217,35 @@ Has tuning parameter alpha
 
 ???
 FIXME pointers data fitting / regularization!
+
+Many models in machine learning, like linear models, SVMs and neural networks follow the general framework of empirical
+risk minimization, which you can see here. We formulate the machine learning problem as an optimization problem over
+a family of functions. In our case that was the family of linear functions parametrized by w and b.
+The minimization problem consists of two parts, the data fitting part and the model complexity part.
+The data fitting part says that the predictions mad eby our functions should be accurate according to some loss L.
+For our regression problems that was the squared loss.
+The model complexity part says that we prefer simple models and penalizes complicated f.
+Most machine learning algorithms can be cast into this, with a particular choice of family of functions f,
+loss function L and regularizer R.
+And most of machine learning theory is build around this framework. People proof for differnt choices
+of F and L and R that if you minimize this, you'll be able to generalize well.
+And that makes intuitive sense. To do well on the test set, we definitely want to do reasonably well on the training set.
+We don't expect that we can do better on a test set than the training set.
+But we also want to minimize the performance difference between training and test set.
+If we restrict our model to be simple via the regularizer R, we have better chances of the model generalizing.
+
 ---
 # Reminder on model complexity
 
 ![:scale 80%](images/overfitting_underfitting_cartoon_full.png)
+
+???
+I hope this sounds familiar from what we talked about last time. This is a
+particular way of dealing with overfitting and underfitting.
+For this framework in general, or for ridge regression in particular, trading off the data fitting and the regularization
+changes the model complexity.
+If we set alpha high we restrict the model, and we will be on the left side of the graph. If we make alpha small,
+we allow the model to fit the data more, and we're on the right side of the graph.
 
 ---
 # Boston Housing Dataset
@@ -188,6 +262,22 @@ print(y.shape)
 ```
 ]
 ???
+Ok after all this pretty abstract talk, let's make this concrete. Let's do some regression on the boston housing dataset.
+After the last homework you're hopefully familiar with it. The idea is to predict prices of property in the boston area
+in different neighborhoods. This is a dataset from the 70s I think, so everything is pretty cheap.
+Most of the features you can see are continuous, with the exception of the charlston river variable which says whether
+the neighborhood is on the river.
+
+Keep in mind that this data lives in a 13 dimensional space and these
+univariate plots only look at 13 different projections of the data, and can't
+capture any of the interactions.
+
+But still we can see that the price clearly depends on some of these variables. It's also pretty clear that the dependency
+is non-linear for some of the variables. We'll still start with a linear model, because its a very simple class
+of models, and I'd always star approaching any model from the simplest baseline. In this case it's linear regression.
+We're having 506 samples and 13 features. We have much more samples than features.
+Linear regression should work just fine. Also it's a tiny dataset, so basically anything we'll try will run instantaneously,
+which is also good to keep in mind.
 
 ---
 class: middle, spacious
@@ -196,7 +286,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, random_state=42)
+    X, y, random_state=0)
 
 np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 ```
@@ -212,6 +302,7 @@ np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 0.649
 ```
 ???
+So here are the
 
 ---
 # Coefficient of determination R^2
