@@ -291,7 +291,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 ```
 ```
-0.651
+0.717
 ```
 
 
@@ -299,7 +299,7 @@ np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 ```
 ```
-0.649
+0.715
 ```
 ???
 So here are the
@@ -355,13 +355,13 @@ X_train, X_test, y_train, y_test = train_test_split(X_poly, y)
 np.mean(cross_val_score(LinearRegression(), X_train, y_train, cv=10))
 ```
 ```
-0.69
+0.74
 ```
 ```python
 np.mean(cross_val_score(Ridge(), X_train, y_train, cv=10))
 ```
 ```
-0.81
+0.76
 ```
 
 ???
@@ -376,8 +376,8 @@ print(grid.best_params_)
 print(grid.best_score_)
 ```
 ```
-{'alpha': 10.0}
-0.86
+{'alpha': 31.6}
+0.83
 ```
 ]
 ???
@@ -518,8 +518,8 @@ print(grid.best_params_)
 print(grid.best_score_)
 ```
 ```
-{'alpha': 0.0018}
-0.86
+{'alpha': 0.001}
+0.837
 ```
 
 
@@ -542,7 +542,7 @@ np.sum(lasso.coef_ != 0)
 ```
 ```
 (506, 104)
-62
+64
 ```
 
 ???
@@ -590,6 +590,45 @@ class: center
 
 Where $\eta$ is the relative amount of l1 penalty (`l1_ratio` in the code).
 ???
+
+---
+# Grid-searching ElasticNet
+
+```python
+from sklearn.linear_model import ElasticNet
+param_grid = {'alpha': np.logspace(-4, -1, 10),
+              'l1_ratio': [0.01, .1, .5, .9, .98, 1]}
+
+grid = GridSearchCV(ElasticNet(), param_grid, cv=10)
+grid.fit(X_train, y_train)
+
+print(grid.best_params_)
+print(grid.best_score_)
+```
+```
+{'alpha': 0.0001, 'l1_ratio': 0.01}
+0.718
+```
+
+---
+class: smaller
+# Analyzing grid-search results
+```python
+import pandas as pd
+res = pd.pivot_table(pd.DataFrame(grid.cv_results_),
+    values='mean_test_score', index='param_alpha', columns='param_l1_ratio')
+```
+.center[
+![:scale 60%](images/elasticnet_search.png)
+]
+---
+
+
+---
+
+
+---
+
 
 ---
 
