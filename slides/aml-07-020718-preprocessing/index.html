@@ -109,7 +109,7 @@ class: center, middle
 
 # Preprocessing and Feature Engineering
 
-02/08/17
+02/07/18
 
 Andreas C. Müller
 
@@ -119,44 +119,12 @@ applies to linear models, and not to tree-based
 models, but it also applies to neural nets and kernel
 SVMs.
 
+TODO: power transforms, categorical encoder
 ---
 
-class: left, middle
+class: middle
 
-# Notes on homework
-
-- Next one will be shorter.
-- Good job everybody !
-- Tools are important !
-  - Don’t use your systems Python, use environments
-  - Pick a decent editor / IDE!
-  - If you’re on windows, consider dual booting
-
-???
-I realized the homework was a bit much for some of
-you who haven’t been familiar with git and testing.
-I saw many of you made really great progress and got
-everything together, so good on you. I promise the
-next homework will be shorter.
-While this might have been much all at once, all the
-pieces are important. Who wants to go to industry?
-You’ll fight these fights all the time!
-I gave some advice at the second lecture, and I
-noticed not everybody took it. If you want be a
-serious data scientist in industry, start now. Less
-applicable to researchers (but also).
-Don’t use system python. Know which environment
-you’re using. Pick an editor.
-If you’re on windows, get comfy with cygwin or better
-set up dual boot. You need to know POSIX!
-
----
-
-class: left, middle
-
-.center[
 ![:scale 90%](images/img_1.png)
-]
 
 
 ???
@@ -171,7 +139,7 @@ linear and non-linear effects, different scales)
 ---
 
 
-class: centre, middle
+class: center, middle
 
 #Scaling
 
@@ -181,7 +149,7 @@ N/A
 
 ---
 
-class: centre, middle
+class: center, middle
 
 .center[
 ![:scale 70%](images/img_2.png)
@@ -201,13 +169,11 @@ penalty. L2 is the same for all!
 
 We can also see non-gaussian distributions here btw!
 ---
-class: centre, middle
+class: center
 
-#Ways to Scale Data
+# Ways to Scale Data
 
-.center[
-![:scale 70%](images/img_3.png)
-]
+![:scale 80%](images/img_3.png)
 
 ???
 StandardScaler: subtract mean, divide by standard
@@ -226,9 +192,9 @@ StandardScaler is usually good, but doesn’t guarantee
 particular min and max values
 
 ---
-class: centre, middle
+class: spacious
 
-#Sparse Data
+# Sparse Data
 
 - Data with many zeros – only store non-zero entries.
 - Subtracting anything will make the data “dense” (no more zeros) and blow the RAM.
@@ -248,10 +214,10 @@ MaxAbsScaler scales between -1 and 1 by dividing
 with the maximum absolute value for each feature.
 ---
 
-class: centre, middle
+class: center, middle
 
 .center[
-![:scale 90%](images/img_4.png)
+![:scale 100%](images/img_4.png)
 ]
 
 ???
@@ -275,10 +241,10 @@ set mean gets subtracted from the test set, not the
 test-set mean. That’s quite important.
 ---
 
-class: centre, middle
+class: center, middle
 
 .center[
-![:scale 90%](images/img_5.png)
+![:scale 100%](images/img_5.png)
 ]
 
 ???
@@ -304,17 +270,15 @@ and maximum at 1, but the data is totally distorted
 from what it was before. So don’t do that.
 ---
 
-class: centre, middle
-
 # Sckit-Learn API Summary
 
-.center[
 ![:scale 90%](images/img_6.png)
-]
 
-- Efficient shortcuts:
-  - est.fit_transform(X) == est.fit(X).transform(X)
-  - est.fit_predict(X) == est.fit(X).predict(X)
+Efficient shortcuts:
+
+  est.fit_transform(X) == est.fit(X).transform(X)  # mostly
+
+  est.fit_predict(X) == est.fit(X).predict(X)   # mostly
 
 ???
 
@@ -340,13 +304,13 @@ goes for fit_predict.
 
 ---
 
-class: centre, middle
+class: center, middle
 
 .center[
-![:scale 60%](images/img_7.png)
+![:scale 80%](images/img_7.png)
 ]
 .center[
-![:scale 60%](images/img_8.png)
+![:scale 80%](images/img_8.png)
 ]
 ???
 
@@ -371,9 +335,10 @@ we did here. Can you see it?
 
 ---
 
-class: centre, middle
+class: center, middle
 
-# A note on preprocessing (and pipelines)
+# A note on preprocessing
+# (and pipelines)
 
 ???
 
@@ -382,18 +347,21 @@ cross-validation here, and introduce pipelines.
 
 ---
 
-class: left, middle
+class: some-space
 
 #Leaking Information
 
-.left-column[Information Leak]
-.right-column[No Information leakage]
+.left-column[
+Information Leak
+![:scale 100%](images/img_9.png)
+]
+.right-column[
+No Information leakage
+![:scale 100%](images/img_10.png)]
 
-.left-column[![:scale 82%](images/img_9.png)]
-.right-column[![:scale 82%](images/img_10.png)]
-
-
+.reset-column[
 Need to include preprocessing in cross-validation !
+]
 
 ???
 
@@ -488,11 +456,9 @@ to apply multiple transformation steps.
 
 ---
 
-class: left, middle
+class: center, middle
 
-.center[
-![:scale 70%](images/img_14.png)
-]
+![:scale 90%](images/img_14.png)
 
 ???
 
@@ -541,13 +507,11 @@ automatically.
 
 ---
 
-class: left, middle
-
 # Pipeline and GridSearchCV
-
+.padding-top[
 .center[
-![:scale 80%](images/img_16.png)
-]
+![:scale 100%](images/img_16.png)
+]]
 
 ???
 
@@ -594,7 +558,7 @@ distributions.
 class: left, middle
 
 .center[
-![:scale 80%](images/img_17.png)
+![:scale 85%](images/img_17.png)
 ]
 
 ???
@@ -619,7 +583,7 @@ a bit better what’s going on.
 class: left, middle
 
 .center[
-![:scale 80%](images/img_18.png)
+![:scale 90%](images/img_18.png)
 ]
 
 ???
@@ -632,20 +596,19 @@ There is slightly more rigorous technique though.
 
 ---
 
-class: left, middle
-
 # Box-Cox Transform
 
-.medium[
+.left-column[
 $$bc_{\lambda}(x) = \cases{\frac{x^\lambda - 1}{\lambda} & \text{if } \lambda \neq 0\cr log(x) & \text{if } \lambda = 0 }$$
 ]
 
-- Only applicable for positive x!
-
-.center[
-![:scale 40%](images/img_19.png)
+.right-column[
+![:scale 100%](images/img_19.png)
 ]
 
+.reset-column[
+Only applicable for positive x!
+]
 ???
 
 
@@ -810,18 +773,18 @@ N/A
 
 ---
 
-class: center, middle
+class: center
 
 #Pandas Categorical Columns
 
-.center[![:scale 70%](images/img_31.png)]
+.center[![:scale 100%](images/img_31.png)]
 
 ???
 N/A
 
 ---
 
-class: left, middle
+class: left
 
 #OneHotEncoder
 
@@ -834,8 +797,7 @@ class: left, middle
 N/A
 
 ---
-
-class: left, middle
+class: some-space
 
 #OneHot vs Statisticians
 
@@ -851,15 +813,15 @@ N/A
 
 ---
 
-class: left, middle
+class: some-space
 
 #Models Supporting Discrete Features
 
 - In principle:
-  - All tree-based models
-- In sckit-learn:
+  - All tree-based models, naive Bayes
+- In scikit-learn:
   - None
-- In sckit-learn soon:
+- In scikit-learn soon:
   - Decision trees, random forests
 
 
@@ -868,7 +830,7 @@ N/A
 
 ---
 
-class: left, middle
+class: some-space
 
 #Count-Based Encoding
 
@@ -908,24 +870,24 @@ N/A
 
 ---
 
-class: left, middle
+class: center
 
 #Interaction Features
 
-.center[![:scale 70%](images/img_33.png)]
+![:scale 70%](images/img_33.png)
 
 ???
 N/A
 
 ---
 
-class: left, middle
+class: center
 
 #Interaction Features
 
-.center[![:scale 50%](images/img_34.png)]
+![:scale 50%](images/img_34.png)
 
-.center[![:scale 70%](images/img_35.png)]
+![:scale 70%](images/img_35.png)
 
 ???
 N/A
@@ -933,24 +895,24 @@ N/A
 
 ---
 
-class: left, middle
+class: center, middle
 
 
-.center[![:scale 50%](images/img_36.png)]
+![:scale 50%](images/img_36.png)
 
-.center[![:scale 70%](images/img_37.png)]
+![:scale 70%](images/img_37.png)
 
 ???
 N/A
 
 ---
 
-class: left, middle
+class: center, middle
 
 
-.center[![:scale 50%](images/img_38.png)]
+![:scale 50%](images/img_38.png)
 
-.center[![:scale 70%](images/img_39.png)]
+![:scale 70%](images/img_39.png)
 
 ???
 N/A
@@ -984,9 +946,9 @@ N/A
 
 ---
 
-class: left, middle
+class: center, middle
 
-.center[![:scale 70%](images/img_41.png)]
+![:scale 70%](images/img_41.png)
 
 
 
@@ -996,11 +958,11 @@ N/A
 
 ---
 
-class: left, middle
+class: center
 
 # Polynomial Features
 
-.center[![:scale 60%](images/img_42.png)]
+![:scale 60%](images/img_42.png)
 
 
 
@@ -1009,7 +971,7 @@ N/A
 
 ---
 
-class: left, middle
+class: spacious
 
 # Polynomial Features
 
@@ -1023,11 +985,11 @@ N/A
 
 ---
 
-class: left, middle
+class: center
 
 # Polynomial Features
 
-.center[![:scale 60%](images/img_43.png)]
+![:scale 60%](images/img_43.png)
 
 
 ???
@@ -1035,7 +997,7 @@ N/A
 
 ---
 
-class: left, middle
+class: spacious
 
 # Other Features?
 
@@ -1047,7 +1009,7 @@ N/A
 
 ---
 
-class: left, middle
+class: spacious
 
 # Discretization and Binning
 
