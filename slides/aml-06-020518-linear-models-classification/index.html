@@ -109,7 +109,7 @@ class: center, middle
 
 # Linear Models for Classification
 
-02/06/17
+02/05/18
 
 Andreas C. Müller
 
@@ -119,7 +119,7 @@ N/A
 ---
 class: center, middle
 
-Linear models for <strong>binary</strong> classfication
+# Linear models for <strong>binary</strong> classfication
 
 ???
 N/A
@@ -131,54 +131,44 @@ class: spacious
 ![:scale 60%](images/img_1.png)
 ]
 
-.smaller[
 $$\hat{y} = sign(w^T \textbf{x} + b) = sign(\sum\limits_{i}w_ix_i + b)$$
-]
 
 ???
 
 ---
 
-class: left, middle
-
 # Picking a loss?
 
-.medium[
-$\hat{y} = sign(w^T \textbf{x} + b)$
+$$\hat{y} = sign(w^T \textbf{x} + b)$$
 
-`$\min_{w \in ℝ^{p}}$$\sum_{i=1}^n$`$1_{y_i \neq sign(w^T \textbf{x} + b)}$
-]
-
-- Obvious Idea: Minimize number of misclassifications aka 0-1 loss.
-- But: non-convex, not continuous => Relax
+`$$\min_{w \in ℝ^{p}} \sum_{i=1}^n 1_{y_i \neq sign(w^T \textbf{x} + b)}$$`
 
 .center[
 ![:scale 40%](images/img_2.png)
 ]
 
 ???
+- Obvious Idea: Minimize number of misclassifications aka 0-1 loss.
+- But: non-convex, not continuous => Relax
+
 
 ---
-
-
-class: left, middle
 
 # Logistic Regression
 
 
-.larger[
+.left-column[
+$$\log\left(\frac{p(y=1|x)}{p(y=0|x)}\right) = w^T\textbf{x}$$
+
+$$p(y|\textbf{x}) = \frac{1}{1+e^{-w^T\textbf{x}}}$$
+
+`$$\min_{w \in ℝ^{p}} -\sum_{i=1}^n log(exp(-y_iw^T \textbf{x}_i) + 1)$$`
 
 
-`$\min_{w \in ℝ^{p}}$$-\sum_{i=1}^n$`$log(exp(-y_iw^T \textbf{x}_i) + 1)$
-
-$ log(\frac{p(y=1|x)}{p(y=0|x)}) = w^T\textbf{x}$
-
-$p(y|\textbf{x}) = \frac{1}{1+e^{-w^T\textbf{x}}}$
-
-$\hat{y} = sign(w^T\textbf{x} + b)$
+$$\hat{y} = sign(w^T\textbf{x} + b)$$
 ]
-
-.center[![:scale 40%](images/img_3.png)]
+.right-column[
+![:scale 100%](images/img_3.png)]
 
 
 ???
@@ -186,18 +176,16 @@ $\hat{y} = sign(w^T\textbf{x} + b)$
 ---
 
 
-class: left, middle
-
 # Penalized Logistic Regression
 
-.larger[
-`$\min_{w \in ℝ^{p}}$$-C \sum_{i=1}^n$`$log(exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$
+`$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
 
-`$\min_{w \in ℝ^{p}}$$-C \sum_{i=1}^n$`$log(exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_1$
-]
+`$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_1$$`
 
 - C is inverse to alpha (or alpha / n_samples)
+
 - Both versions strongly convex, l2 version smooth (differentiable).
+
 - All points contribute to w (dense solution to dual).
 
 ???
@@ -206,25 +194,22 @@ class: left, middle
 ---
 
 
-class: left, middle
-
 # (soft margin) linear SVM
 
 .larger[
-`$\min_{w \in ℝ^{p}}$$C \sum_{i=1}^n$`$max(0,1-y_iw^T \textbf{x}_i) + ||w||_2^2$
+`$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\max(0,1-y_iw^T \textbf{x}_i) + ||w||_2^2$$`
 
-`$\min_{w \in ℝ^{p}}$$C \sum_{i=1}^n$`$max(0,1-y_iw^T \textbf{x}_i)+ ||w||_1$
+`$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\max(0,1-y_iw^T \textbf{x}_i)+ ||w||_1$$`
 ]
 
 - Both versions strongly convex, neither smooth.
+
 - Only some points contribute (the support vectors) to w (sparse solution to dual).
 
 ???
 
 ---
 
-
-class: left, middle
 
 # SVM or LogReg?
 
@@ -236,8 +221,6 @@ class: left, middle
 ???
 
 ---
-
-class: left, middle
 
 # Effect of regularization
 
@@ -255,15 +238,13 @@ N/A
 
 class: center, middle
 
-Multiclass classification
+# Multiclass classification
 
 
 ???
 N/A
 
 ---
-
-class: left, middle
 
 # Reduction to Binary Classification
 
@@ -281,27 +262,22 @@ For 4 classes
 
 ---
 
-class: left, middle
+class: spacious
 
 # Prediction with One Vs Rest
 
 
-- "Class with highest score"
+"Class with highest score"
 
-.medium[
-$\hat{y} = arg \max_{i \in Y} \textbf{w}_i\textbf{x}$
-]
+$$\hat{y} = arg \max_{i \in Y} \textbf{w}_i\textbf{x}$$
 
-
-- Unclear why it even works, but work well.
+Unclear why it even works, but work well.
 
 
 ???
 
 
 ---
-
-class: left, middle
 
 # One vs Rest Prediction
 
@@ -315,8 +291,6 @@ N/A
 
 ---
 
-class: left, middle
-
 # One vs Rest Prediction
 
 .center[
@@ -329,7 +303,7 @@ N/A
 
 ---
 
-class: left, middle
+class: spacious
 
 # Prediction with One Vs One
 
@@ -344,13 +318,11 @@ class: left, middle
 
 ---
 
-class: left, middle
+class: center
 
 # One vs One Prediction
 
-.center[
 ![:scale 80%](images/img_7.png)
-]
 
 
 ???
@@ -358,31 +330,28 @@ N/A
 
 ---
 
-class: left, middle
+class: center
+# One vs One Prediction
 
 
-.center[
 ![:scale 80%](images/img_8.png)
-]
 
 
 ???
 N/A
 
 ---
-
-class: left, middle
 
 # Multinomial Logistic Regression
 
 Probabilistic multi-class model:
 
 .medium[
-$p(y=i|x) = \frac{e^{-\textbf{w}_i^T\textbf{x}}}{\sum e^{-\textbf{w}_j^T\textbf{x}}}$
+$$p(y=i|x) = \frac{e^{-\textbf{w}_i^T\textbf{x}}}{\sum e^{-\textbf{w}_j^T\textbf{x}}}$$
 
-`$\min_{w \in ℝ^{p}}$$- \sum_{i=1}^n$`$log(p(y=y_i|x_i))$
+`$$\min_{w \in ℝ^{p}}- \sum_{i=1}^n log(p(y=y_i|x_i))$$`
 
-$\hat{y} = arg \max_{i \in Y} \textbf{w}_i\textbf{x}$
+$$\hat{y} = arg \max_{i \in Y} \textbf{w}_i\textbf{x}$$
 ]
 
 - Same prediction rule as OvR !
@@ -392,10 +361,9 @@ summation equation to be modified
 
 ---
 
-class: left, middle
+class: some-space
 
 # In sckit-learn
-
 
 - OvO: only SVC
 - OvR: default for all linear models, even LogisticRegression
@@ -408,8 +376,6 @@ class: left, middle
 ???
 N/A
 ---
-
-class: left, middle
 
 # Multi-Class in Practice
 
@@ -427,16 +393,11 @@ SVC would produce the same shape, but with different semantics!
 N/A
 ---
 
-class: left, middle
+class: center
 
-
-.center[
 ![:scale 80%](images/img_10.png)
-]
 
-.center[
 ![:scale 80%](images/img_11.png)
-]
 
 (after centering data, without intercept)
 
@@ -448,14 +409,14 @@ N/A
 class: center, middle
 
 
-Computational Considerations (for all linear models)
+# Computational Considerations (for all linear models)
 
 
 ???
 N/A
 ---
 
-class: left, middle
+class: some-space
 
 # Solver choices
 
@@ -472,16 +433,16 @@ large”
 N/A
 ---
 
-class: center, middle
+class: middle
 
 
-Efficient Cross-Validation
+# Efficient Cross-Validation
 
 
 ???
 N/A
 ---
-class: left, middle
+class: some space
 
 # Models with build-in cross-validation
 
@@ -497,7 +458,7 @@ class: left, middle
 N/A
 ---
 
-class: center, middle
+class: center
 
 # Using EstimatorCV
 
@@ -510,7 +471,7 @@ N/A
 ---
 class: center, middle
 
-Stochastic Gradient Descent
+# Stochastic Gradient Descent
 
 ( see http://leon.bottou.org/projects/sgd
 and http://leon.bottou.org/papers/bottou-bousquet-2008
@@ -520,7 +481,7 @@ and http://scikit-learn.org/stable/modules/scaling_strategies.html )
 N/A
 
 ---
-class: right, middle
+class: right
 
 # Decomposing Generalization Error
 
@@ -534,7 +495,7 @@ Bottou et. al.
 N/A
 
 ---
-class: center, middle
+class: center
 
 .center[
 ![:scale 90%](images/img_14.png)
@@ -544,8 +505,6 @@ class: center, middle
 N/A
 
 ---
-class: left, middle
-
 # The Trade-off
 
 .center[
@@ -561,25 +520,21 @@ use a worse algorithm but look at more data!
 ???
 
 ---
-class: left, middle
-
 # Reminder: Gradient Descent
 
-.right-column[![:scale 80%](images/img_15.png)]
+.right-column[![:scale 1-0%](images/img_15.png)]
 
-Want: $arg \min_w F(w)$
+Want: $$\arg \min_w F(w)$$
 
 Initialize $w_0$
 
-$w^{(i+1)} \leftarrow w^{(i)} - \eta_i\frac{d}{dw}F(w^{(i)})$
+$$w^{(i+1)} \leftarrow w^{(i)} - \eta_i\frac{d}{dw}F(w^{(i)})$$
 
 Converges to local minimum
 
 ???
 
 ---
-
-class: left, middle
 
 # Reminder: Gradient Descent
 
@@ -594,7 +549,6 @@ $$w^{(i+1)} \leftarrow w^{(i)} - \eta_i\frac{d}{dw}F(w^{(i)})$$
 
 
 ---
-class: left, middle
 
 # Pick a learning rate
 
@@ -612,12 +566,12 @@ $$w^{(i+1)} \leftarrow w^{(i)} - \eta_i\frac{d}{dw}F(w^{(i)})$$
 
 - Logistic Regression:
 
-$F(w) = -C $`$\sum_{i=1}^n$` $log(exp(-y_iw^T \textbf{x}_i) +1 ) + ||w||_2^2$
+`$$F(w) = -C \sum_{i=1}^n\log(exp(-y_iw^T \textbf{x}_i) +1 ) + ||w||_2^2$$`
 
 
 - Pick $x_i$ randomly, then
 
-$\frac{d}{dw}F(w) = \frac{d}{dw} -C$ $log(exp(-y_iw^T \textbf{x}_i) +1 ) + \frac{1}{n}||w||_2^2$
+`$$\frac{d}{dw}F(w) = \frac{d}{dw} -C \log(exp(-y_iw^T \textbf{x}_i) +1 ) + \frac{1}{n}||w||_2^2$$`
 
 - Is a stochastic approximation of gradient of F with expectation the actual gradient.
 - In practice: just iterate over i.
@@ -626,8 +580,7 @@ $\frac{d}{dw}F(w) = \frac{d}{dw} -C$ $log(exp(-y_iw^T \textbf{x}_i) +1 ) + \frac
 ???
 
 ---
-class: left, middle
-
+class: spacious
 
 # SGD and partial_fit
 
@@ -639,15 +592,11 @@ class: left, middle
 ???
 
 ---
+class: center, spacious
 
-
-
-.center[
 ![:scale 90%](images/img_18.png)
-]
-.center[
+
 ![:scale 90%](images/img_19.png)
-]
 
 
 
