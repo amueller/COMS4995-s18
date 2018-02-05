@@ -347,6 +347,7 @@ In practice it doesn't make a big difference.
 - Need compact model or believe solution is sparse? Use L1
 
 ???
+FIXME DRAWING
 So which one of them should you use? If you need probability estimates,
 you should use logistic regression. If you don't, you can pick either, and it doesn't really matter.
 Logistic regression can be a bit faster to optimize in theory.
@@ -388,21 +389,43 @@ class: center, middle
 
 ???
 
+Ok, so I think that's enough on the two loss functions and regularization, and hopefully you have a bit of a feel for
+how these two classifiers work, and also an understanding that they are in fact quite similar in practice.
+
+Next I want to look at how to go from binary classification to multi-class classification.
+Basically there is a simple but hacky way, and there's a slightly more complicated but theoretically sound way.
+
 ---
 
 # Reduction to Binary Classification
 
+One vs Rest
 
+One vs One
+
+???
+The slightly hacky way is using what's known as a reduction.
+We're doing a reduction like in math: reducing one problem to another.
+In this case we're reducing the problem of multi-class classification into
+several instances of the binary classification problem.
+And we already know how to deal with binary classification.
+
+There are two straight-forward ways to reduce multi-class to binary classification.
+the first is called one vs rest, the second one is called one-vs-one.
+
+---
+# One Vs Rest
 For 4 classes
-- <strong> One vs Rest </strong> [STANDARD]
   - 1v{2,3,4}, 2v{1,3,4}, 3v{1,2,4}, 4v{1,2,3}
   - n binary classifiers - each on all data
 
-- <strong> One vs One </strong>
-  - 1v1, 1v2, 1v3, 1v4, 2v3, 2v4, 3v4
-  - n * (n-1) / 2 binary classifiers - each on a fraction of the data
-
 ???
+Let's start with One vs Rest.
+here, we learn one binary classifier for each class against the remaining
+classes. So let's say we have 4 classes, called 1 to 4.  First we learn a
+binary classifier of the points in class 1 vs the points in the classes 2, 3
+and 4.  Then, we do the same for class 2, and so on.
+The way we end up building as many classifiers as we have classes.
 
 ---
 
@@ -415,11 +438,18 @@ class: spacious
 
 $$\hat{y} = \text{arg}\max_{i \in Y} \textbf{w}_i\textbf{x}$$
 
-Unclear why it even works, but work well.
+Unclear why it works, but work well.
 
 
 ???
+To make a prediction, we compute the decision function of all classifiers,
+say 4 in the example, on a new data point. The one with the highest score for the positive
+class, the single class, wins, and that class is predicted.
 
+It's a little bit unclear why this works as well as it does. Maybe there's some papers
+about that now, but I'm not 
+
+So in this case we have one coefficient vector w and one bias b for each class.
 
 ---
 
@@ -431,7 +461,11 @@ Unclear why it even works, but work well.
 
 
 ???
-N/A
+Here is an illustration of what that looks like. Unfortunately it's a bit hard
+to draw 4 classes in general position in 2 dimensions, so I only used 3 classes here.
+So each class has an associated coefficient vector and bias, corresponding to a line.
+The line tries to separate this class from the other two classes.
+# Fixme draw ws?
 
 ---
 
@@ -443,13 +477,24 @@ N/A
 
 
 ???
-N/A
+
+# FIXME URGENT images are different!!!
+
+Here are the decision boundaries resulting from the these three binary classifiers.
+Basically what they say is that the line that is closest decides the class.
+What you can not see here is that each of the lines also have a magnitude associated with them.
+It's not only the direction of the normal vector that matters, but also the length.
+You can think of that as some form of uncertainty attached to the line.
 
 ---
 
-class: spacious
+class: some-space
 
-# Prediction with One Vs One
+# One Vs One
+
+- 1v2, 1v3, 1v4, 2v3, 2v4, 3v4
+- n * (n-1) / 2 binary classifiers - each on a fraction of the data
+
 
 - "Vote for highest positives"
 - Classify by all classifiers.
@@ -459,6 +504,19 @@ class: spacious
 
 
 ???
+
+The other method of reduction is called one vs one.
+In one vs one, we build one binary model for each pair of classes. In the
+example of having four classes that is one for 1 vs 2, one for 1v3 and so on.
+So we end up with n * (n - 1) /2 binary classifiers. And each is trained only
+on the subset of the data that belongs to these classes.
+
+To make a prediction, we again apply all of the classifiers. For each class
+we count how often one of the classifiers predicted that class, and we
+predict the class with the most votes.
+
+Again, this is just a heuristic and there's not really a good theoretical explanation
+why this should work.
 
 ---
 
@@ -470,8 +528,13 @@ class: center
 
 
 ???
-N/A
+Here is an example for predicting on three classes in 2d using the one-vs-one heuristic.
+In the case of three classes, there's also three pairs. Three is a bit of a special case,
+with any more classes there would be more classifiers than classes.
 
+The dashed lines are colored according to the pair of classes they separate. So the green
+and blue line separates the green and blue classes. The data points belonging to the grey
+class were not used in building this model at all.
 ---
 
 class: center
@@ -482,7 +545,29 @@ class: center
 
 
 ???
-N/A
+
+Looking at the predictions made by the one vs one classifier the correspondence to the binary
+decision boundaries is a bit more clear than for the one vs rest heuristic, because
+it only takes the actual boundaries into account, not the length of the normal vectors.
+That makes it easier to visualize the geometry, but it's also a bit of a downside
+of the method because it means it discards any notion of uncertainty that was
+present in the binary classifiers.
+The decision boundary for each class is given by the two lines that this class is involved in.
+So the grey class is bounded by the green and grey line and the blue and grey line.
+
+There is a triangle in the center in which there is one vote for each of the
+classes.  In this implemenatation the tie is broken to just always predict the
+first class, which is the green one.
+That might not be the best tie breaking strategy, but this is a relatively rare case, in particular
+if there's more than three classes.
+
+OVR and OVO are general heuristics not restricted to linear models.
+They can be used whenever a binary model for classification needs to be extended to the multi-class
+case.
+For logistic regression, there is actually a natural extension of the formulation, and we don't
+have to resort to these hacks.
+
+FIXME summary of ovo vs ovr?
 
 ---
 
@@ -490,18 +575,19 @@ N/A
 
 Probabilistic multi-class model:
 
-.medium[
-$$p(y=i|x) = \frac{e^{-\textbf{w}_i^T\textbf{x}}}{\sum e^{-\textbf{w}_j^T\textbf{x}}}$$
+$$p(y=i|x) = \frac{e^{-\textbf{w}_i^T\textbf{x}}}{\sum_j e^{-\textbf{w}_j^T\textbf{x}}}$$
 
 `$$\min_{w \in ℝ^{p}}- \sum_{i=1}^n \log(p(y=y_i|x_i))$$`
 
 $$\hat{y} = \text{arg} \max_{i \in Y} \textbf{w}_i\textbf{x}$$
-]
 
 - Same prediction rule as OvR !
 
 ???
-summation equation to be modified
+The binary logistic regression case can be generalized to multinomial logistic regression, in which
+we model the probability that i is one of the classes using this formula, which is also known as softmax.
+The probability is proportional to e to the minus $w^t x$ which is the same as in the binary case.
+But now we need to normalize it so that the sum over all classes is one. So we just divide it by this sum.
 
 ---
 
@@ -586,16 +672,15 @@ class: middle
 ???
 N/A
 ---
-class: some-space
+class: spacious
 
 # Models with build-in cross-validation
 
-- RidgeCV() - does GCV, approximation to LOO
-- LarsCV(), LassoLarsCV(), ElasticNetCV()
-- Use path-algorithms to compute the full solution path.
+- LarsCV(), LassoLarsCV(), ElasticNetCV()<br/>Use path-algorithms to compute the full solution path.
 - LogisticRegressionCV() uses warm-starts, doesn’t support all solvers.
 - All have reasonable build-in parameter grids.
-- For RidgeCV you can’t pick the “cv”!
+- RidgeCV() - does GCV, approximation to LOO<br />
+So you can’t pick the “cv”!
 
 
 ???
@@ -654,7 +739,7 @@ N/A
 .center[
 ![:scale 90%](images/img_math_1.png)
 ]
-- If n_max large, we are constraint by T_max!
+- If `$n_\text{max}$` is large, we are constraint by $T_\max$!
 - Making the optimization error small doesn’t matter if it means we can’t look at all training
 examples!
 - Trade optimization error for estimation error
@@ -717,11 +802,11 @@ $$w^{(i+1)} \leftarrow w^{(i)} - \eta_i\frac{d}{dw}F(w^{(i)})$$
 
 `$$\frac{d}{dw}F(w) = \frac{d}{dw} -C \log(exp(-y_iw^T \textbf{x}_i) +1 ) + \frac{1}{n}||w||_2^2$$`
 
-- Is a stochastic approximation of gradient of F with expectation the actual gradient.
 - In practice: just iterate over i.
 
 
 ???
+Is a stochastic approximation of gradient of F with expectation the actual gradient.
 
 ---
 class: spacious
