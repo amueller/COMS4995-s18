@@ -48,17 +48,17 @@
           overflow: auto;
           width: 100%;
       }
-      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre{
+      .remark-slide-container .compact p, .remark-slide-container .compact li, .remark-slide-container .compact pre{
           font-size: 30px;
           line-height: 1.1;
           display: block;
-          margin: 2px 0;
+          margin: 10px 0;
       }
       .padding-top {
           padding-top: 100px;
       }
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
-      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+      .remark-slide-container .smaller p, .remark-slide-container .smaller li,
+      .remark-slide-container .smaller .remark-code, .remark-slide-container .smaller a{
           font-size: 25px;
       }
       .normal {
@@ -119,7 +119,10 @@ applies to linear models, and not to tree-based
 models, but it also applies to neural nets and kernel
 SVMs.
 
-TODO: power transforms, categorical encoder
+FIXME: power transforms, categorical encoder, column transformer
+slide 30: pandas categorical fix
+count based encoding
+
 ---
 
 class: middle
@@ -214,11 +217,22 @@ MaxAbsScaler scales between -1 and 1 by dividing
 with the maximum absolute value for each feature.
 ---
 
-class: center, middle
+```python
+from sklearn.linear_model import Ridge
+X, y = boston.data, boston.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
-.center[
-![:scale 100%](images/img_4.png)
-]
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+
+ridge = Ridge().fit(X_train_scaled, y_train)
+X_test_scaled = scaler.transform(X_test)
+ridge.score(X_test_scaled, y_test)
+```
+```
+0.634
+```
 
 ???
 Here’s how you do the scaling with StandardScaler in
@@ -276,9 +290,10 @@ from what it was before. So don’t do that.
 
 Efficient shortcuts:
 
-  est.fit_transform(X) == est.fit(X).transform(X)  # mostly
-
-  est.fit_predict(X) == est.fit(X).predict(X)   # mostly
+```python
+est.fit_transform(X) == est.fit(X).transform(X)  # mostly
+est.fit_predict(X) == est.fit(X).predict(X)   # mostly
+```
 
 ???
 
@@ -303,15 +318,52 @@ more efficient then using first fit and then transform. The same
 goes for fit_predict.
 
 ---
+class: smaller, compact
 
-class: center, middle
+```python
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import RidgeCV
+scores = cross_val_score(RidgeCV(), X_train, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
 
-.center[
-![:scale 80%](images/img_7.png)
-]
-.center[
-![:scale 80%](images/img_8.png)
-]
+```
+(0.717, 0.125)
+
+```
+
+```python
+scores = cross_val_score(RidgeCV(), X_train_scaled, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+
+```
+(0.718, 0.127)
+
+```
+
+```python
+from sklearn.neighbors import KNeighborsRegressor
+scores = cross_val_score(KNeighborsRegressor(), X_train, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+
+```
+(0.499, 0.146)
+
+```
+
+```python
+from sklearn.neighbors import KNeighborsRegressor
+scores = cross_val_score(KNeighborsRegressor(), X_train_scaled, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+
+```
+(0.750, 0.106)
+
+```
+
 ???
 
 Let’s apply the scaler to the Boston housing data.
@@ -389,15 +441,34 @@ see later, this might make a huge difference. So we should
 get it right from the start.
 
 ---
+class: smaller
 
-class: left, middle
+```python
+from sklearn.linear_model import Ridge
+X, y = boston.data, boston.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
-.center[
-![:scale 80%](images/img_11.png)
-]
-.center[
-![:scale 80%](images/img_12.png)
-]
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+ridge = Ridge().fit(X_train_scaled, y_train)
+
+X_test_scaled = scaler.transform(X_test)
+ridge.score(X_test_scaled, y_test)
+```
+```
+0.634
+```
+
+```python
+from sklearn.pipeline import make_pipeline
+pipe = make_pipeline(StandardScaler(), Ridge())
+pipe.fit(X_train, y_train)
+pipe.score(X_test, y_test)
+```
+```
+0.634
+```
 
 ???
 
@@ -456,10 +527,18 @@ to apply multiple transformation steps.
 
 ---
 
-class: center, middle
+.padding-top[
 
-![:scale 90%](images/img_14.png)
-
+```python
+from sklearn.neighbors import KNeighborsRegressor
+knn_pipe = make_pipeline(StandardScaler(), KNeighborsRegressor())
+scores = cross_val_score(knn_pipe, X_train, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+```
+(0.745, 0.106)
+```
+]
 ???
 
 How does that help with the cross-validation problem?
@@ -474,18 +553,23 @@ to cross-validation.
 
 ---
 
-class: left, middle
+# Naming Steps
 
-- print(knn_pipe.steps)
+```python
+from sklearn.pipeline import make_pipeline
+knn_pipe = make_pipeline(StandardScaler(), KNeighborsRegressor())
+print(knn_pipe.steps)
+```
+```
+[('standardscaler', StandardScaler(copy=True, with_mean=True, with_std=True)),
+('kneighborsregressor', KNeighborsRegressor(algorithm='auto', ...))]
+```
 
-  - [('standardscaler', StandardScaler(copy=True, with_mean=True, with_std=True)),
-('kneighborsregressor', KNeighborsRegressor(algorithm='auto', leaf_size=30,
-metric='minkowski', metric_params=None, n_jobs=1, n_neighbors=5, p=2,
-weights='uniform'))]
-
-.center[
-![:scale 60%](images/img_15.png)
-]
+```python
+from sklearn.pipeline import Pipeline
+pipe = Pipeline((("scaler", StandardScaler()),
+                 ("regressor", KNeighborsRegressor)))
+```
 
 ???
 
@@ -509,9 +593,22 @@ automatically.
 
 # Pipeline and GridSearchCV
 .padding-top[
-.center[
-![:scale 100%](images/img_16.png)
-]]
+```python
+from sklearn.model_selection import GridSearchCV
+
+knn_pipe = make_pipeline(StandardScaler(), KNeighborsRegressor())
+param_grid = {'kneighborsregressor__n_neighbors': range(1, 10)}
+grid = GridSearchCV(knn_pipe, param_grid, cv=10)
+grid.fit(X_train, y_train)
+print(grid.best_params_)
+print(grid.score(X_test, y_test))
+```
+
+```
+{'kneighborsregressor__n_neighbors': 7}
+0.60
+```
+]
 
 ???
 
