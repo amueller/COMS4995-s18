@@ -127,10 +127,8 @@ We'll first start with linear models for binary classification, so if there are 
 That makes the models much easier to understand.
 
 ---
-class: spacious
-
 .center[
-![:scale 60%](images/img_1.png)
+![:scale 55%](images/linear_boundary_vector.png)
 ]
 
 $$\hat{y} = \text{sign}(w^T \textbf{x} + b) = \text{sign}\left(\sum\limits_{i}w_ix_i + b\right)$$
@@ -314,10 +312,9 @@ don't influence the solution any more.
 All the point that are not classified correctly by this margin are the ones
 that do influence the solution and they are called the support vectors.
 
-
 FIXME graph of not influencing the solution?
 
-FIXME: motivate SVM?
+FIXME: motivate SVM? we'll do it in two lectures...
 
 ---
 class: center
@@ -487,8 +484,6 @@ The line tries to separate this class from the other two classes.
 
 
 ???
-
-# FIXME URGENT images are different!!!
 
 Here are the decision boundaries resulting from the these three binary classifiers.
 Basically what they say is that the line that is closest decides the class.
@@ -667,7 +662,8 @@ N/A
 class: center, middle
 
 
-# Computational Considerations (for all linear models)
+# Computational Considerations
+#(for all linear models)
 
 
 ???
