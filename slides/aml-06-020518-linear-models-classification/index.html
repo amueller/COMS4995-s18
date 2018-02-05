@@ -339,13 +339,13 @@ In practice it doesn't make a big difference.
 
 # SVM or LogReg?
 
-- Do you need probability estimates?
-- if [NO] --> It doesn't matter - try either / Both
-- if [YES] --> Logistic Regression
+.center[
+![:scale 80%](images/svm_or_lr.png)
+]
+
 - Need compact model or believe solution is sparse? Use L1
 
 ???
-FIXME DRAWING
 So which one of them should you use? If you need probability estimates,
 you should use logistic regression. If you don't, you can pick either, and it doesn't really matter.
 Logistic regression can be a bit faster to optimize in theory.
@@ -358,7 +358,7 @@ but you can actually solve either of the problems in the dual, and we'll talk ab
 
 
 .center[
-![:scale 90%](images/img_4.png)
+![:scale 90%](images/linear_svm_regularization.png)
 ]
 
 - Small C (a lot of regularization) limits the influence of individual points!
