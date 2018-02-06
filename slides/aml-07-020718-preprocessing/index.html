@@ -127,7 +127,7 @@ count based encoding
 
 class: middle
 
-![:scale 90%](images/img_1.png)
+![:scale 90%](images/boston_scatter.png)
 
 
 ???
@@ -175,9 +175,8 @@ We can also see non-gaussian distributions here btw!
 class: center
 
 # Ways to Scale Data
-
+<br />
 ![:scale 80%](images/img_3.png)
-
 ???
 StandardScaler: subtract mean, divide by standard
 deviation.
@@ -216,11 +215,13 @@ So don’t subtract anything, but you can still scale.
 MaxAbsScaler scales between -1 and 1 by dividing
 with the maximum absolute value for each feature.
 ---
+# Standard Scaler Example
 
 ```python
 from sklearn.linear_model import Ridge
 X, y = boston.data, boston.target
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, random_state=0)
 
 scaler = StandardScaler()
 scaler.fit(X_train)
