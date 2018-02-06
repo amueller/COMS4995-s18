@@ -680,7 +680,7 @@ a bit better what’s going on.
 class: left, middle
 
 .center[
-![:scale 90%](images/img_18.png)
+![:scale 90%](images/boston_hist.png)
 ]
 
 ???
@@ -727,14 +727,15 @@ applicable to positive features.
 
 ---
 
-class: left, middle
+.wide-left-column[
+![:scale 85%](images/boston_hist.png)
+]
 
-Before
-.center[![:scale 52%](images/img_20.png)]
+.narrow-right-column[Before]
+.clear-column[]
 
-After
-.center[![:scale 52%](images/img_21.png)]
-
+.wide-left-column[![:scale 85%](images/boston_hist_boxcox.png)]
+.narrow-right-column[After]
 
 
 ???
@@ -754,13 +755,16 @@ a lot of sense, though.
 
 ---
 
-class: left, middle
 
-Before
-.center[![:scale 52%](images/img_22.png)]
+.wide-left-column[
+![:scale 85%](images/boston_scatter.png)
+]
 
-After
-.center[![:scale 52%](images/img_23.png)]
+.narrow-right-column[Before]
+.clear-column[]
+
+.wide-left-column[![:scale 85%](images/boston_bc_scaled_scatter.png)]
+.narrow-right-column[After]
 
 
 
@@ -869,29 +873,103 @@ class: center, middle
 N/A
 
 ---
-
-class: center
+class: smaller
 
 #Pandas Categorical Columns
 
-.center[![:scale 100%](images/img_31.png)]
+```python
+import pandas as pd
+df = pd.DataFrame({'salary': [103, 89, 142, 54, 63, 219],
+                   'boro': ['Manhatten', 'Queens', 'Manhatten',
+                            'Brooklyn', 'Brooklyn', 'Bronx']})
+
+df.boro = df.boro.astype(pd.api.types.CategoricalDtype(
+    categories=['Manhatten', 'Queens', 'Brooklyn', 'Bronx', 'Staten Island']))
+pd.get_dummies(df)
+```
+```
+   salary  boro_Manhatten  boro_Queens  boro_Brooklyn  boro_Bronx  boro_Staten Island
+0     103               1            0              0           0                   0
+1      89               0            1              0           0                   0
+2     142               1            0              0           0                   0
+3      54               0            0              1           0                   0
+4      63               0            0              1           0                   0
+5     219               0            0              0           1                   0
+```
+
 
 ???
 N/A
 
 ---
 
-class: left
-
 #OneHotEncoder
 
-.center[![:scale 70%](images/img_32.png)]
+```python
+from sklearn.preprocessing import OneHotEncoder
 
-- Fit-transform paradigm ensures train and test-set categories correspond.
-- Only works for integers right now, not strings (we’re fixing this).
+df = pd.DataFrame({'salary': [103, 89, 142, 54, 63, 219],
+                   'boro': [0, 1, 0, 2, 2, 3]})
+
+ohe = OneHotEncoder(categorical_features=[0]).fit(df)
+ohe.transform(df).toarray()
+```
+```
+array([[   1.,    0.,    0.,    0.,  103.],
+       [   0.,    1.,    0.,    0.,   89.],
+       [   1.,    0.,    0.,    0.,  142.],
+       [   0.,    0.,    1.,    0.,   54.],
+       [   0.,    0.,    1.,    0.,   63.],
+       [   0.,    0.,    0.,    1.,  219.]])
+```
+
+- Only works for integers right now, not strings.
 
 ???
 N/A
+- Fit-transform paradigm ensures train and test-set categories correspond.
+
+
+---
+
+# CategoricalEncoder
+
+```python
+import pandas as pd
+df = pd.DataFrame({'salary': [103, 89, 142, 54, 63, 219],
+                   'boro': ['Manhatten', 'Queens', 'Manhatten',
+                            'Brooklyn', 'Brooklyn', 'Bronx']})
+
+ce = CategoricalEncoder().fit(df)
+ce.transform(df).toarray()
+```
+```
+array([[ 0.,  0.,  1.,  0.,  0.,  0.,  0.,  1.,  0.,  0.],
+       [ 0.,  0.,  0.,  1.,  0.,  0.,  1.,  0.,  0.,  0.],
+       [ 0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  1.,  0.],
+       [ 0.,  1.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  1.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.],
+       [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.]])
+```
+
+- Always transforms all columns
+
+???
+- Fit-transform paradigm ensures train and test-set categories correspond.
+
+---
+# The Future
+## CategoricalEncoder + ColumnTransformer
+
+```python
+categorical = df.dtypes == object
+
+preprocess = make_column_transformer(
+    (StandardScaler(), ~categorical),
+    (CategoricalEncoder(), categorical))
+
+model = make_pipeline(preprocess, LogisticRegression())
+```
 
 ---
 class: some-space
@@ -1004,12 +1082,21 @@ N/A
 
 ---
 
-class: center, middle
+.center[
+![:scale 60%](images/img_38.png)
+]
 
-
-![:scale 50%](images/img_38.png)
-
-![:scale 70%](images/img_39.png)
+.smaller[
+```python
+X_i_train, X_i_test, y_train, y_test = train_test_split(
+	X_interaction, y, random_state=0)
+logreg3 = LogisticRegressionCV().fit(X_i_train, y_train)
+logreg3.score(X_i_test, y_test)
+```
+]
+```
+0.960
+```
 
 ???
 N/A
@@ -1043,9 +1130,11 @@ N/A
 
 ---
 
-class: center, middle
+class: center
 
-![:scale 70%](images/img_41.png)
+# Polynomial Features
+
+![:scale 60%](images/img_41.png)
 
 
 
@@ -1081,13 +1170,39 @@ class: spacious
 N/A
 
 ---
-
-class: center
-
+class: smaller
 # Polynomial Features
 
-![:scale 60%](images/img_43.png)
+```python
+from sklearn.preprocessing import PolynomialFeatures
+poly = PolynomialFeatures()
+X_bc_poly = poly.fit_transform(X_bc_scaled)
+print(X_bc_scaled.shape)
+print(X_bc_poly.shape)A
+```
 
+```
+(379, 13)
+(379, 105)
+```
+
+```python
+scores = cross_val_score(RidgeCV(), X_bc_scaled, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+```
+(0.759, 0.081)
+```
+
+
+```python
+scores = cross_val_score(RidgeCV(), X_bc_poly, y_train, cv=10)
+np.mean(scores), np.std(scores)
+```
+```
+(0.865, 0.080)
+
+```
 
 ???
 N/A
@@ -1129,7 +1244,7 @@ N/A
         return '<img src="' + url + '" style="width: ' + percentage + '" />';
     };
     config_remark = {
-        highlightStyle: 'github',
+        highlightStyle: 'magula',
         highlightSpans: true,
         highlightLines: true,
         ratio: "16:9"
