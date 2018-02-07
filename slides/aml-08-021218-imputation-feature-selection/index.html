@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Imputation and Feature Selection
+
+02/03/17
+
+Andreas C. Müller
+
+???
+N/A
+
+---
+class: spacious
+
+# Dealing with missing values
+
+- Missing values can be encoded in many ways
+- Numpy has no standard format for it (often np.NaN)
+- Sometimes: 999, ???, ?, np.inf, “N/A”, “Unknown“ …
+- Not discussing “missing output” - that’s semi-supervised learning.
+- Add feature that encodes that data was missing!
+- Often missingness is informative!
+
+???
+
+---
+
+.center[
+![:scale 70%](images/img_1.png)
+]
+
+- Problem : Prediction not for all samples !
+- Accuracy might be biased
+
+???
+
+---
+
+.center[
+![:scale 100%](images/img_2.png)
+]
+
+???
+
+---
+class: spacious
+
+# Imputation Methods
+
+- Mean / Median
+- kNN
+- Model-driven
+- Iterative
+
+???
+
+---
+
+
+```python
+
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.model_selection import train_test_split, cross_val_score
+X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify=y, random_state=0)
+```
+```python
+nan_columns = np.any(np.isnan(X_train), axis=0)
+X_drop_columns = X_train[:, ~nan_columns]
+scores = cross_val_score(LogisticRegressionCV(v=5), X_drop_columns, y_train, cv=10)
+np.mean(scores)
+```
+0.77166672
+
+
+???
+
+---
+
+# Mean and Median
+
+.center[
+![:scale 100%](images/img_4.png)
+]
+
+???
+
+---
+
+.center[
+![:scale 100%](images/img_5.png)
+]
+
+???
+
+
+---
+
+
+
+```python
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScalar
+
+nan_columns = np.any(np.isnan(X_train), axis = 0)
+X_drop_columns = X_train[:,~nan_columns]
+logreg = make_pipeline(StandardScalar(), LogisticRegression())
+scores = cross_val_score(logreg, X_drop_columns, y_train, cv = 10)
+np.mean(scores)
+```
+0.79388887
+```python
+mean_pipe = make_pipeline(Imputer(), StandardScalar(), LogisticRegression())
+scores = cross_val_score(mean_pipe, X_train, y_train, cv =10)
+np.mean(scores)
+```
+0.728892
+
+???
+
+
+---
+class: spacious
+
+# KNN Imputation
+
+- Find k nearest neighbors that have non-missing values.
+- Fill in all missing values using the average of the
+neighbors.
+- Different strategies possible for finding neighbors that
+have missing values.
+- Tricky if there is no feature that is always non-missing.
+- PR in scikit-learn: https://github.com/scikit-learn/scikitlearn/pull/4844
+
+???
+
+---
+
+# KNN Imputation
+
+.smaller[
+```python
+from sklearn.neighbors import KNeighborsRegressor
+feature2_missing = np.isnan(X_train[:, 2])
+knn_feature2 = KNeighborsRegressor().fit(X_train[~feature2_missing, :2],
+                                         X_train[~feature2_missing, 2])
+X_train_knn2 = X_train.copy()
+X_train_knn2[feature2_missing, 2] = knn_feature2.predict(X_train[feature2_missing, :2])
+```
+
+```python
+# impute feature 3 with KNN
+feature3_missing = np.isnan(X_train[:, 3])
+knn_feature3 = KNeighborsRegressor().fit(X_train[~feature3_missing, :2],
+                                         X_train[~feature3_missing, 3])
+X_train_knn3 = X_train_knn2.copy()
+X_train_knn3[feature3_missing, 3] = knn_feature3.predict(X_train[feature3_missing, :2])
+```
+]
+An efficient implementation would find nearest neighbors only once! This approach is quite naive as is requires the first two features to always be present!
+.smaller[
+```python
+scores = cross_val_score(logreg, X_train_knn3, y_train, cv=10)
+np.mean(scores) # yields 0.798334
+```
+]
+
+???
+
+Vinay - Included output in same cell due to size limit
+
+---
+
+.center[
+![:scale 100%](images/img_9.png)
+]
+
+???
+
+---
+class: spacious
+
+# Model-Driven Imputation
+
+- Train regression model for missing values
+- Possibly iterate: retrain after filling in
+- Very flexible!
+
+???
+
+---
+class: smaller
+
+# Model-driven Imputation w RF
+
+
+.smaller[
+```python
+rf = RandomForestRegressor(n_estimators=100)
+for i in range(10):
+    last = X_imputed.copy()
+    # imput feature 2 with rf
+    rf.fit(X_imputed[~feature2_missing][:, inds_not_2], X_train[~feature2_missing, 2])
+    X_imputed[feature2_missing, 2] = rf.predict(X_imputed[feature2_missing][:, inds_not_2])
+    # impute feature 3 with rf
+    rf.fit(X_imputed[~feature3_missing][:, inds_not_3], X_train[~feature3_missing, 3])
+    X_imputed[feature3_missing, 3] = rf.predict(X_imputed[feature3_missing][:, inds_not_3])
+    # this would make more sense if we scaled the data beforehand
+    if (np.linalg.norm(last - X_imputed)) < .5:
+        break
+```
+```python
+scores = cross_val_score(logreg, X_imputed, y_train, cv=10)
+np.mean(scores)
+```
+0.849998
+]
+
+???
+
+---
+class: spacious
+
+# Comparision of Imputation Methods
+
+.center[
+![:scale 100%](images/img_12.png)
+]
+
+???
+
+---
+class: spacious
+
+
+# Fanyimpute
+
+- pip install fancyimpute
+- Has many methods – but no fit-transform
+paradigm
+- MICE is iterative and works well often
+- Try different things in practice, MICE might be best
+
+???
+
+---
+class: spacious
+
+
+.center[
+![:scale 100%](images/img_13.png)
+]
+
+???
+
+---
+
+.center[
+![:scale 70%](images/img_14.png)
+]
+
+???
+
+---
+
+# Applying fancyimpute
+
+.smaller[
+```python
+X_train_fancy_mice = mice.complete(X_train)
+scores = cross_val_score(logreg, X_train_fancy_mice, y_train, cv=10)
+scores.mean()
+```
+0.8233347
+]
+- Again, cheating with the imputation :(
+- This is allowed for the homework because the current tools make it hard to do the right thing.
+
+???
+
+---
+
+class: center, middle
+
+##Feature Selection
+
+???
+
+---
+
+class: spacious
+
+# Why Select Features?
+
+- Avoid overfitting
+- Faster prediction and training
+- Less storage for model and dataset
+
+???
+
+---
+
+class: spacious
+
+
+# Types of Feature Selection
+
+- Unsupervised vs Supervised
+- Univariate vs Multivariate
+- Model based or not
+
+???
+
+---
+class: spacious
+
+# Unsupervised Feature Selection
+
+- May discard important information
+- Variance-based: 0 variance or few unique values
+- Covariance-based: remove correlated features
+- PCA: remove linear subspaces
+
+???
+
+
+---
+
+# Covariance
+
+.smaller[
+```python
+boston = load_boston()
+X, y = boston.data, boston.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+```
+```python
+from sklearn.preprocessing import scale
+X_train_scaled = scale(X_train)
+cov = np.cov(X_train_scaled, rowvar=False)
+```
+]
+.center[
+![:scale 35%](images/img_17.png)
+]
+
+???
+
+---
+
+```python
+from scipy.cluster import hierarchy
+order = np.array(hierarchy.dendrogram(hierarchy.ward(cov), no_plot=True)['ivl'], dtype="int")
+```
+
+.center[
+![:scale 80%](images/img_19.png)
+]
+
+- Can use this to iteratively remove most correlated pairs.
+- Beware: might discard important information !
+
+???
+
+---
+
+
+class: center, middle
+
+## Supervised Feature Selection
+
+???
+
+---
+
+# Simple Univariate Selection
+
+- Pick statistic, check p-values !
+- f_regression, f_classsif, chi2 in scikit-learn
+
+```python
+from sklearn.feature_selection import f_regression
+f_values, p_values = f_regression(X, y)
+```
+.center[
+![:scale 50%](images/img_20.png)
+]
+
+???
+
+---
+
+.smaller[
+```python
+from sklearn.feature_selection import SelectKBest, SelectPercentile, SelectFpr
+from sklearn.linear_model import RidgeCV
+
+select = SelectKBest(k=2, score_func=f_regression)
+select.fit(X_train, y_train)
+print(X_train.shape)
+print(select.transform(X_train).shape)
+```
+(379,13)
+(379,2)
+```python
+all_features = make_pipeline(StandardScaler(), RidgeCV())
+select_2 = make_pipeline(StandardScaler(), SelectKBest(k=2, score_func=f_regression), RidgeCV())
+np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
+```
+0.71798
+```python
+np.mean(cross_val_score(select_2, X_train, y_train, cv=10))
+```
+0.62436
+]
+
+???
+
+---
+
+# Mututal Information
+
+.smaller[
+```python
+from sklearn.feature_selection import mutual_info_regression
+scores = mutual_info_regression(X_train, y_train, discrete_features=[3])
+```
+]
+.center[
+![:scale 70%](images/img_22.png)
+]
+
+
+- Mutual information (as implemented here) is also univariate, but doesn’t assume a linear model (like the F statistics do)
+- Can be used with SelectKBest etc
+
+???
+
+
+---
+class: spacious
+
+#Model-Based Feature Selection
+
+- Get best fit for a particular model
+- Ideally: exhaustive search over all possible
+combinations
+- Exhaustive is infeasible (and has multiple testing
+issues)
+- Use heuristics in practice.
+
+???
+
+---
+
+# Model based (single fit)
+.smaller[
+- Build a model, select features important to model
+- Lasso, other linear models, tree-based Models
+- Multivariate - linear models assume linear relation
+]
+.smaller[
+```python
+from sklearn.linear_model import LassoCV
+X_train_scaled = scale(X_train)
+lasso = LassoCV().fit(X_train_scaled, y_train)
+print(lasso.coef_)
+```
+[-0.881  0.951 -0.082  0.59  -1.69   2.639 -0.146 -2.796  1.695 -1.614
+ -2.133  0.729 -3.615]
+]
+
+.center[
+![:scale 55%](images/img_23.png)
+]
+
+???
+
+---
+
+# Changing Lasso alpha
+
+.smaller[
+```python
+from sklearn.linear_model import Lasso
+X_train_scaled = scale(X_train)
+lasso = Lasso().fit(X_train_scaled, y_train)
+print(lasso.coef_)
+```
+[-0.     0.    -0.     0.    -0.     2.529 -0.    -0.    -0.    -0.228
+ -1.701  0.132 -3.606]
+]
+
+.center[
+![:scale 80%](images/img_24.png)
+]
+
+???
+
+---
+
+# SelectFromModel
+
+.smaller[
+```python
+from sklearn.feature_selection import SelectFromModel
+select_lassocv = SelectFromModel(LassoCV(), threshold="median")
+select_lassocv.fit(X_train, y_train)
+print(select_lassocv.transform(X_train).shape)
+#(379,7)
+
+pipe_lassocv = make_pipeline(StandardScaler(), select_lassocv, RidgeCV())
+np.mean(cross_val_score(pipe_lassocv, X_train, y_train, cv=10))
+#0.712
+
+np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
+#0.7179
+
+# could grid-search alpha in lasso
+select_lasso = SelectFromModel(Lasso())
+pipe_lasso = make_pipeline(StandardScaler(), select_lasso, RidgeCV())
+np.mean(cross_val_score(pipe_lasso, X_train, y_train, cv=10))
+#0.6705
+```
+]
+
+???
+
+Vinay - Included output in same cell due to size limit
+
+---
+class: spacious
+
+# Iterative Model-Based Selection
+
+- Fit model, find least important feature, remove, iterate.
+- Or: Start with single feature, find most important feature, add, iterate.
+
+???
+
+---
+class: spacious
+
+# Recursive Feature Elimination
+
+- Uses feature importances / coefficients, similar to “SelectFromModel”
+- Iteratively removes features (one by one or in groups)
+- Runtime: (n_features - n_feature_to_keep) / stepsize
+
+???
+
+---
+
+.smaller[
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.feature_selection import RFE
+
+# create ranking among all features by selecting only one
+rfe = RFE(LinearRegression(), n_features_to_select=1)
+rfe.fit(X_train_scaled, y_train)
+rfe.ranking_
+```
+array([ 9,  8, 13, 11,  5,  2, 12,  4,  7,  6,  3, 10,  1])
+]
+
+
+.center[
+![:scale 75%](images/img_27.png)
+]
+
+
+???
+
+---
+
+# RFECV
+.smaller[
+Efficient CV for n_features_to_keep
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.feature_selection import RFECV
+rfe = RFECV(LinearRegression(), cv=10)
+rfe.fit(X_train_scaled, y_train)
+print(rfe.support_)
+print(boston.feature_names[rfe.support_])
+[ True  True False  True  True  True False  True  True  True  True  True
+  True]
+['CRIM' 'ZN' 'CHAS' 'NOX' 'RM' 'DIS' 'RAD' 'TAX' 'PTRATIO' 'B' 'LSTAT']
+pipe_rfe_ridgecv = make_pipeline(StandardScaler(), RFECV(LinearRegression(), cv=10), RidgeCV())
+np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
+0.71019583375843554
+```
+If we want to predict with the same model as used for selection, RFECV can be used as the prediction step. Could also use RFECV as transformer and use any other model!
+```python
+from sklearn.preprocessing import PolynomialFeatures
+pipe_rfe_ridgecv = make_pipeline(StandardScaler(), PolynomialFeatures(), RFECV(LinearRegression(), cv=10), RidgeCV())
+np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
+# 0.82031507795394398
+```
+]
+???
+FIXME !
+
+Vinay -- Couldn't decrease the overall size further. Needs correction
+---
+class: spacious
+
+# Wrapper Methods
+
+- Can be applied for ANY model!
+- Shrink / grow feature set by greedy search
+- Called Forward or Backward selection
+- Complexity: n_features * (n_features + 1) / 2
+- Implemented in mlxtend
+
+???
+
+---
+
+# SequentialFeatureSelector
+
+.smaller[
+```python
+from mlxtend.feature_selection import SequentialFeatureSelector
+sfs = SequentialFeatureSelector(LinearRegression(), forward=False, k_features=7)
+sfs.fit(X_train_scaled, y_train)
+```
+Features: 7/7
+```python
+print(sfs.k_feature_idx_)
+print(boston.feature_names[np.array(sfs.k_feature_idx_)])
+```
+(1, 4, 5, 7, 9, 10, 12)
+['ZN' 'NOX' 'RM' 'DIS' 'TAX' 'PTRATIO' 'LSTAT']
+```python
+sfs.k_score_
+```
+0.72508612228296487
+
+]
+
+???
+
+---
+
+
+class: center, middle
+
+# Questions ?
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
