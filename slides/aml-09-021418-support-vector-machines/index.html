@@ -373,18 +373,14 @@ scaled_svc = make_pipeline(StandardScaler(), SVC())
 print(np.mean(cross_val_score(SVC(), X_train, y_train, cv=10)))
 print(np.mean(cross_val_score(scaled_svc, X_train, y_train, cv=10)))
 ```
-```python
 0.578282235299
 0.978450806169
-```
 ```python
 # X_train.std() is also good for global scaling - if the features were on the same scale.
 # this dataset is very atypical.
 print(np.mean(cross_val_score(SVC(gamma=(1. / (X_train.shape[1] * X_train.std()))), X_train, y_train, cv=10)))
 ```
-```python
 0.98730879194
-```
 ]
 
 ???
@@ -399,10 +395,8 @@ param_grid = {'svc__C': np.logspace(-3, 2, 6),
               'svc__gamma': np.logspace(-3, 2, 6) / X_train.shape[0]}
 param_grid
 ```
-```python
-{'svc__C': array([   0.001,    0.01 ,    0.1  ,    1.   ,   10.   ,  100.   ]),
- 'svc__gamma': array([ 0.000001,  0.000007,  0.000074,  0.000742,  0.007424,  0.074239])}
-```
+{'svc_C': array([   0.001,    0.01 ,    0.1  ,    1.   ,   10.   ,  100.   ]),   
+ 'svc_gamma': array([ 0.000001,  0.000007,  0.000074,  0.000742,  0.007424,  0.074239])}
 ```python
 grid = GridSearchCV(scaled_svc, param_grid=param_grid, cv=10)
 grid.fit(X_train, y_train)
@@ -578,15 +572,11 @@ w = rng.normal(size=(X_train.shape[1], 100))
 X_train_wat = np.tanh(scale(np.dot(X_train, w)))
 print(X_train_wat.shape)
 ```
-```python
 (1347, 100)
-```
 ```python
 np.mean(cross_val_score(LinearSVC(), X_train_wat, y_train, cv=10))
 ```
-```python
 0.96354231101095089
-```
 
 ???
 

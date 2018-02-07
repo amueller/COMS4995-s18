@@ -176,10 +176,8 @@ X_drop_columns = X_train[:, ~nan_columns]
 scores = cross_val_score(LogisticRegressionCV(v=5), X_drop_columns, y_train, cv=10)
 np.mean(scores)
 ```
-```python
 0.77166672
 
-```
 
 ???
 
@@ -216,17 +214,13 @@ logreg = make_pipeline(StandardScalar(), LogisticRegression())
 scores = cross_val_score(logreg, X_drop_columns, y_train, cv = 10)
 np.mean(scores)
 ```
-```python
 0.79388887
-```
 ```python
 mean_pipe = make_pipeline(Imputer(), StandardScalar(), LogisticRegression())
 scores = cross_val_score(mean_pipe, X_train, y_train, cv =10)
 np.mean(scores)
 ```
-```python
 0.728892
-```
 
 ???
 
@@ -325,9 +319,7 @@ for i in range(10):
 scores = cross_val_score(logreg, X_imputed, y_train, cv=10)
 np.mean(scores)
 ```
-```python
 0.849998
-```
 ]
 
 ???
@@ -385,9 +377,7 @@ X_train_fancy_mice = mice.complete(X_train)
 scores = cross_val_score(logreg, X_train_fancy_mice, y_train, cv=10)
 scores.mean()
 ```
-```python
 0.8233347
-```
 ]
 - Again, cheating with the imputation :(
 - This is allowed for the homework because the current tools make it hard to do the right thing.
@@ -516,24 +506,18 @@ select.fit(X_train, y_train)
 print(X_train.shape)
 print(select.transform(X_train).shape)
 ```
-```python
 (379,13)
 (379,2)
-```
 ```python
 all_features = make_pipeline(StandardScaler(), RidgeCV())
 select_2 = make_pipeline(StandardScaler(), SelectKBest(k=2, score_func=f_regression), RidgeCV())
 np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
 ```
-```python
 0.71798
-```
 ```python
 np.mean(cross_val_score(select_2, X_train, y_train, cv=10))
 ```
-```python
 0.62436
-```
 ]
 
 ???
@@ -588,10 +572,8 @@ X_train_scaled = scale(X_train)
 lasso = LassoCV().fit(X_train_scaled, y_train)
 print(lasso.coef_)
 ```
-```python
 [-0.881  0.951 -0.082  0.59  -1.69   2.639 -0.146 -2.796  1.695 -1.614
  -2.133  0.729 -3.615]
-```
 ]
 
 .center[
@@ -611,10 +593,8 @@ X_train_scaled = scale(X_train)
 lasso = Lasso().fit(X_train_scaled, y_train)
 print(lasso.coef_)
 ```
-```python
 [-0.     0.    -0.     0.    -0.     2.529 -0.    -0.    -0.    -0.228
  -1.701  0.132 -3.606]
-```
 ]
 
 .center[
@@ -687,9 +667,7 @@ rfe = RFE(LinearRegression(), n_features_to_select=1)
 rfe.fit(X_train_scaled, y_train)
 rfe.ranking_
 ```
-```python
 array([ 9,  8, 13, 11,  5,  2, 12,  4,  7,  6,  3, 10,  1])
-```
 ]
 
 
@@ -754,23 +732,17 @@ from mlxtend.feature_selection import SequentialFeatureSelector
 sfs = SequentialFeatureSelector(LinearRegression(), forward=False, k_features=7)
 sfs.fit(X_train_scaled, y_train)
 ```
-```python
 Features: 7/7
-```
 ```python
 print(sfs.k_feature_idx_)
 print(boston.feature_names[np.array(sfs.k_feature_idx_)])
 ```
-```python
 (1, 4, 5, 7, 9, 10, 12)
 ['ZN' 'NOX' 'RM' 'DIS' 'TAX' 'PTRATIO' 'LSTAT']
-```
 ```python
 sfs.k_score_
 ```
-```python
 0.72508612228296487
-```
 
 ]
 
