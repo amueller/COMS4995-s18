@@ -57,8 +57,8 @@
       .padding-top {
           padding-top: 100px;
       }
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
-      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+      .remark-slide-container .smaller p, .remark-slide-container .smaller li,
+      .remark-slide-container .smaller .remark-code, .remark-slide-container .smaller a{
           font-size: 25px;
       }
       .normal {
@@ -374,7 +374,7 @@ X_train_fancy_mice = mice.complete(X_train)
 scores = cross_val_score(logreg, X_train_fancy_mice, y_train, cv=10)
 scores.mean()
 ```
-0.823
+0.866
 ???
 - Again, cheating with the imputation :(
 - This is allowed for the homework because the current tools make it hard to do the right thing.
@@ -609,31 +609,38 @@ print(lasso.coef_)
 ???
 
 ---
-
+class: smaller
 # SelectFromModel
 
-.smaller[
 ```python
 from sklearn.feature_selection import SelectFromModel
-select_lassocv = SelectFromModel(LassoCV(), threshold="median")
+select_lassocv = SelectFromModel(LassoCV(), threshold=1e-5)
 select_lassocv.fit(X_train, y_train)
 print(select_lassocv.transform(X_train).shape)
-#(379,7)
-
+```
+```
+(379,11)
+```
+--
+```python
 pipe_lassocv = make_pipeline(StandardScaler(), select_lassocv, RidgeCV())
 np.mean(cross_val_score(pipe_lassocv, X_train, y_train, cv=10))
-#0.712
-
 np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
-#0.7179
-
+```
+```
+0.717
+0.718
+```
+--
+```python
 # could grid-search alpha in lasso
 select_lasso = SelectFromModel(Lasso())
 pipe_lasso = make_pipeline(StandardScaler(), select_lasso, RidgeCV())
 np.mean(cross_val_score(pipe_lasso, X_train, y_train, cv=10))
-#0.6705
 ```
-]
+```
+0.671
+```
 
 ???
 
