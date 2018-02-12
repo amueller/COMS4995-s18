@@ -109,7 +109,7 @@ class: center, middle
 
 # Imputation and Feature Selection
 
-02/125/18
+02/12/18
 
 Andreas C. Müller
 
@@ -122,24 +122,24 @@ class: spacious
 # Dealing with missing values
 
 - Missing values can be encoded in many ways
-- Numpy has no standard format for it (often np.NaN)
+- Numpy has no standard format for it (often np.NaN) - pandas does
 - Sometimes: 999, ???, ?, np.inf, “N/A”, “Unknown“ …
 - Not discussing “missing output” - that’s semi-supervised learning.
-- Add feature that encodes that data was missing!
 - Often missingness is informative!
 
 ???
 
+- Add feature that encodes that data was missing!
 ---
 
 .center[
-![:scale 70%](images/img_1.png)
+![:scale 80%](images/img_1.png)
 ]
 
+???
 - Problem : Prediction not for all samples !
 - Accuracy might be biased
 
-???
 
 ---
 
@@ -156,8 +156,8 @@ class: spacious
 
 - Mean / Median
 - kNN
-- Model-driven
-- Iterative
+- Regression models
+- Probabilistic models
 
 ???
 
@@ -235,7 +235,7 @@ class: spacious
 - Find k nearest neighbors that have non-missing values.
 - Fill in all missing values using the average of the
 neighbors.
-- PR in scikit-learn: https://github.com/scikit-learn/scikitlearn/pull/4844
+- PR in scikit-learn: https://github.com/scikit-learn/scikit-learn/pull/9212
 
 ???
 
@@ -405,7 +405,6 @@ class: spacious
 
 class: spacious
 
-
 # Types of Feature Selection
 
 - Unsupervised vs Supervised
@@ -471,7 +470,7 @@ order = np.array(hierarchy.dendrogram(
 
 class: center, middle
 
-## Supervised Feature Selection
+# Supervised Feature Selection
 
 ???
 
@@ -479,15 +478,16 @@ class: center, middle
 
 # Univariate Statistics
 
+.smaller[
 - Pick statistic, check p-values !
 - f_regression, f_classsif, chi2 in scikit-learn
-
 ```python
 from sklearn.feature_selection import f_regression
 f_values, p_values = f_regression(X, y)
 ```
+]
 .center[
-![:scale 50%](images/img_20.png)
+![:scale 60%](images/img_20.png)
 ]
 
 ???
@@ -508,14 +508,20 @@ print(select.transform(X_train).shape)
 (379, 13)
 (379, 2)
 ```
+]
+--
+.smaller[
 ```python
 all_features = make_pipeline(StandardScaler(), RidgeCV())
-select_2 = make_pipeline(StandardScaler(),
-                         SelectKBest(k=2, score_func=f_regression), RidgeCV())
 np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
 ```
 0.718
+]
+--
+.smaller[
 ```python
+select_2 = make_pipeline(StandardScaler(),
+                         SelectKBest(k=2, score_func=f_regression), RidgeCV())
 np.mean(cross_val_score(select_2, X_train, y_train, cv=10))
 ```
 0.624
@@ -736,6 +742,7 @@ class: spacious
 - Can be applied for ANY model!
 - Shrink / grow feature set by greedy search
 - Called Forward or Backward selection
+- Run CV / train-val split per feature
 - Complexity: n_features * (n_features + 1) / 2
 - Implemented in mlxtend
 
