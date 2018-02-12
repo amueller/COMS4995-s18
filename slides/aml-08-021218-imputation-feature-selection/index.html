@@ -109,7 +109,7 @@ class: center, middle
 
 # Imputation and Feature Selection
 
-02/03/17
+02/125/18
 
 Andreas C. Müller
 
@@ -163,21 +163,22 @@ class: spacious
 
 ---
 
+# Baseline: Dropping Columns
 
+.smaller[
 ```python
 
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import train_test_split, cross_val_score
-X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify=y, random_state=0)
-```
-```python
+X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify=y)
+
 nan_columns = np.any(np.isnan(X_train), axis=0)
 X_drop_columns = X_train[:, ~nan_columns]
 scores = cross_val_score(LogisticRegressionCV(v=5), X_drop_columns, y_train, cv=10)
 np.mean(scores)
 ```
-0.77166672
-
+0.772
+]
 
 ???
 
@@ -214,13 +215,14 @@ logreg = make_pipeline(StandardScalar(), LogisticRegression())
 scores = cross_val_score(logreg, X_drop_columns, y_train, cv = 10)
 np.mean(scores)
 ```
-0.79388887
+0.794
 ```python
-mean_pipe = make_pipeline(Imputer(), StandardScalar(), LogisticRegression())
+mean_pipe = make_pipeline(Imputer(), StandardScalar(),
+                          LogisticRegression())
 scores = cross_val_score(mean_pipe, X_train, y_train, cv =10)
 np.mean(scores)
 ```
-0.728892
+0.729
 
 ???
 
@@ -305,7 +307,7 @@ class: smaller
 rf = RandomForestRegressor(n_estimators=100)
 for i in range(10):
     last = X_imputed.copy()
-    # imput feature 2 with rf
+    # impute feature 2 with rf
     rf.fit(X_imputed[~feature2_missing][:, inds_not_2], X_train[~feature2_missing, 2])
     X_imputed[feature2_missing, 2] = rf.predict(X_imputed[feature2_missing][:, inds_not_2])
     # impute feature 3 with rf
@@ -350,19 +352,9 @@ paradigm
 ???
 
 ---
-class: spacious
-
 
 .center[
-![:scale 100%](images/img_13.png)
-]
-
-???
-
----
-
-.center[
-![:scale 70%](images/img_14.png)
+![:scale 60%](images/fancy_impute_comparison.png)
 ]
 
 ???
@@ -377,7 +369,7 @@ X_train_fancy_mice = mice.complete(X_train)
 scores = cross_val_score(logreg, X_train_fancy_mice, y_train, cv=10)
 scores.mean()
 ```
-0.8233347
+0.823
 ]
 - Again, cheating with the imputation :(
 - This is allowed for the homework because the current tools make it hard to do the right thing.
@@ -436,18 +428,18 @@ class: spacious
 
 .smaller[
 ```python
+from sklearn.preprocessing import scale
+
 boston = load_boston()
 X, y = boston.data, boston.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-```
-```python
-from sklearn.preprocessing import scale
 X_train_scaled = scale(X_train)
+
 cov = np.cov(X_train_scaled, rowvar=False)
 ```
 ]
 .center[
-![:scale 35%](images/img_17.png)
+![:scale 32%](images/img_17.png)
 ]
 
 ???
@@ -456,17 +448,18 @@ cov = np.cov(X_train_scaled, rowvar=False)
 
 ```python
 from scipy.cluster import hierarchy
-order = np.array(hierarchy.dendrogram(hierarchy.ward(cov), no_plot=True)['ivl'], dtype="int")
+order = np.array(hierarchy.dendrogram(
+    hierarchy.ward(cov),no_plot=True)['ivl'], dtype="int")
 ```
 
 .center[
-![:scale 80%](images/img_19.png)
+![:scale 90%](images/img_19.png)
 ]
+
+???
 
 - Can use this to iteratively remove most correlated pairs.
 - Beware: might discard important information !
-
-???
 
 ---
 
@@ -506,18 +499,19 @@ select.fit(X_train, y_train)
 print(X_train.shape)
 print(select.transform(X_train).shape)
 ```
-(379,13)
-(379,2)
+(379, 13)
+(379, 2)
 ```python
 all_features = make_pipeline(StandardScaler(), RidgeCV())
-select_2 = make_pipeline(StandardScaler(), SelectKBest(k=2, score_func=f_regression), RidgeCV())
+select_2 = make_pipeline(StandardScaler(),
+                         SelectKBest(k=2, score_func=f_regression), RidgeCV())
 np.mean(cross_val_score(all_features, X_train, y_train, cv=10))
 ```
-0.71798
+0.718
 ```python
 np.mean(cross_val_score(select_2, X_train, y_train, cv=10))
 ```
-0.62436
+0.624
 ]
 
 ???
@@ -526,21 +520,19 @@ np.mean(cross_val_score(select_2, X_train, y_train, cv=10))
 
 # Mututal Information
 
-.smaller[
 ```python
 from sklearn.feature_selection import mutual_info_regression
-scores = mutual_info_regression(X_train, y_train, discrete_features=[3])
+scores = mutual_info_regression(X_train, y_train,
+                                discrete_features=[3])
 ```
-]
 .center[
-![:scale 70%](images/img_22.png)
+![:scale 90%](images/img_22.png)
 ]
 
+???
 
 - Mutual information (as implemented here) is also univariate, but doesn’t assume a linear model (like the F statistics do)
 - Can be used with SelectKBest etc
-
-???
 
 
 ---
@@ -672,7 +664,7 @@ array([ 9,  8, 13, 11,  5,  2, 12,  4,  7,  6,  3, 10,  1])
 
 
 .center[
-![:scale 75%](images/img_27.png)
+![:scale 95%](images/img_27.png)
 ]
 
 
@@ -682,7 +674,6 @@ array([ 9,  8, 13, 11,  5,  2, 12,  4,  7,  6,  3, 10,  1])
 
 # RFECV
 .smaller[
-Efficient CV for n_features_to_keep
 ```python
 from sklearn.linear_model import LinearRegression
 from sklearn.feature_selection import RFECV
@@ -690,25 +681,46 @@ rfe = RFECV(LinearRegression(), cv=10)
 rfe.fit(X_train_scaled, y_train)
 print(rfe.support_)
 print(boston.feature_names[rfe.support_])
+```
+```                   
 [ True  True False  True  True  True False  True  True  True  True  True
   True]
 ['CRIM' 'ZN' 'CHAS' 'NOX' 'RM' 'DIS' 'RAD' 'TAX' 'PTRATIO' 'B' 'LSTAT']
-pipe_rfe_ridgecv = make_pipeline(StandardScaler(), RFECV(LinearRegression(), cv=10), RidgeCV())
-np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
-0.71019583375843554
 ```
-If we want to predict with the same model as used for selection, RFECV can be used as the prediction step. Could also use RFECV as transformer and use any other model!
 ```python
-from sklearn.preprocessing import PolynomialFeatures
-pipe_rfe_ridgecv = make_pipeline(StandardScaler(), PolynomialFeatures(), RFECV(LinearRegression(), cv=10), RidgeCV())
+pipe_rfe_ridgecv = make_pipeline(StandardScaler(),
+                                 RFECV(LinearRegression(), cv=10), RidgeCV())
 np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
-# 0.82031507795394398
+```
+```
+0.710
 ```
 ]
 ???
-FIXME !
-
-Vinay -- Couldn't decrease the overall size further. Needs correction
+Efficient CV for n_features_to_keep
+If we want to predict with the same model as used for selection, RFECV can be used as the prediction step. Could also use RFECV as transformer and use any other model!
+---
+.smaller[
+```python
+pipe_rfe_ridgecv = make_pipeline(StandardScaler(),
+                                 RFECV(LinearRegression(), cv=10), RidgeCV())
+np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
+```
+```
+0.710
+```
+```python
+from sklearn.preprocessing import PolynomialFeatures
+pipe_rfe_ridgecv = make_pipeline(StandardScaler(), PolynomialFeatures(),
+                                 RFECV(LinearRegression(), cv=10), RidgeCV())
+np.mean(cross_val_score(pipe_rfe_ridgecv, X_train, y_train, cv=10))
+```
+```
+0.820
+```
+]
+???
+If we want to predict with the same model as used for selection, RFECV can be used as the prediction step. Could also use RFECV as transformer and use any other model!
 ---
 class: spacious
 
@@ -732,17 +744,23 @@ from mlxtend.feature_selection import SequentialFeatureSelector
 sfs = SequentialFeatureSelector(LinearRegression(), forward=False, k_features=7)
 sfs.fit(X_train_scaled, y_train)
 ```
+```
 Features: 7/7
+```
 ```python
 print(sfs.k_feature_idx_)
 print(boston.feature_names[np.array(sfs.k_feature_idx_)])
 ```
+```
 (1, 4, 5, 7, 9, 10, 12)
 ['ZN' 'NOX' 'RM' 'DIS' 'TAX' 'PTRATIO' 'LSTAT']
+```
 ```python
 sfs.k_score_
 ```
-0.72508612228296487
+```
+0.725
+```
 
 ]
 
