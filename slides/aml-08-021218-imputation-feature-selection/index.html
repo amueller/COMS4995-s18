@@ -245,39 +245,43 @@ neighbors.
 
 .smaller[
 ```python
-from sklearn.neighbors import KNeighborsRegressor
-feature2_missing = np.isnan(X_train[:, 2])
-knn_feature2 = KNeighborsRegressor().fit(X_train[~feature2_missing, :2],
-                                         X_train[~feature2_missing, 2])
-X_train_knn2 = X_train.copy()
-X_train_knn2[feature2_missing, 2] = knn_feature2.predict(X_train[feature2_missing, :2])
-```
+# Very inefficient didactic implementation
 
-```python
-# impute feature 3 with KNN
-feature3_missing = np.isnan(X_train[:, 3])
-knn_feature3 = KNeighborsRegressor().fit(X_train[~feature3_missing, :2],
-                                         X_train[~feature3_missing, 3])
-X_train_knn3 = X_train_knn2.copy()
-X_train_knn3[feature3_missing, 3] = knn_feature3.predict(X_train[feature3_missing, :2])
-```
-]
-An efficient implementation would find nearest neighbors only once! This approach is quite naive as is requires the first two features to always be present!
-.smaller[
-```python
-scores = cross_val_score(logreg, X_train_knn3, y_train, cv=10)
-np.mean(scores) # yields 0.798334
+distances = np.zeros((X_train.shape[0], X_train.shape[0]))
+for i, x1 in enumerate(X_train):
+    for j, x2 in enumerate(X_train):
+        dist = (x1 - x2) ** 2
+        nan_mask = np.isnan(dist)
+        distances[i, j] = dist[~nan_mask].mean() * X_train.shape[1]
+        
+neighbors = np.argsort(distances, axis=1)[:, 1:]
+n_neighbors = 3
+
+X_train_knn = X_train.copy()
+for feature in range(X_train.shape[1]):
+    has_missing_value = np.isnan(X_train[:, feature])
+    for row in np.where(has_missing_value)[0]:
+        neighbor_features = X_train[neighbors[row], feature]
+        non_nan_neighbors = neighbor_features[~np.isnan(neighbor_features)]
+        X_train_knn[row, feature] = non_nan_neighbors[:n_neighbors].mean()
 ```
 ]
 
 ???
 
-Vinay - Included output in same cell due to size limit
-
 ---
+.smaller[
+```python
+scores = cross_val_score(logreg, X_train_knn, y_train, cv=10)
+np.mean(scores)
+```
+```
+0.849
+```
+]
 
 .center[
-![:scale 100%](images/img_9.png)
+![:scale 70%](images/img_9.png)
 ]
 
 ???
@@ -302,34 +306,36 @@ class: smaller
 .smaller[
 ```python
 rf = RandomForestRegressor(n_estimators=100)
+
 for i in range(10):
-    last = X_imputed.copy()
-    # impute feature 2 with rf
-    rf.fit(X_imputed[~feature2_missing][:, inds_not_2], X_train[~feature2_missing, 2])
-    X_imputed[feature2_missing, 2] = rf.predict(X_imputed[feature2_missing][:, inds_not_2])
-    # impute feature 3 with rf
-    rf.fit(X_imputed[~feature3_missing][:, inds_not_3], X_train[~feature3_missing, 3])
-    X_imputed[feature3_missing, 3] = rf.predict(X_imputed[feature3_missing][:, inds_not_3])
-    # this would make more sense if we scaled the data beforehand
+    last = X_train.copy()
+    for feature in range(X_train.shape[1]):
+        inds_not_f = np.arange(X_train.shape[1])
+        inds_not_f = inds_not_f[inds_not_f != feature]
+        f_missing = np.isnan(X_train[:, feature])
+        rf.fit(X_imputed[~f_missing][:, inds_not_f], X_train[~f_missing, feature])
+
+        X_imputed[f_missing, feature] = rf.predict(
+            X_imputed[f_missing][:, inds_not_f])
+
     if (np.linalg.norm(last - X_imputed)) < .5:
         break
-```
-```python
+
 scores = cross_val_score(logreg, X_imputed, y_train, cv=10)
 np.mean(scores)
 ```
-0.849998
+0.855
 ]
 
 ???
-
+Assumes we did some imputation on X_train before, like mean.
 ---
 class: spacious
 
 # Comparision of Imputation Methods
 
 .center[
-![:scale 100%](images/img_12.png)
+![:scale 100%](images/mean_knn_rf_comparison.png)
 ]
 
 ???
@@ -357,27 +363,28 @@ paradigm
 ???
 
 ---
-
+class: spacious
 # Applying fancyimpute
 
-.smaller[
 ```python
+import fancyimpute
+mice = fancyimpute.MICE(verbose=0)
+
 X_train_fancy_mice = mice.complete(X_train)
 scores = cross_val_score(logreg, X_train_fancy_mice, y_train, cv=10)
 scores.mean()
 ```
 0.823
-]
+???
 - Again, cheating with the imputation :(
 - This is allowed for the homework because the current tools make it hard to do the right thing.
 
-???
 
 ---
 
 class: center, middle
 
-##Feature Selection
+# Feature Selection
 
 ???
 
@@ -387,9 +394,10 @@ class: spacious
 
 # Why Select Features?
 
-- Avoid overfitting
+- Avoid overfitting (?)
 - Faster prediction and training
 - Less storage for model and dataset
+- More interpretable model
 
 ???
 
@@ -469,7 +477,7 @@ class: center, middle
 
 ---
 
-# Simple Univariate Selection
+# Univariate Statistics
 
 - Pick statistic, check p-values !
 - f_regression, f_classsif, chi2 in scikit-learn
@@ -496,8 +504,10 @@ select.fit(X_train, y_train)
 print(X_train.shape)
 print(select.transform(X_train).shape)
 ```
+```
 (379, 13)
 (379, 2)
+```
 ```python
 all_features = make_pipeline(StandardScaler(), RidgeCV())
 select_2 = make_pipeline(StandardScaler(),
