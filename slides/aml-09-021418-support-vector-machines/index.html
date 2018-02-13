@@ -114,7 +114,9 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
+FIXME: more stuff on margin, normal vectors etc
+less bullet points
+revisit linear svc in more detail?
 
 ---
 class: spacious
@@ -361,9 +363,9 @@ digits = load_digits()
 # Scaling and Default Params
 
 .smaller[
-```python
+```
 gamma : float, optional (default = "auto")
-  Kernel coefficiant for 'rbf', 'poly' and 'sigmoid'.
+  Kernel coefficient for 'rbf', 'poly' and 'sigmoid'.
   If gamma is 'auto' then 1/n_features will be used
 ```
 ```python
@@ -371,24 +373,29 @@ scaled_svc = make_pipeline(StandardScaler(), SVC())
 print(np.mean(cross_val_score(SVC(), X_train, y_train, cv=10)))
 print(np.mean(cross_val_score(scaled_svc, X_train, y_train, cv=10)))
 ```
+```
 0.578
 0.978
+```
 ```python
-# X_train.std() is also good for global scaling - if the features were on the same scale.
-# this dataset is very atypical.
-print(np.mean(cross_val_score(SVC(gamma=(1. / (X_train.shape[1] * X_train.std()))), X_train, y_train, cv=10)))
+gamma = (1. / (X_train.shape[1] * X_train.std()))
+print(np.mean(cross_val_score(SVC(gamma=gamma), X_train, y_train, cv=10)))
+```
 ```
 0.987
+```
 ]
 
 ???
+Default gamma is 1/ n_features, works reasonably well when feature have std 1.
+If features have similar std, we can also just rescale gamma by it, instead of the data.
+Features having the same scale is a bit unusual though, this is a very particular dataset.
 
 ---
 
 # Grid-Searching Parameters
 
 ```python
-# using pipeline of scaler and SVC. Could also use SVC and rescale gamma
 param_grid = {'svc__C': np.logspace(-3, 2, 6),
               'svc__gamma': np.logspace(-3, 2, 6) / X_train.shape[0]}
 param_grid
@@ -510,13 +517,13 @@ print(X_train_rbf.shape)
 # (1347, 5000)
 
 np.mean(cross_val_score(LinearSVC(), X_train, y_train, cv=10))
-# 0.94587717101873703
+# 0.946
 
 np.mean(cross_val_score(SVC(gamma=gamma), X_train, y_train, cv=10))
-# 0.98730879194042775
+# 0.987
 
 np.mean(cross_val_score(LinearSVC(), X_train_rbf, y_train, cv=10))
-# 0.98352851106359773
+# 0.984
 ```
 
 ???
@@ -540,7 +547,7 @@ X_train_ny = nystroem.fit_transform(X_train)
 print(X_train_ny.shape)
 # (1347, 200)
 np.mean(cross_val_score(LinearSVC(), X_train_ny, y_train, cv=10))
-# 0.97405989084114819
+# 0.974
 ```
 ???
 
@@ -574,7 +581,7 @@ print(X_train_wat.shape)
 ```python
 np.mean(cross_val_score(LinearSVC(), X_train_wat, y_train, cv=10))
 ```
-0.96354231101095089
+0.966
 
 ???
 
