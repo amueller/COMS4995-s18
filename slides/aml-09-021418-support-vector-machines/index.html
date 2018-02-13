@@ -57,8 +57,8 @@
       .padding-top {
           padding-top: 100px;
       }
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
-      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+      .remark-slide-container .smaller p, .remark-slide-container .smaller li,
+      .remark-slide-container .smaller .remark-code, .remark-slide-container .smaller a{
           font-size: 25px;
       }
       .normal {
@@ -109,7 +109,7 @@ class: center, middle
 
 # Support Vector Machines
 
-02/15/17
+02/14/18
 
 Andreas C. Müller
 
@@ -137,11 +137,10 @@ class: spacious
 
 $$ \hat{y} = \text{sign}(w^T \mathbf{x})  $$
 
-FIXME support vector image here
 
 ???
 
-FIXME.
+FIXME support vector image here
 
 
 ---
@@ -153,39 +152,40 @@ FIXME.
 
 $$ w = \sum_{i=1}^n \alpha_i \mathbf{x}_i $$
 
-(alpha are dual coefficiants. Non-zero for support vectors only)
+(alpha are dual coefficients. Non-zero for support vectors only)
 
 
 $$ \hat{y} = \text{sign}(w^T \mathbf{x})  \Longrightarrow   \hat{y} = \text{sign}\left(\sum_i^{n}\alpha_i (\mathbf{x}_i^T  \mathbf{x})\right) $$
 
-- Can formulate learning as optimization over alpha, only involves x via
-dot-products ($x_i^T, x_j$)
-- Regularization parameter C is limit on alphas!
+$$ \alpha_i <= C$$
+
 ]
 
 ???
+- Can formulate learning as optimization over alpha, only involves x via
+dot-products 
+- Regularization parameter C is limit on alphas!
 
 ---
+class: spacious
 
 # Introducing Kernels
 
 
-.smaller[
-$$\hat{y} = \text{sign}\left(\sum_i^{n}\alpha_i (\mathbf{x}_i^T  \mathbf{x})\right) \Longrightarrow \hat{y} = \text{sign}\left(\sum_i^{n}\alpha_i (\phi(\mathbf{x}_i)^T  \phi(\mathbf{x}))\right) $$
-]
+$$\hat{y} = \text{sign}\left(\sum_i^{n}\alpha_i (\mathbf{x}_i^T  \mathbf{x})\right) \longrightarrow \hat{y} = \text{sign}\left(\sum_i^{n}\alpha_i (\phi(\mathbf{x}_i)^T  \phi(\mathbf{x}))\right) $$
+
+$$ \phi(\mathbf{x}_i)^T \phi( \mathbf{x}_j) \longrightarrow k(\mathbf{x}_i,  \mathbf{x}_j) $$
+
+k positive definite, symmetric $\Rightarrow$ there exists a $\phi$! (possilby $\infty$-dim)
+
+
+???
 - Dimensionality of $\phi$ “doesn’t matter”. We only ever need to compute dot-product!
-
-$$ \phi(\mathbf{x}_i)^T \phi( \mathbf{x}_j) \Longrightarrow k(\mathbf{x}_i,  \mathbf{x}_j) $$
-
-- As long as k is positive definite, symmetric, there exists a phi! (might be infinite-dimensional)
 
 - Can now design k instead of $\phi$ – which might be easier, more flexible!
 
 - Can be done for any linear model – not only SVM! (svm has some alpha zero).
 Kernel Logistic Regression, Kernel PCA, Kernel Kmeans….
-
-
-???
 
 ---
 
@@ -207,24 +207,23 @@ $$k_\text{sigmoid}(\mathbf{x}, \mathbf{x}') = \tanh\left(\gamma \mathbf{x}^T\mat
 ???
 
 ---
+# Polynomial Kernel vs Features
 
-# Polynomial Kernel vs Polynomial Features
-
-- SVM with poly kernel equivalent to linear SVM with
-polynomial features!
 
 $$ k_\text{poly}(\mathbf{x}, \mathbf{x}') = (\mathbf{x}^T\mathbf{x}' + c) ^ d $$
 
-Primal vs Dual Optimization:
+Primal vs Dual Optimization<br /><br />
 
-- Explicit polynomials => compute on n_features ^ d * n_samples
-- Kernel trick => compute on kernel matrix of shape n_samples * n_samples
+Explicit polynomials $\rightarrow$ compute on `n_samples * n_features ** d`
 
-For a single feature, easy to see:
+Kernel trick $\rightarrow$ compute on kernel matrix of shape `n_samples * n_samples`
+<br /><br />
+For a single feature:
 
 $$ (x^2, \sqrt{2}x, 1)^T (x'^2, \sqrt{2}x', 1) = x^2x'^2 + 2xx' + 1 = (xx' + 1)^2 $$
 
 ???
+- SVM with poly kernel similar to linear SVM with polynomial features!
 
 ---
 
@@ -232,33 +231,32 @@ $$ (x^2, \sqrt{2}x, 1)^T (x'^2, \sqrt{2}x', 1) = x^2x'^2 + 2xx' + 1 = (xx' + 1)^
 
 .smaller[
 ```python
-poly = PolynomialFeatures(include_bias= False)
+poly = PolynomialFeatures(include_bias=False)
 X_poly = poly.fit_transform(X)
-X.shape, X_poly.shape
-# ((100, 2), (100, 5))
-poly.get_feature_names()
-# ['x0', 'x1', 'x0^2', 'x0 x1', 'x1^2']
+print(X.shape, X_poly.shape)
+print(poly.get_feature_names())
+```
+```
+((100, 2), (100, 5))
+['x0', 'x1', 'x0^2', 'x0 x1', 'x1^2']
 ```
 ]
 
 .center[
-![:scale 100%](images/img_1.png)
+![:scale 70%](images/poly_kernel_features.png)
 ]
 
 ???
-Vinay - Included output in same cell due to size limit
 
 ---
-
+class: smaller
 # Understanding Dual Coefficiants
 
-.smaller[
 ```python
 linear_svm.coef_
 #array([[0.139, 0.06, -0.201, 0.048, 0.019]])
 ```
-y = sign( 0.139 * x[0] + 0.06 * x[1] – 0.201 * x[0] ** 2 + 0.048 * x[0] * x[1] + 0.019 x[1] ** 2)
-]
+$$ y = \text{sign}(0.139 x_0 + 0.06 x_1 - 0.201 x_0^2 + 0.048 x_0 x_1 + 0.019 x_1^2) $$
 
 ```python
 linear_svm.dual_coef_
@@ -266,9 +264,12 @@ linear_svm.dual_coef_
 linear_svm.support_
 #array([1,26,42,62], dtype=int32)
 ```
+`$$ y = \text{sign}(-0.03 \phi(\mathbf{x_0})^T \phi(x) - 0.003 \phi(\mathbf{x}_{26})^T \phi(\mathbf{x})  +0.003 \phi(\mathbf{x}_{42})^T \phi(\mathbf{x}) + 0.03 \phi(\mathbf{x}_{63})^T \phi(\mathbf{x})) $$`
 
-y = sign(-0.03 * np.inner(poly(X[1]), poly(x)) – 0.003 * np.inner(poly(X[26]), poly(x))
-+0.003 * np.inner(poly(X[42]), poly(x)) + 0.03 * np.inner(poly(X[63]), poly(x))
+???
+---
+# With Kernel
+`$$y = \text{sign}\left(\sum_i^{n}\alpha_i k(\mathbf{x}_i,  \mathbf{x})\right) $$`
 
 ```python
 poly_svm.dual_coef_
@@ -276,15 +277,14 @@ poly_svm.dual_coef_
 poly_svm.support_
 # array([1,26,41,42,62], dtype=int32)
 ```
-y = sign(-0.057 * (np.inner(X[1], x) + 1) ** 2 – 0.012 * (np.inner(X[41], x) + 1) ** 2
-+0.008 * (np.inner(X[42], x) + 1) ** 2 + 0.062 * (np.inner(X[63], x) + 1) ** 2
+`$$ y = \text{sign}(-0.057 (\mathbf{x}_1^T\mathbf{x} + 1)^2
+         -0.012 (\mathbf{x}_{41}^T \mathbf{x} + 1)^2 \\
+         +0.008 (\mathbf{x}_{42}^T \mathbf{x} + 1)^2 + 0.062 * (\mathbf{x}_{63}, \mathbf{x} + 1)^2
+$$`
 
 ???
 
-FIXME !
-
-Vinay -- Not able to decrease overall size further.
-
+$$ y = sign(-0.03 * np.inner(poly(X[1]), poly(x)) – 0.003 * np.inner(poly(X[26]), poly(x)) +0.003 * np.inner(poly(X[42]), poly(x)) + 0.03 * np.inner(poly(X[63]), poly(x)) $$
 ---
 
 # Runtime Considerations
@@ -349,8 +349,6 @@ variance.
 ```python
 from sklearn.datasets import load_digits
 digits = load_digits()
-X_train, X_test, y_train, y_test = train_test_split(
-    digits.data, digits.target, stratify=digits.target, random_state=0)
 ```
 .center[
 ![:scale 65%](images/img_5.png)
@@ -373,14 +371,14 @@ scaled_svc = make_pipeline(StandardScaler(), SVC())
 print(np.mean(cross_val_score(SVC(), X_train, y_train, cv=10)))
 print(np.mean(cross_val_score(scaled_svc, X_train, y_train, cv=10)))
 ```
-0.578282235299
-0.978450806169
+0.578
+0.978
 ```python
 # X_train.std() is also good for global scaling - if the features were on the same scale.
 # this dataset is very atypical.
 print(np.mean(cross_val_score(SVC(gamma=(1. / (X_train.shape[1] * X_train.std()))), X_train, y_train, cv=10)))
 ```
-0.98730879194
+0.987
 ]
 
 ???
