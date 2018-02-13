@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .column:first-of-type {float:left}
+      .column:last-of-type {float:right}
+      .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
+      .split-40 .column:first-of-type {width: 50%}
+      .split-40 .column:last-of-type {width: 50%}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Boosting, Stacking, Calibration
+
+02/21/18
+
+Andreas C. Müller
+
+???
+N/A
+
+---
+class: centre,middle
+# Gradient Boosting
+???
+---
+
+# Gradient Boosting Algorithm
+
+![:scale 10%](images/img_1.png) ![:scale 20%](images/img_2.png) ![:scale 10%](images/img_8.png) ![:scale 20%](images/img_3.png) ![:scale 10%](images/img_8.png) ![:scale 20%](images/img_4.png)
+
+
+.center[
+![:scale 20%](images/img_5.png)]
+
+.center[
+![:scale 30%](images/img_6.png)
+]
+.center[
+![:scale 30%](images/img_7.png)
+]
+
+- Iteratively add regression trees to model
+- Use log loss for classification
+- Discount update by learning rate
+???
+Come back to this
+---
+#GradientBoostingClassifier
+
+.center[
+![:scale 70%](images/img_9.png)
+]
+???
+
+---
+class:spacious
+# Gradient Boosting
+ - Many shallow trees
+ - learning_rate ↔ n_estimators
+ - Slower to train than RF (serial), but much faster to predict
+ - Small model size
+ - Uses one-vs-rest for multi-class!
+???
+---
+
+class:spacious
+# Tuning Gradient Boosting
+- Pick n_estimators, tune learning rate
+- Can also tune max_features
+- Typically strong pruning via max_depth
+
+???
+---
+
+# Partial Dependence Plots
+- Marginal dependence of prediction on one or two features
+.smaller[
+```python
+boston = load_boston()
+X_train, X_test, y_train, y_test = 
+train_test_split(boston.data, boston.target,random_state=0)
+gbrt = GradientBoostingRegressor().fit(X_train, y_train)
+gbrt.score(X_test, y_test)
+from sklearn.ensemble.partial_dependence import plot_partial_dependence
+fig, axs = plot_partial_dependence(gbrt, X_train, np.argsort(gbrt.feature_import
+                                      ances_)[-6:],feature_names=boston.feature_name
+                                      s,n_jobs=3, grid_resolution=50)
+plt.tight_layout()
+```
+```0.81833662390886375```
+]
+
+???
+---
+.center[
+Plot depicting importance of features vs Partial Dependence
+![:scale 70%](images/img_10.png)
+]
+
+???
+---
+.smaller[
+```python
+fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_importances_)[-2:]],
+                                   feature_names=boston.feature_names,
+                                   n_jobs=3, grid_resolution=50)
+```
+]
+.center[
+![:scale 70%](images/img_11.png)
+]
+.center[
+Insert Caption
+]
+
+???
+What is the semantic meaning of this image?
+---
+# Partial Dependence for Classification
+.tiny-code[
+```python
+from sklearn.ensemble.partial_dependence import plot_partial_dependence
+for i in range(3):
+    fig, axs = plot_partial_dependence(gbrt, X_train, range(4), n_cols=4,
+                                       feature_names=iris.feature_names, grid_resolution=50, label=i,
+                                       figsize=(8, 2))
+    fig.suptitle(iris.target_names[i])
+    for ax in axs: ax.set_xticks(())
+    for ax in axs[1:]: ax.set_ylabel("")
+    plt.tight_layout()
+```
+]
+.center[
+![:scale 40%](images/img_12.png)
+]
+.center[
+Feature Importance vs Partial Dependence (Classification)
+]
+???
+
+---
+
+# XGBoost
+- Efficient implementation of gradient boosting
+- Improvements on original algorithm
+- https://arxiv.org/abs/1603.02754
+- Adds l1 and l2 penalty on leaf-weights
+- Fast approximate split finding
+- Can pip-install
+- Scikit-learn compatible interface
+
+???
+---
+class:spacious
+#Boosting in General
+ - “Meta-algorithm” to create strong learners from weak learners.
+ - AdaBoost, GentleBoost, …
+ - Trees or stumps work best
+ - Gradient Boosting often the best of the bunch
+ - Many specialized algorithms (ranking etc)
+
+
+???
+---
+class:spacious
+# When to use tree-based models
+- Model non-linear relationships
+- Single tree: very interpretable (if small)
+- Random forests very robust, good benchmark
+- Gradient boosting often best performance with careful tuning
+- Doesn’t care about scaling, no need for feature engineering!
+
+???
+---
+class: centre,middle
+# More ensembles: Stacking
+???
+---
+# Poor man’s Stacking
+ .tiny-code[
+```python
+from sklearn.neighbors import KNeighborsClassifier
+
+X, y = make_moons(noise=.2, random_state=18)
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=0)
+
+voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', DecisionTreeClassifier(max_depth=3, random_state=0)),
+                          ('knn', KNeighborsClassifier(n_neighbors=3))],voting='soft')
+voting.fit(X_train, y_train)
+lr, tree, knn = voting.estimators_
+print(("{:.2f} " * 4).format(voting.score(X_test, y_test),
+                             lr.score(X_test, y_test), tree.score(X_test, y_test),
+                             knn.score(X_test, y_test)))
+```
+]
+
+- Build multiple models
+- Train model on probabilities / scores produced
+
+.center[
+![:scale 60%](images/img_13.png)
+]
+.center[
+KNeighborsClassifier with voting
+]
+
+???
+---
+# Poor man’s Stacking
+ .tiny-code[
+```python
+from sklearn.preprocessing import FunctionTransformer
+# we need to reshape the result from votingclassifier.transform because
+# of some annoyance in sklearn. We then keep only the probabilities of the positive classes!
+reshaper = FunctionTransformer(lambda X_: np.rollaxis(X_, 1).reshape(-1, 6)[:, 1::2], validate=False)
+stacking = make_pipeline(voting, reshaper,
+                         LogisticRegression(C=100))
+stacking.fit(X_train, y_train)
+stacking.score(X_train, y_train)
+```
+```0.98666666666666669```
+]
+
+ .tiny-code[
+```python
+stacking.score(X_test, y_test)
+```
+```0.95999999999999996```
+]
+.center[
+![:scale 20%](images/img_14.png)
+]
+.center[
+Result of Stacking
+]
+???
+---
+class:centre,middle
+.center[
+![:scale 80%](images/img_15.png)
+]
+.center[
+Selecting the required classifier (3)
+]
+
+ - Problem : Overfitting!
+???
+---
+class:spacious
+# Stacking
+- Use cross-validation (even LOO!) to produce probability estimates on training set.
+- Train second step estimator on held-out estimates
+- No overfitting of second step!
+- For testing: as usual
+???
+---
+# Hold-out estimates of Probabilities
+![:scale 100%](images/img_16.png)
+.center[
+Role of hold out estimates
+]
+
+- Split 1 produces probabilities for Fold 1, split2 for Fold 2 etc.
+- Get a probability estimate for each data point!
+- Unbiased estimates (like on the test set) for the whole training set!
+- Without it: The best estimator is the one that memorized the training set.
+
+
+
+???
+What would be an appropriate caption for this?
+---
+
+.tiny-code[
+```python
+from sklearn.model_selection import cross_val_predict
+first_stage = make_pipeline(voting, reshaper)
+transform_cv = cross_val_predict(first_stage, X_train, y_train, cv=10, method="transform")
+second_stage = LogisticRegression(C=100).fit(transform_cv, y_train)
+print(second_stage.coef_)
+[[ 2.09  -1.424  7.93 ]]
+```
+
+```python
+second_stage.score(transform_cv, y_train)
+0.95999999999999996```
+
+```python
+second_stage.score(first_stage.transform(X_test), y_test)
+1.0
+```
+]
+.center[
+![:scale 40%](images/img_17.png)
+![:scale 40%](images/img_18.png)
+
+Hold out Stacking(left) and Naive Stacking (right)
+]
+
+
+???
+---
+class:spacious
+#Calibration
+.center[
+<a href="http://www.datascienceassn.org/sites/default/files/
+Predicting%20good%20probabilities%20with%20supervised%20learning.pdf">Source</a>
+]
+- Probabilities can be much more informative than labels:
+
+- “The model predicted you don’t have cancer” vs “The model predicted you’re 40% likely to have cancer”
+
+???
+---
+#Calibration curve (Reliability diagram)
+- For binary classification only
+- Given a predicted ranking or probability from a supervised classifier, bin predictions.
+- Plot fraction of data that’s positive in each bin.
+- Doesn’t require ground truth probabilities!
+
+.center[
+![:scale 30%](images/img_19.png)
+![:scale 30%](images/img_20.png)
+
+Probability Table  and Calibration Curve 
+
+]
+
+???
+---
+class: split-40
+# calibration_curve with sklearn
+
+Using subsample of covertype dataset
+.column[
+.tiny-code[
+```python
+from sklearn.linear_model import LogisticRegressionCV
+print(X_train.shape)
+print(np.bincount(y_train))
+lr = LogisticRegressionCV().fit(X_train, y_train)
+(52292, 54)
+[19036 33256]```
+
+
+```python
+lr.C_
+array([ 2.783])
+```
+
+```python
+print(lr.predict_proba(X_test)[:10])
+print(y_test[:10])
+[[ 0.681  0.319]
+ [ 0.049  0.951]
+ [ 0.706  0.294]
+ [ 0.537  0.463]
+ [ 0.819  0.181]
+ [ 0.     1.   ]
+ [ 0.794  0.206]
+ [ 0.676  0.324]
+ [ 0.727  0.273]
+ [ 0.597  0.403]]
+[0 1 0 1 1 1 0 0 0 1]
+```
+
+]
+]
+
+.column[
+.tiny-code[
+```python
+from sklearn.calibration import calibration_curve
+probs = lr.predict_proba(X_test)[:, 1]
+prob_true, prob_pred = calibration_curve(y_test, probs, n_bins=5)
+print(prob_true)
+print(prob_pred)
+[ 0.2    0.303  0.458  0.709  0.934]
+[ 0.138  0.306  0.498  0.701  0.926]
+```
+]
+.center[![:scale 30%](images/img_21.png)
+.center[Predicted Probability vs Fraction of Samples]
+]
+]
+
+???
+---
+class:spacious
+#Influence of number of bins
+
+.center[![:scale 70%](images/img_22.png)]
+.center[Figure depicting influence of number of bins]
+- Works here because dataset is big
+- Might become very noisy for larger datasets
+
+???
+---
+class:spacious
+# Comparing Models
+
+.center[![:scale 90%](images/img_23.png)]
+.center[Calibration curve on different models]
+???
+---
+# Brier Score (for binary classification)
+
+- “mean squared error of probability estimate”
+.center[![:scale 50%](images/img_24.png)]
+
+.center[Different Models along with their Brier Score]
+.center[![:scale 70%](images/img_25.png)]
+???
+---
+# Fixing it: Calibrating a classifier
+- Build another model, mapping classifier probabilities to better probabilities!
+- 1d model! (or more for multi-class)
+
+
+.center[![:scale 50%](images/img_26.png)]
+
+
+
+- s(x) is score given by model, usually
+- Can also work with models that don’t even provide probabilities!
+Need model for f_callib, need to decide what data to train it on.
+- Can train on training set → Overfit
+- Can train using cross-validation → use data, slower
+
+???
+---
+
+# Platt Scaling
+
+- Use a logistic sigmoid for F_callib
+- Basically learning a 1d logistic regression
+- (+ some tricks)
+- Works well for SVMs
+
+.center[![:scale 50%](images/img_27.png)]
+
+???
+---
+# Isotonic Regression
+
+- Very flexible way to specify F_callib
+- Learns arbitrary monotonically increasing step-functions in 1d.
+- Groups data into constant parts, steps in between.
+- Optimum monotone function on training data (wrt mse).
+.center[![:scale 40%](images/img_28.png)]
+.center[Isotonic fit vs Linear fit]
+
+???
+---
+class:spacious
+# Building the model
+- Using the training set is bad
+- Either use hold-out set or cross-validation
+- Cross-validation can be use as in stacking to make unbiased probability predictions, use that as training set.
+
+???
+---
+# CalibratedClassifierCV
+.tiny-code[
+```python
+from sklearn.calibration import CalibratedClassifierCV
+X_train_sub, X_val, y_train_sub, y_val = train_test_split(X_train, y_train,
+                                                          stratify=y_train, random_state=0)
+rf = RandomForestClassifier(n_estimators=100).fit(X_train_sub, y_train_sub)
+scores = rf.predict_proba(X_test)[:, 1]
+plot_calibration_curve(y_test, scores, n_bins=20)
+plt.title("{}: {:.3f}".format(clf.__class__.__name__, brier_score_loss(y_test, scores)))
+```
+.center[![:scale 30%](images/img_29.png)]
+.center[Random Forest Calibrated Classifier]
+]
+???
+---
+.smaller[
+```python
+cal_rf = CalibratedClassifierCV(rf, cv="prefit", method='sigmoid')
+cal_rf.fit(X_val, y_val)
+scores_sigm = cal_rf.predict_proba(X_test)[:, 1]
+
+cal_rf_iso = CalibratedClassifierCV(rf, cv="prefit", method='isotonic')
+cal_rf_iso.fit(X_val, y_val)
+scores_iso = cal_rf_iso.predict_proba(X_test)[:, 1]
+```]
+???
+---
+class: spacious
+# Calibration on Random Forest
+
+.center[![:scale 90%](images/img_30.png)]
+.center[Comparison of different types of calibration]
+
+???
+---
+
+- Fixme add multi-class and calibration with cross-validation
+???
+---
+class: center, middle
+
+# Questions ?
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
