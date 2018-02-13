@@ -126,9 +126,11 @@ applies to linear models, and not to tree-based
 models, but it also applies to neural nets and kernel
 SVMs.
 
-FIXME URGENT count based encoding
 FIXME: Yeo-Johnson
 FIXME: box-cox fitting
+FIXME: move scaling motivation before scaling
+FIXME: add illustration of why one-hot is better than integer encoding
+FIXME: add rank scaler
 
 ---
 
@@ -923,15 +925,15 @@ class: smaller
 ```python
 import pandas as pd
 df = pd.DataFrame({'salary': [103, 89, 142, 54, 63, 219],
-                   'boro': ['Manhatten', 'Queens', 'Manhatten',
+                   'boro': ['Manhattan', 'Queens', 'Manhattan',
                             'Brooklyn', 'Brooklyn', 'Bronx']})
 
-df.boro = df.boro.astype(pd.api.types.CategoricalDtype(
-    categories=['Manhatten', 'Queens', 'Brooklyn', 'Bronx', 'Staten Island']))
+df['boro'] = pd.Categorical(
+    df.boro, categories=['Manhattan', 'Queens', 'Brooklyn', 'Bronx', 'Staten Island'])
 pd.get_dummies(df)
 ```
 ```
-   salary  boro_Manhatten  boro_Queens  boro_Brooklyn  boro_Bronx  boro_Staten Island
+   salary  boro_Manhattan  boro_Queens  boro_Brooklyn  boro_Bronx  boro_Staten Island
 0     103               1            0              0           0                   0
 1      89               0            1              0           0                   0
 2     142               1            0              0           0                   0
@@ -980,7 +982,7 @@ N/A
 ```python
 import pandas as pd
 df = pd.DataFrame({'salary': [103, 89, 142, 54, 63, 219],
-                   'boro': ['Manhatten', 'Queens', 'Manhatten',
+                   'boro': ['Manhattan', 'Queens', 'Manhattan',
                             'Brooklyn', 'Brooklyn', 'Bronx']})
 
 ce = CategoricalEncoder().fit(df)

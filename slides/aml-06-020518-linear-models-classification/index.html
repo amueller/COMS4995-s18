@@ -242,9 +242,9 @@ tries to fit the training data, but it doesn't care about finding a simple solut
 
 # Penalized Logistic Regression
 
-`$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
+`$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
 
-`$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_1$$`
+`$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_1$$`
 
 - C is inverse to alpha (or alpha / n_samples)
 
@@ -321,7 +321,7 @@ FIXME: motivate SVM? we'll do it in two lectures...
 class: center
 # Logistic Regression vs SVM
 .compact[
-`$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
+`$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
 `$$\min_{w \in ℝ^{p}}C \sum_{i=1}^n\max(0,1-y_iw^T \textbf{x}_i) + ||w||_2^2$$`
 
 ![:scale 45%](images/binary_loss.png)
@@ -599,9 +599,9 @@ If original problem was balanced, that is...
 
 Probabilistic multi-class model:
 
-$$p(y=i|x) = \frac{e^{-\textbf{w}_i^T\textbf{x}}}{\sum_j e^{-\textbf{w}_j^T\textbf{x}}}$$
+$$p(y=i|x) = \frac{e^{\textbf{w}_i^T\textbf{x}}}{\sum_j e^{\textbf{w}_j^T\textbf{x}}}$$
 
-`$$\min_{w \in ℝ^{p}}- \sum_{i=1}^n \log(p(y=y_i|x_i))$$`
+`$$\min_{w \in ℝ^{p}} \sum_{i=1}^n \log(p(y=y_i|x_i))$$`
 
 $$\hat{y} = \text{arg} \max_{i \in Y} \textbf{w}_i\textbf{x}$$
 

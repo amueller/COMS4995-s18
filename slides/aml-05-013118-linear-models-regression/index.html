@@ -304,6 +304,8 @@ Today I'm mostly gonna ignore this. But let's get started with Linear Regression
 
 ---
 class: middle, spacious
+
+
 ```python
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -340,7 +342,6 @@ Can be negative for biased estimators - or the test set!
 
 ---
 # Scaling (if you want)
-
 ```python
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
@@ -355,7 +356,6 @@ ridge = Ridge().fit(X_train_scaled, y_train)
 X_test_scaled = scaler.transform(X_test)
 ridge.score(X_test_scaled, y_test)
 ```
-
 ???
 If you want to scale the data, you can use StandardScaler for that.
 It makes the mean zero and the standard deviation one. It's an unsupervised
