@@ -25,6 +25,7 @@
         font-size:30px;
         line-height: 1.4;
       }
+      
       .remark-code {
         font-size:30px;
       }
@@ -61,6 +62,7 @@
       .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
           font-size: 25px;
       }
+
       .normal {
           font-size: 30px;
       }
@@ -98,9 +100,11 @@
           visibility: hidden
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-
       .column:first-of-type {float:left}
       .column:last-of-type {float:right}
+      .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
       .split-40 .column:first-of-type {width: 50%}
       .split-40 .column:last-of-type {width: 50%}
     </style>
@@ -156,7 +160,7 @@ class: split-40
 ]
 .column[
 ![:scale 50%](images/img_3.png)
----
+
 ![:scale 50%](images/img_4.png)
 ]
 
@@ -218,23 +222,17 @@ Does the layout look okay??
 ```python
 from sklearn.datasets import load_breast_cancer
 cancer = load_breast_cancer()
-```
-```python
-X_train, X_test, y_train, y_test = train_test_split(cancer.data,canc
-er.target, stratify=cancer.target,random_state=0)
-```
-```python
+X_train, X_test, y_train, y_test = train_test_split(cancer.data,cancer.target,
+                                                    stratify=cancer.target,
+                                                    random_state=0)
+
 #tree visualization
-```
-```python
+
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 tree = DecisionTreeClassifier(max_depth=2)
 tree.fit(X_train, y_train) 
-```
-```python
 tree_dot = export_graphviz(tree, out_file=None, feature_names=cancer.feature_names)
-print(tree_dot)
-```
+print(tree_dot)```
 ]
 
 ???
@@ -315,7 +313,7 @@ class:spacious
 from sklearn.model_selection import GridSearchCV
 param_grid = {'max_depth':range(1, 7)}
 grid = GridSearchCV(DecisionTreeClassifier(random_state=0),param_grid=param_grid,
-cv=10)
+                    cv=10)
 grid.fit(X_train, y_train)
 ```
 ]
@@ -330,7 +328,7 @@ grid.fit(X_train, y_train)
 from sklearn.model_selection import GridSearchCV
 param_grid = {'max_leaf_nodes':range(2, 20)}
 grid = GridSearchCV(DecisionTreeClassifier(random_state=0),
-param_grid=param_grid, cv=10)
+                    param_grid=param_grid, cv=10)
 grid.fit(X_train, y_train)
 ```
 ]
@@ -353,7 +351,7 @@ grid.fit(X_train, y_train)
 ---
 #Extrapolation
 .center[
-![:scale 85%](images/img_20.png)
+![:scale 80%](images/img_33.png)
 ]
 ???
 ---
@@ -362,33 +360,36 @@ class: split-40
 # Instability
 
 .column[
-.smaller[
+.tiny-code[
 ```python
 iris = load_iris()
-X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, stratify=iris.target, random_state=0)
-tree = DecisionTreeClassifier(max_leaf_no
-des=6).fit(X_train,y_train)
-tree_dot = export_graphviz(tree,out_file=
-None,feature_names=iris.feature_names)
+X_train, X_test, y_train, y_test = train_test_split(iris.data,
+                                                    iris.target,
+                                                    stratify=iris.
+                                                    target,
+                                                    random_state=0)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,
+                                                   y_train)
+tree_dot = export_graphviz(tree,out_file=None,feature_names=
+                          iris.feature_names)
 graphviz.Source(tree_dot)
 ```
 ]
 ![:scale 70%](images/img_21.png)
 ]
 .column[
-
-.smaller[```python
+.tiny-code[```python
 X_train, X_test, y_train, y_test = 
-train_test_split(iris.data, iris.target, stratify=iris.target, random_state=1)
-tree = DecisionTreeClassifier(max_leaf_no
-des=6).fit(X_train,y_train)
-tree_dot = export_graphviz(tree,out_file=
-None,feature_names=iris.feature_names)
+train_test_split(iris.data, iris.target, stratify=iris.target, random
+                _state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
+tree_dot = export_graphviz(tree,out_file=None,feature_names=iris.
+                          feature_names)
 graphviz.Source(tree_dot)
 ```
 ]
-![:scale 28%](images/img_22.png)
-]
+.center[![:scale 35%](images/img_22.png)
+]]
 ???
 ---
 
@@ -396,21 +397,22 @@ class: split-40
 # Feature importance
 
 .column[
-.smaller[```python
+.tiny-code[```python
 X_train, X_test, y_train, y_test = 
-train_test_split(iris.data, iris.target, stratify=iris.target, random_state=1)
-tree = DecisionTreeClassifier(max_leaf_no
-des=6).fit(X_train,y_train)
-tree_dot = export_graphviz(tree,out_file=
-None,feature_names=iris.feature_names)
+train_test_split(iris.data,iris.target,stratify=iris.target,
+                 random_state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
+tree_dot = 
+export_graphviz(tree,out_file=None,feature_names=iris.feature_names)
 graphviz.Source(tree_dot)
 ```]
-![:scale 50%](images/img_22.png)
+.center[![:scale 60%](images/img_22.png)
+]
 ]
 
 .column[
 
-.smaller[
+.tiny-code[
 ```python
 tree.feature_importances_
 array([0.0, 0.0, 0.414, 0.586])
@@ -500,15 +502,15 @@ class: centre,middle
 
 .smaller[
 ```python
-voting = VotingClassifier([('logreg', LogisticRegression(C=100)),
-('tree', DecisionTreeClassifier(max_depth=3, random_state=0))],
-voting='soft')
+voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', Decision
+                         TreeClassifier(max_depth=3, random_state=0))],
+                         voting='soft')
 voting.fit(X_train, y_train)
 lr, tree = voting.estimators_
 print(("{:.2f} " * 3).format(voting.score(X_test, y_test),
 lr.score(X_test, y_test), tree.score(X_test, y_test)))
-```
-0.88 0.84 0.80 
+
+0.88 0.84 0.80``` 
 ]
 .center[![:scale 50%](images/img_25.png)]
 ???
@@ -646,7 +648,8 @@ oob_scores = []
 
 feature_range = range(1, 64, 5)
 for max_features in feature_range:
-    rf = RandomForestClassifier(max_features=max_features, oob_score=True, n_estimators=200, random_state=0)
+    rf = RandomForestClassifier(max_features=max_features, oob_score=True,
+                                n_estimators=200, random_state=0)
     rf.fit(X_train, y_train)
     train_scores.append(rf.score(X_train, y_train))
     test_scores.append(rf.score(X_test, y_test))
@@ -657,7 +660,7 @@ for max_features in feature_range:
 ???
 ---
 .center[
-![:scale 70%](images/img_31.png)
+![:scale 90%](images/img_31.png)
 ]
 
 ???
@@ -670,14 +673,11 @@ for max_features in feature_range:
 X_train, X_test, y_train, y_test = train_test_split(
     iris.data, iris.target, stratify=iris.target, random_state=1)
 rf = RandomForestClassifier(n_estimators=100).fit(X_train, y_train)
-```
-```python
 rf.feature_importances_
-```
-```python
 plt.barh(range(4), rf.feature_importances_)
 plt.yticks(range(4), iris.feature_names);
 ```
+```array([ 0.126,  0.033,  0.445,  0.396])```
 ]
 .center[
 ![:scale 40%](images/img_32.png)
