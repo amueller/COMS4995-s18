@@ -117,6 +117,7 @@ Andreas C. Müller
 FIXME: more stuff on margin, normal vectors etc
 less bullet points
 revisit linear svc in more detail?
+explain approximation better?
 
 ---
 class: spacious
@@ -133,7 +134,7 @@ class: spacious
 class: spacious
 
 
-# Reformulate Linear Models
+# Reminder on Linear SVM
 
 `$$ \min_{w \in \mathbb{R}^p} C \sum_{i=1}^n \max(0, 1 - y_i w^T\mathbf{x}) + ||w||^2_2 $$`
 
@@ -142,11 +143,25 @@ $$ \hat{y} = \text{sign}(w^T \mathbf{x})  $$
 
 ???
 
-FIXME support vector image here
+---
 
+#Max-Margin and Support Vectors
+
+.center[
+![:scale 75%](images/max_margin.png)
+]
+
+???
 
 ---
+class: center
+
 #Max-Margin and Support Vectors
+`$$ \min_{w \in \mathbb{R}^p} C \sum_{i=1}^n \max(0, 1 - y_i w^T\mathbf{x}) + ||w||^2_2 $$`
+
+$$\text{Within margin} \Leftrightarrow y_iw^T x < 1$$
+
+Smaller $w \Rightarrow$ larger margin
 
 
 ---
@@ -187,15 +202,6 @@ $$ \alpha_i <= C$$
 dot-products 
 - Regularization parameter C is limit on alphas!
 
----
-
-#Max-Margin and Support Vectors
-
-.center[
-![:scale 75%](images/max_margin.png)
-]
-
-???
 ---
 class: spacious
 
@@ -606,7 +612,7 @@ class: spacious
 
 - SVM: only when 100000 >> n_samples,
 but works for n_features large
-- SVMSampler, Nystroem can allow making anything
+- RBFSampler, Nystroem can allow making anything
 kernelized!
 - Some kernels (like chi2 and intersection) have
 really fast approximation.
