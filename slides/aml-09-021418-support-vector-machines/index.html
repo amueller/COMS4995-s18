@@ -146,6 +146,25 @@ FIXME support vector image here
 
 
 ---
+#Max-Margin and Support Vectors
+
+
+---
+class: center
+
+#Max-Margin and Support Vectors
+
+.left-column[
+![:scale 80%](images/max_margin_C_0.1.png)
+]
+.right-column[
+![:scale 80%](images/max_margin_C_1.png)
+]
+
+???
+
+
+---
 
 # Reformulate Linear Models
 
@@ -168,6 +187,15 @@ $$ \alpha_i <= C$$
 dot-products 
 - Regularization parameter C is limit on alphas!
 
+---
+
+#Max-Margin and Support Vectors
+
+.center[
+![:scale 75%](images/max_margin.png)
+]
+
+???
 ---
 class: spacious
 
@@ -266,7 +294,7 @@ linear_svm.dual_coef_
 linear_svm.support_
 #array([1,26,42,62], dtype=int32)
 ```
-`$$ y = \text{sign}(-0.03 \phi(\mathbf{x_0})^T \phi(x) - 0.003 \phi(\mathbf{x}_{26})^T \phi(\mathbf{x})  +0.003 \phi(\mathbf{x}_{42})^T \phi(\mathbf{x}) + 0.03 \phi(\mathbf{x}_{63})^T \phi(\mathbf{x})) $$`
+`$$ y = \text{sign}(-0.03 \phi(\mathbf{x}_0)^T \phi(x) - 0.003 \phi(\mathbf{x}_{26})^T \phi(\mathbf{x})  +0.003 \phi(\mathbf{x}_{42})^T \phi(\mathbf{x}) + 0.03 \phi(\mathbf{x}_{63})^T \phi(\mathbf{x})) $$`
 
 ???
 ---
@@ -413,31 +441,6 @@ grid.fit(X_train, y_train)
 
 .center[
 ![:scale 95%](images/img_6.png)
-]
-
-???
-
----
-
-#Max-Margin and Support Vectors
-
-.center[
-![:scale 75%](images/img_7.png)
-]
-
-???
-
----
-
-
-#Max-Margin and Support Vectors
-
-.center[
-![:scale 40%](images/img_7.png)
-]
-
-.center[
-![:scale 80%](images/img_8.png)
 ]
 
 ???
