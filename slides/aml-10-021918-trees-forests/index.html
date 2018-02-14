@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .column:first-of-type {float:left}
+      .column:last-of-type {float:right}
+      .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
+      .split-40 .column:first-of-type {width: 50%}
+      .split-40 .column:last-of-type {width: 50%}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Trees &amp; Forests
+
+02/14/18
+
+Andreas C. Müller
+
+???
+N/A
+
+---
+class: spacious
+# Why Trees?
+- Very powerful modeling method – non-linear!
+- Doesn’t care about scaling of distribution of data!
+- “Interpretable”
+- Basis of very powerful models!
+???
+---
+
+class: centre,middle
+# Decision Trees for Classification
+???
+---
+
+# Idea: series of binary questions
+.center[
+![:scale 70%](images/img_1.png)
+]
+???
+
+---
+class: split-40
+# Building Trees
+
+.column[
+![:scale 70%](images/img_2.png)
+ - Continuous features:
+ - “questions” are thresholds on single features.
+ - [Other methods are possible but not as common]
+ - For each split: exhaustive search over all features and thresholds!
+ - Minimize “impurity”
+]
+.column[
+![:scale 50%](images/img_3.png)
+
+![:scale 50%](images/img_4.png)
+]
+
+???
+Does the layout look okay??
+---
+
+# Criteria (for classification)
+ - Gini Index: 
+   --
+   .center[![:scale 50%](images/img_5.png)]
+ - Cross-Entropy:
+   --
+   .center[![:scale 50%](images/img_6.png)]
+
+
+ 
+ ![:scale 5%](images/img_7.png) observations in node m
+ 
+ ![:scale 3%](images/img_8.png) classes
+ 
+ ![:scale 5%](images/img_9.png) distribution over classes in node m
+???
+---
+
+# Prediction
+
+.center[
+![:scale 80%](images/img_10.png)
+]
+
+ - Traverse tree based on feature tests
+ - Predict most common class in leaf
+
+???
+
+---
+
+# Regression trees
+
+ - Impurity Criteria:
+ - Mean Squared Error
+ - Mean Absolute Error
+ 
+ 
+ - Prediction:
+ - Predict mean.
+ 
+
+ - Without regularization / pruning:
+ - Each leaf often contains a single point to be “pure”
+???
+
+---
+
+# Visualizing trees with sklearn
+
+.smaller[
+```python
+from sklearn.datasets import load_breast_cancer
+cancer = load_breast_cancer()
+X_train, X_test, y_train, y_test = train_test_split(cancer.data,cancer.target,
+                                                    stratify=cancer.target,
+                                                    random_state=0)
+
+#tree visualization
+
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
+tree = DecisionTreeClassifier(max_depth=2)
+tree.fit(X_train, y_train) 
+tree_dot = export_graphviz(tree, out_file=None, feature_names=cancer.feature_names)
+print(tree_dot)```
+]
+
+???
+---
+# Visualizing trees with sklearn
+.center[
+![:scale 80%](images/img_11.png)
+]
+???
+---
+
+
+# Showing dot files in Jupyter
+ - First install graphvis C library:
+   conda install graphviz
+ - Then install graphviz python library:
+ - pip install graphviz
+
+ .center[
+ ![:scale 60%](images/img_12.png)
+ ]
+
+
+???
+---
+class:spacious
+
+# Parameter Tuning
+
+ - Pre-pruning and post-pruning (not in sklearn yet)
+ - Limit tree size (pick one):
+   max_depth
+   --
+   max_leaf_nodes
+   --
+   min_samples_split
+   --
+   (and more)
+???
+---
+class:spacious
+
+# No pruning
+.center[
+![:scale 100%](images/img_13.png)
+]
+???
+
+---
+
+# max_depth = 4
+
+.center[
+![:scale 100%](images/img_14.png)
+]
+
+???
+---
+
+# max_leaf_nodes = 8
+.center[
+![:scale 50%](images/img_15.png)
+]
+
+???
+---
+
+# min_samples_split = 50
+.center[
+![:scale 70%](images/img_16.png)
+]
+
+???
+---
+
+.smaller[
+```python
+from sklearn.model_selection import GridSearchCV
+param_grid = {'max_depth':range(1, 7)}
+grid = GridSearchCV(DecisionTreeClassifier(random_state=0),param_grid=param_grid,
+                    cv=10)
+grid.fit(X_train, y_train)
+```
+]
+.center[
+![:scale 70%](images/img_17.png)
+]
+
+???
+---
+.smaller[
+```python
+from sklearn.model_selection import GridSearchCV
+param_grid = {'max_leaf_nodes':range(2, 20)}
+grid = GridSearchCV(DecisionTreeClassifier(random_state=0),
+                    param_grid=param_grid, cv=10)
+grid.fit(X_train, y_train)
+```
+]
+.center[
+![:scale 70%](images/img_18.png)
+]
+
+???
+---
+.center[
+![:scale 95%](images/img_19.png)
+]
+
+???
+---
+.center[
+![:scale 95%](images/img_20.png)
+]
+???
+---
+#Extrapolation
+.center[
+![:scale 80%](images/img_33.png)
+]
+???
+---
+
+class: split-40
+# Instability
+
+.column[
+.tiny-code[
+```python
+iris = load_iris()
+X_train, X_test, y_train, y_test = train_test_split(iris.data,
+                                                    iris.target,
+                                                    stratify=iris.
+                                                    target,
+                                                    random_state=0)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,
+                                                   y_train)
+tree_dot = export_graphviz(tree,out_file=None,feature_names=
+                          iris.feature_names)
+graphviz.Source(tree_dot)
+```
+]
+![:scale 70%](images/img_21.png)
+]
+.column[
+.tiny-code[```python
+X_train, X_test, y_train, y_test = 
+train_test_split(iris.data, iris.target, stratify=iris.target, random
+                _state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
+tree_dot = export_graphviz(tree,out_file=None,feature_names=iris.
+                          feature_names)
+graphviz.Source(tree_dot)
+```
+]
+.center[![:scale 35%](images/img_22.png)
+]]
+???
+---
+
+class: split-40
+# Feature importance
+
+.column[
+.tiny-code[```python
+X_train, X_test, y_train, y_test = 
+train_test_split(iris.data,iris.target,stratify=iris.target,
+                 random_state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
+tree_dot = 
+export_graphviz(tree,out_file=None,feature_names=iris.feature_names)
+graphviz.Source(tree_dot)
+```]
+.center[![:scale 60%](images/img_22.png)
+]
+]
+
+.column[
+
+.tiny-code[
+```python
+tree.feature_importances_
+array([0.0, 0.0, 0.414, 0.586])
+```
+]
+
+![:scale 50%](images/img_23.png)
+
+.smaller[
+- Unstable Tree -> Unstable feature importances.
+- Might take one or multiple from a group of correlated features.
+]
+]
+
+???
+---
+
+# Categorical Data
+
+- Can split on categorical data directly
+- Intuitive way to split: split in two subsets
+- 2 ^ n_values many possibilities
+- Possible to do in linear time exactly for gini index and binary classification.
+- Heuristics done in practice for multi-class.
+- Not in sklearn release version :(
+
+???
+
+---
+class:spacious
+# Predicting probabilities
+- Fraction of class in leaf.
+- Without pruning: Always 100% certain!
+- Even with pruning might be too certain.
+???
+---
+
+class:spacious
+# Conditional Inference Trees
+
+- Select “best” split with correcting for multiple-hypothesis testing.
+- More “fair” to categorical variables.
+- Only in R so far (party)
+???
+---
+
+class:spacious
+# Relation to Nearest Neighbors
+- Predict average of neighbors – either by k, by epsilon ball or by leaf.
+- Trees are much faster to predict.
+- Both can’t extrapolate
+???
+---
+
+# Different splitting methods
+- Could use anything as split candidate!
+- Linear models used if extrapolation is needed.
+- Computer vision: pixel comparisons
+- Kinect (first generation): depth comparison
+
+.center[![:scale 50%](images/img_24.png)]
+
+.smaller[(taken from Shotton et. al. Real-Time Human Pose Recognition ..)]
+
+???
+---
+class: centre,middle
+# Ensemble Models
+???
+---
+
+
+# Poor man’s ensembles
+
+- Build different models
+- Average the result
+- Owen Zhang (long time kaggle 1st): build XGBoosting models with different random seeds.
+- More models are better – if they are not correlated.
+- Also works with neural networks
+- You can average any models as long as they provide calibrated (“good”) probabilities.
+- Scikit-learn: VotingClassifier hard and soft voting
+
+???
+---
+
+# VotingClassifier
+
+.smaller[
+```python
+voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', Decision
+                         TreeClassifier(max_depth=3, random_state=0))],
+                         voting='soft')
+voting.fit(X_train, y_train)
+lr, tree = voting.estimators_
+print(("{:.2f} " * 3).format(voting.score(X_test, y_test),
+lr.score(X_test, y_test), tree.score(X_test, y_test)))
+
+0.88 0.84 0.80``` 
+]
+.center[![:scale 50%](images/img_25.png)]
+???
+---
+
+class: spacious
+# Bagging (Bootstrap AGGregation)
+
+- Generic way to build “slightly different” models
+- Draw bootstrap samples from dataset
+- (as many as there are in the dataset, with repetition)
+- Implemented in BaggingClassifier, BaggingRegressor
+.center[![:scale 30%](images/img_26.png)]
+???
+
+???
+
+---
+class: spacious
+
+# Bias and Variance
+.center[![:scale 40%](images/img_27.png)]
+
+
+.left[
+.smaller[http://scott.fortmann-roe.com/docs/BiasVariance.html]
+]
+
+???
+---
+class: spacious
+
+# Bias and Variance in Ensembles
+
+- Breiman showed that generalization depends on strength of the individual classifiers and (inversely) on their correlation
+- Uncorrelating them might help, even at the expense of strength
+
+???
+---
+
+class: spacious
+
+# Random Forests
+
+- Smarter bagging for trees!
+.center[![:scale 70%](images/img_28.png)]
+
+???
+---
+
+class: split-40
+# Randomize in two ways
+
+.column[
+ - For each tree:
+ - Pick bootstrap sample of data
+ 
+
+ - For each split:
+  - Pick random sample of features
+ 
+ - More trees are always better 
+]
+
+.column[
+
+![:scale 30%](images/img_26.png)
+![:scale 50%](images/img_29.png)
+]
+
+???
+---
+class:spacious
+# Tuning Random Forests
+
+- Main parameter: max_features
+  - around sqrt(n_features) for classification
+  - Around n_features for regression
+
+- n_estimators > 100
+- Prepruning might help, definitely helps with model size!
+- max_depth, max_leaf_nodes, min_samples_split again
+
+???
+---
+
+class:spacious
+# Extremely Randomized Trees
+
+- More randomness!
+- Randomly draw threshold for each feature!
+- Doesn’t use bootstrap
+- Faster because no sorting / searching
+- Can have smoother boundaries
+
+???
+---
+
+# Warm-Starts
+
+.smaller[
+```python
+train_scores = []
+test_scores = []
+
+rf = RandomForestClassifier(warm_start=True)
+estimator_range = range(1, 100, 5)
+for n_estimators in estimator_range:
+    rf.n_estimators = n_estimators
+    rf.fit(X_train, y_train)
+    train_scores.append(rf.score(X_train, y_train))
+    test_scores.append(rf.score(X_test, y_test))
+```
+]
+
+.center[
+![:scale 39%](images/img_30.png)
+]
+
+???
+---
+
+# Out-of-bag estimates
+
+- Each tree only uses ~66% of data
+- Can evaluate it on the rest!
+- Make predictions for out-of-bag, average, score.
+- Each prediction is an average over different subset of trees
+
+.smaller[
+```python
+train_scores = []
+test_scores = []
+oob_scores = []
+
+feature_range = range(1, 64, 5)
+for max_features in feature_range:
+    rf = RandomForestClassifier(max_features=max_features, oob_score=True,
+                                n_estimators=200, random_state=0)
+    rf.fit(X_train, y_train)
+    train_scores.append(rf.score(X_train, y_train))
+    test_scores.append(rf.score(X_test, y_test))
+    oob_scores.append(rf.oob_score_)
+```
+]
+
+???
+---
+.center[
+![:scale 90%](images/img_31.png)
+]
+
+???
+---
+
+# Variable Importance
+
+.smaller[
+```python
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, stratify=iris.target, random_state=1)
+rf = RandomForestClassifier(n_estimators=100).fit(X_train, y_train)
+rf.feature_importances_
+plt.barh(range(4), rf.feature_importances_)
+plt.yticks(range(4), iris.feature_names);
+```
+```array([ 0.126,  0.033,  0.445,  0.396])```
+]
+.center[
+![:scale 40%](images/img_32.png)
+]
+???
+---
+
+class: center, middle
+
+# Questions ?
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
