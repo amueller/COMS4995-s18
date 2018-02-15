@@ -2,5 +2,6 @@
 *.odp
 *.swp
 *.~lock*
+*.pyc
 
 *.DS_Store
