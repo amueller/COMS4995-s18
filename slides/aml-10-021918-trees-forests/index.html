@@ -103,8 +103,6 @@
       .tiny-code .remark-code .remark-code-line{
         font-size: 15px;
       }
-      .split-40 .column:first-of-type {width: 45%}
-      .split-40 .column:last-of-type {width: 45%}
     </style>
   </head>
   <body>
@@ -123,6 +121,7 @@ Andreas C. Müller
 ???
 FIXME bullet points!
 animation searching for split in tree?
+categorical data split?
 predition animation tree?
 add my tree visualization hack?
 
@@ -149,10 +148,9 @@ class: centre,middle
 ???
 
 ---
-class: split-40
 # Building Trees
 
-.column[
+.left-column[
 ![:scale 100%](images/img_2.png)
 <br />
 <br />
@@ -160,10 +158,10 @@ Continuous features:
  - “questions” are thresholds on single features.
  - Minimize impurity
 ]
-.column[
-![:scale 50%](images/img_3.png)
+.right-column[
+![:scale 100%](images/img_3.png)
 
-![:scale 50%](images/img_4.png)
+![:scale 100%](images/img_4.png)
 ]
 
 ???
@@ -228,11 +226,12 @@ X_train, X_test, y_train, y_test = train_test_split(cancer.data,cancer.target,
                                                     stratify=cancer.target,
                                                     random_state=0)
 
-# tree visualization
 
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 tree = DecisionTreeClassifier(max_depth=2)
 tree.fit(X_train, y_train) 
+
+# tree visualization
 tree_dot = export_graphviz(tree, out_file=None, feature_names=cancer.feature_names)
 print(tree_dot)```
 ]
@@ -244,19 +243,19 @@ print(tree_dot)```
 ```
 digraph Tree {
 node [shape=box] ;
-0 [label="worst perimeter <= 106.1\ngini = 0.468\nsamples = 426\nvalue = [159, 267]"] ;
-1 [label="worst concave points <= 0.134\ngini = 0.081\nsamples = 259\nvalue = [11, 248]"] ;
-0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
-2 [label="gini = 0.008\nsamples = 240\nvalue = [1, 239]"] ;
-1 -> 2 ;
-3 [label="gini = 0.499\nsamples = 19\nvalue = [10, 9]"] ;
-1 -> 3 ;
-4 [label="worst concave points <= 0.142\ngini = 0.202\nsamples = 167\nvalue = [148, 19]"] ;
-0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
-5 [label="gini = 0.497\nsamples = 37\nvalue = [20, 17]"] ;
-4 -> 5 ;
-6 [label="gini = 0.03\nsamples = 130\nvalue = [128, 2]"] ;
-4 -> 6 ;
+0 [label="worst perimeter <= 106.1\ngini = 0.468\nsamples = 426\nvalue = [159, 267]"];
+1 [label="worst concave points <= 0.134\ngini = 0.081\nsamples = 259\nvalue = [11, 248]"];
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"];
+2 [label="gini = 0.008\nsamples = 240\nvalue = [1, 239]"];
+1 -> 2;
+3 [label="gini = 0.499\nsamples = 19\nvalue = [10, 9]"];
+1 -> 3;
+4 [label="worst concave points <= 0.142\ngini = 0.202\nsamples = 167\nvalue = [148, 19]"];
+0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"];
+5 [label="gini = 0.497\nsamples = 37\nvalue = [20, 17]"];
+4 -> 5;
+6 [label="gini = 0.03\nsamples = 130\nvalue = [128, 2]"];
+4 -> 6;
 }
 ```
 ]
@@ -265,10 +264,11 @@ node [shape=box] ;
 
 
 # Showing dot files in Jupyter
-First install graphvis C library:
+Requires graphviz C library and Python library
 
 `conda install graphviz python-graphviz`
-
+<br />
+<br />
  .center[
  ![:scale 60%](images/img_12.png)
  ]
@@ -283,7 +283,9 @@ First install graphvis C library:
 from tree_plotting import plot_tree
 tree_dot = plot_tree(tree, feature_names=cancer.feature_names)
 ```
+.center[
 ![:scale 80%](images/mpl_tree_plot.png)
+]
 
 ???
 ---
@@ -315,6 +317,7 @@ class:spacious
 ???
 
 ---
+class:spacious
 
 # max_depth = 4
 
@@ -332,6 +335,7 @@ class:spacious
 
 ???
 ---
+class:spacious
 
 # min_samples_split = 50
 .center[
@@ -441,13 +445,11 @@ array([0.0, 0.0, 0.414, 0.586])
 
 ![:scale 80%](images/img_23.png)
 
-.smaller[
-- Unstable Tree -> Unstable feature importances.
-- Might take one or multiple from a group of correlated features.
-]
 ]
 
 ???
+- Unstable Tree -> Unstable feature importances.
+- Might take one or multiple from a group of correlated features.
 ---
 
 # Categorical Data
@@ -468,6 +470,7 @@ class:spacious
 - Without pruning: Always 100% certain!
 - Even with pruning might be too certain.
 ???
+FIXME PLOT
 ---
 
 class:spacious
@@ -485,19 +488,20 @@ class:spacious
 - Trees are much faster to predict.
 - Both can’t extrapolate
 ???
+FIXME plots
 ---
 
 # Different splitting methods
+.center[![:scale 80%](images/img_24.png)]
+
+.smaller[(taken from Shotton et. al. Real-Time Human Pose Recognition ..)]
+
+???
 - Could use anything as split candidate!
 - Linear models used if extrapolation is needed.
 - Computer vision: pixel comparisons
 - Kinect (first generation): depth comparison
 
-.center[![:scale 50%](images/img_24.png)]
-
-.smaller[(taken from Shotton et. al. Real-Time Human Pose Recognition ..)]
-
-???
 ---
 class: centre,middle
 # Ensemble Models
@@ -588,10 +592,9 @@ class: spacious
 - Smarter bagging for trees!
 ---
 
-class: split-40
 # Randomize in two ways
 
-.column[
+.left-column[
  - For each tree:
  - Pick bootstrap sample of data
  
@@ -602,10 +605,11 @@ class: split-40
  - More trees are always better 
 ]
 
-.column[
+.right-column[
 
-![:scale 30%](images/img_26.png)
-![:scale 50%](images/img_29.png)
+![:scale 100%](images/img_26.png)
+
+![:scale 100%](images/img_29.png)
 ]
 
 ???
