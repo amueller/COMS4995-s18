@@ -26,7 +26,7 @@
         line-height: 1.4;
       }
       
-      .remark-code {
+      .remark-code, .remark-code-line {
         font-size:30px;
       }
       .remark-slide-content p {
@@ -59,7 +59,7 @@
           padding-top: 100px;
       }
       .remark-slide-content .smaller p, .remark-slide-content .smaller li,
-      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a, .remark-slide-content .smaller .remark-code-line{
           font-size: 25px;
       }
 
@@ -100,13 +100,11 @@
           visibility: hidden
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-      .column:first-of-type {float:left}
-      .column:last-of-type {float:right}
-      .remark-code, .remark-inline-code .tiny-code{
+      .tiny-code .remark-code .remark-code-line{
         font-size: 15px;
       }
-      .split-40 .column:first-of-type {width: 50%}
-      .split-40 .column:last-of-type {width: 50%}
+      .split-40 .column:first-of-type {width: 45%}
+      .split-40 .column:last-of-type {width: 45%}
     </style>
   </head>
   <body>
@@ -116,23 +114,27 @@ class: center, middle
 
 ### W4995 Applied Machine Learning
 
-# Trees &amp; Forests
+# Trees, Forests &amp; Ensembles
 
-02/14/18
+02/19/18
 
 Andreas C. Müller
 
 ???
-N/A
+FIXME bullet points!
+animation searching for split in tree?
+predition animation tree?
+add my tree visualization hack?
 
 ---
-class: spacious
+class: spacious, middle
 # Why Trees?
+???
 - Very powerful modeling method – non-linear!
 - Doesn’t care about scaling of distribution of data!
 - “Interpretable”
 - Basis of very powerful models!
-???
+- add stacking classifier from PR?
 ---
 
 class: centre,middle
@@ -151,12 +153,12 @@ class: split-40
 # Building Trees
 
 .column[
-![:scale 70%](images/img_2.png)
- - Continuous features:
+![:scale 100%](images/img_2.png)
+<br />
+<br />
+Continuous features:
  - “questions” are thresholds on single features.
- - [Other methods are possible but not as common]
- - For each split: exhaustive search over all features and thresholds!
- - Minimize “impurity”
+ - Minimize impurity
 ]
 .column[
 ![:scale 50%](images/img_3.png)
@@ -170,10 +172,8 @@ Does the layout look okay??
 
 # Criteria (for classification)
  - Gini Index: 
-   --
    .center[![:scale 50%](images/img_5.png)]
  - Cross-Entropy:
-   --
    .center[![:scale 50%](images/img_6.png)]
 
 
@@ -192,27 +192,29 @@ Does the layout look okay??
 ![:scale 80%](images/img_10.png)
 ]
 
+???
  - Traverse tree based on feature tests
  - Predict most common class in leaf
 
-???
 
 ---
 
 # Regression trees
-
- - Impurity Criteria:
- - Mean Squared Error
- - Mean Absolute Error
  
- 
- - Prediction:
- - Predict mean.
+`$$\text{Prediction: } \bar{y}_m = \frac{1}{N_m} \sum_{i \in N_m} y_i $$`
  
 
+Mean Squared Error:
+`$$ H(X_m) = \frac{1}{N_m} \sum_{i \in N_m} (y_i - \bar{y}_m)^2 $$`
+
+Mean Absolute Error:
+`$$ H(X_m) = \frac{1}{N_m} \sum_{i \in N_m} |y_i - \bar{y}_m| $$`
+
+ 
+
+???
  - Without regularization / pruning:
  - Each leaf often contains a single point to be “pure”
-???
 
 ---
 
@@ -226,7 +228,7 @@ X_train, X_test, y_train, y_test = train_test_split(cancer.data,cancer.target,
                                                     stratify=cancer.target,
                                                     random_state=0)
 
-#tree visualization
+# tree visualization
 
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 tree = DecisionTreeClassifier(max_depth=2)
@@ -238,23 +240,50 @@ print(tree_dot)```
 ???
 ---
 # Visualizing trees with sklearn
-.center[
-![:scale 80%](images/img_11.png)
+.smaller[
+```
+digraph Tree {
+node [shape=box] ;
+0 [label="worst perimeter <= 106.1\ngini = 0.468\nsamples = 426\nvalue = [159, 267]"] ;
+1 [label="worst concave points <= 0.134\ngini = 0.081\nsamples = 259\nvalue = [11, 248]"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="gini = 0.008\nsamples = 240\nvalue = [1, 239]"] ;
+1 -> 2 ;
+3 [label="gini = 0.499\nsamples = 19\nvalue = [10, 9]"] ;
+1 -> 3 ;
+4 [label="worst concave points <= 0.142\ngini = 0.202\nsamples = 167\nvalue = [148, 19]"] ;
+0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+5 [label="gini = 0.497\nsamples = 37\nvalue = [20, 17]"] ;
+4 -> 5 ;
+6 [label="gini = 0.03\nsamples = 130\nvalue = [128, 2]"] ;
+4 -> 6 ;
+}
+```
 ]
 ???
 ---
 
 
 # Showing dot files in Jupyter
- - First install graphvis C library:
-   conda install graphviz
- - Then install graphviz python library:
- - pip install graphviz
+First install graphvis C library:
+
+`conda install graphviz python-graphviz`
 
  .center[
  ![:scale 60%](images/img_12.png)
  ]
 
+???
+---
+# Easier visualization
+
+[PR #9251](https://github.com/scikit-learn/scikit-learn/pull/9251) (or [a gist](https://gist.github.com/amueller/1f8d3c03305642ab3bad677d9b443b80) )
+
+```python
+from tree_plotting import plot_tree
+tree_dot = plot_tree(tree, feature_names=cancer.feature_names)
+```
+![:scale 80%](images/mpl_tree_plot.png)
 
 ???
 ---
@@ -262,15 +291,19 @@ class:spacious
 
 # Parameter Tuning
 
- - Pre-pruning and post-pruning (not in sklearn yet)
- - Limit tree size (pick one):
-   max_depth
-   --
-   max_leaf_nodes
-   --
-   min_samples_split
-   --
-   (and more)
+- Pre-pruning and post-pruning (not in sklearn yet)
+
+- Limit tree size (pick one, maybe two):
+
+  - max_depth
+
+  - max_leaf_nodes
+
+  - min_samples_split
+
+  - min_impurity_decrease
+
+  - ...
 ???
 ---
 class:spacious
@@ -338,79 +371,66 @@ grid.fit(X_train, y_train)
 
 ???
 ---
+#Extrapolation
 .center[
-![:scale 95%](images/img_19.png)
+![:scale 80%](images/ram_prices.png)
 ]
 
 ???
 ---
+#Extrapolation
 .center[
-![:scale 95%](images/img_20.png)
+![:scale 80%](images/ram_prices_train.png)
 ]
 ???
 ---
 #Extrapolation
 .center[
-![:scale 80%](images/img_33.png)
+![:scale 80%](images/ram_prices_test.png)
 ]
 ???
 ---
 
-class: split-40
 # Instability
 
-.column[
+.left-column[
 .tiny-code[
 ```python
-iris = load_iris()
-X_train, X_test, y_train, y_test = train_test_split(iris.data,
-                                                    iris.target,
-                                                    stratify=iris.
-                                                    target,
-                                                    random_state=0)
-tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,
-                                                   y_train)
-tree_dot = export_graphviz(tree,out_file=None,feature_names=
-                          iris.feature_names)
-graphviz.Source(tree_dot)
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, stratify=iris.target, random_state=0)
+tree = DecisionTreeClassifier(max_leaf_nodes=6)
+tree.fit(X_train, y_train)
 ```
 ]
 ![:scale 70%](images/img_21.png)
 ]
-.column[
+.right-column[
 .tiny-code[```python
-X_train, X_test, y_train, y_test = 
-train_test_split(iris.data, iris.target, stratify=iris.target, random
-                _state=1)
-tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
-tree_dot = export_graphviz(tree,out_file=None,feature_names=iris.
-                          feature_names)
-graphviz.Source(tree_dot)
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, stratify=iris.target, random_state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6)
+tree.fit(X_train, y_train)
 ```
 ]
-.center[![:scale 35%](images/img_22.png)
+.center[![:scale 70%](images/img_22.png)
 ]]
 ???
 ---
 
-class: split-40
 # Feature importance
 
-.column[
+.left-column[
 .tiny-code[```python
-X_train, X_test, y_train, y_test = 
-train_test_split(iris.data,iris.target,stratify=iris.target,
-                 random_state=1)
-tree = DecisionTreeClassifier(max_leaf_nodes=6).fit(X_train,y_train)
-tree_dot = 
-export_graphviz(tree,out_file=None,feature_names=iris.feature_names)
-graphviz.Source(tree_dot)
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, stratify=iris.target, random_state=1)
+tree = DecisionTreeClassifier(max_leaf_nodes=6)
+tree.fit(X_train,y_train)
 ```]
 .center[![:scale 60%](images/img_22.png)
 ]
 ]
 
-.column[
+.right-column[
 
 .tiny-code[
 ```python
@@ -419,7 +439,7 @@ array([0.0, 0.0, 0.414, 0.586])
 ```
 ]
 
-![:scale 50%](images/img_23.png)
+![:scale 80%](images/img_23.png)
 
 .smaller[
 - Unstable Tree -> Unstable feature importances.
@@ -502,31 +522,37 @@ class: centre,middle
 
 .smaller[
 ```python
-voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', Decision
-                         TreeClassifier(max_depth=3, random_state=0))],
-                         voting='soft')
+voting = VotingClassifier(
+    [('logreg', LogisticRegression(C=100)),
+     ('tree', DecisionTreeClassifier(max_depth=3, random_state=0))],
+    voting='soft')
 voting.fit(X_train, y_train)
 lr, tree = voting.estimators_
-print(("{:.2f} " * 3).format(voting.score(X_test, y_test),
-lr.score(X_test, y_test), tree.score(X_test, y_test)))
+voting.score(X_test, y_test), lr.score(X_test, y_test), tree.score(X_test, y_test)
+```
 
-0.88 0.84 0.80``` 
+```
+0.88 0.84 0.80
+```
 ]
-.center[![:scale 50%](images/img_25.png)]
+
+.center[![:scale 30%](images/img_25.png)]
 ???
 ---
 
 class: spacious
 # Bagging (Bootstrap AGGregation)
-
+.left-column[
 - Generic way to build “slightly different” models
+- BaggingClassifier, BaggingRegressor
+]
+.right-column[
+.center[![:scale 100%](images/img_26.png)]
+]
+???
 - Draw bootstrap samples from dataset
 - (as many as there are in the dataset, with repetition)
-- Implemented in BaggingClassifier, BaggingRegressor
-.center[![:scale 30%](images/img_26.png)]
-???
 
-???
 
 ---
 class: spacious
@@ -549,16 +575,17 @@ class: spacious
 - Uncorrelating them might help, even at the expense of strength
 
 ???
+FIXME worst slide!
 ---
 
 class: spacious
 
 # Random Forests
 
-- Smarter bagging for trees!
-.center[![:scale 70%](images/img_28.png)]
+.center[![:scale 90%](images/img_28.png)]
 
 ???
+- Smarter bagging for trees!
 ---
 
 class: split-40
@@ -583,7 +610,7 @@ class: split-40
 
 ???
 ---
-class:spacious
+class:some-space
 # Tuning Random Forests
 
 - Main parameter: max_features

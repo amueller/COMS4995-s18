@@ -1,0 +1,8 @@
+digraph Tree {
+node [shape=box] ;
+0 [label="worst perimeter <= 106.1\ngini = 0.468\nsamples = 426\nvalue = [159, 267]"] ;
+1 [label="gini = 0.081\nsamples = 259\nvalue = [11, 248]"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="gini = 0.202\nsamples = 167\nvalue = [148, 19]"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+}

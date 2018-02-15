@@ -1,0 +1,28 @@
+digraph Tree {
+node [shape=box] ;
+0 [label="worst perimeter <= 106.1\ngini = 0.468\nsamples = 426\nvalue = [159, 267]"] ;
+1 [label="worst concave points <= 0.134\ngini = 0.081\nsamples = 259\nvalue = [11, 248]"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="area error <= 48.975\ngini = 0.008\nsamples = 240\nvalue = [1, 239]"] ;
+1 -> 2 ;
+3 [label="gini = 0.0\nsamples = 239\nvalue = [0, 239]"] ;
+2 -> 3 ;
+4 [label="gini = 0.0\nsamples = 1\nvalue = [1, 0]"] ;
+2 -> 4 ;
+5 [label="gini = 0.499\nsamples = 19\nvalue = [10, 9]"] ;
+1 -> 5 ;
+6 [label="worst concave points <= 0.142\ngini = 0.202\nsamples = 167\nvalue = [148, 19]"] ;
+0 -> 6 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+7 [label="gini = 0.497\nsamples = 37\nvalue = [20, 17]"] ;
+6 -> 7 ;
+8 [label="radius error <= 0.188\ngini = 0.03\nsamples = 130\nvalue = [128, 2]"] ;
+6 -> 8 ;
+9 [label="gini = 0.0\nsamples = 1\nvalue = [0, 1]"] ;
+8 -> 9 ;
+10 [label="radius error <= 0.241\ngini = 0.015\nsamples = 129\nvalue = [128, 1]"] ;
+8 -> 10 ;
+11 [label="gini = 0.375\nsamples = 4\nvalue = [3, 1]"] ;
+10 -> 11 ;
+12 [label="gini = 0.0\nsamples = 125\nvalue = [125, 0]"] ;
+10 -> 12 ;
+}
