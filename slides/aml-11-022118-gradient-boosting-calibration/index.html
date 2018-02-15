@@ -133,18 +133,16 @@ class: centre,middle
 
 # Gradient Boosting Algorithm
 
-![:scale 10%](images/img_1.png) ![:scale 20%](images/img_2.png) ![:scale 10%](images/img_8.png) ![:scale 20%](images/img_3.png) ![:scale 10%](images/img_8.png) ![:scale 20%](images/img_4.png)
+0.1 \* ![:scale 22.5%](images/grad_boost_term_1.png) + 0.1\* ![:scale 22.5%](images/grad_boost_term_2.png) + 0.1\* ![:scale 20%](images/grad_boost_term_3.png)
 
 
-.center[
-![:scale 20%](images/img_5.png)]
+`$$ f_{1}(x) \approx y  $$`
 
-.center[
-![:scale 30%](images/img_6.png)
-]
-.center[
-![:scale 30%](images/img_7.png)
-]
+`$$ f_{2}(x) \approx y - \alpha f_{1}(x) $$`
+
+`$$ f_{3}(x) \approx y - \alpha f_{1}(x) - \alpha f_{2}(x)$$`
+
+
 
 - Iteratively add regression trees to model
 - Use log loss for classification
@@ -155,7 +153,7 @@ Come back to this
 #GradientBoostingClassifier
 
 .center[
-![:scale 70%](images/img_9.png)
+![:scale 70%](images/grad_boost_depth2.png)
 ]
 ???
 
@@ -194,14 +192,14 @@ fig, axs = plot_partial_dependence(gbrt, X_train, np.argsort(gbrt.feature_import
                                       s,n_jobs=3, grid_resolution=50)
 plt.tight_layout()
 ```
-```0.81833662390886375```
+```0.819```
 ]
 
 ???
 ---
 .center[
 Plot depicting importance of features vs Partial Dependence
-![:scale 70%](images/img_10.png)
+![:scale 70%](images/feat_impo_part_dep.png)
 ]
 
 ???
@@ -214,14 +212,10 @@ fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_impor
 ```
 ]
 .center[
-![:scale 70%](images/img_11.png)
-]
-.center[
-Insert Caption
+![:scale 70%](images/feature_importance.png)
 ]
 
 ???
-What is the semantic meaning of this image?
 ---
 # Partial Dependence for Classification
 .tiny-code[
@@ -238,7 +232,7 @@ for i in range(3):
 ```
 ]
 .center[
-![:scale 40%](images/img_12.png)
+![:scale 40%](images/feat_impo_part_dep_class.png)
 ]
 .center[
 Feature Importance vs Partial Dependence (Classification)
@@ -305,7 +299,7 @@ print(("{:.2f} " * 4).format(voting.score(X_test, y_test),
 - Train model on probabilities / scores produced
 
 .center[
-![:scale 60%](images/img_13.png)
+![:scale 60%](images/kneighbors_voting.png)
 ]
 .center[
 KNeighborsClassifier with voting
@@ -325,17 +319,17 @@ stacking = make_pipeline(voting, reshaper,
 stacking.fit(X_train, y_train)
 stacking.score(X_train, y_train)
 ```
-```0.98666666666666669```
+```0.987```
 ]
 
  .tiny-code[
 ```python
 stacking.score(X_test, y_test)
 ```
-```0.95999999999999996```
+```0.96```
 ]
 .center[
-![:scale 20%](images/img_14.png)
+![:scale 20%](images/stacking_result.png)
 ]
 .center[
 Result of Stacking
@@ -344,7 +338,7 @@ Result of Stacking
 ---
 class:centre,middle
 .center[
-![:scale 80%](images/img_15.png)
+![:scale 80%](images/select_classif.png)
 ]
 .center[
 Selecting the required classifier (3)
@@ -362,7 +356,7 @@ class:spacious
 ???
 ---
 # Hold-out estimates of Probabilities
-![:scale 100%](images/img_16.png)
+![:scale 100%](images/holdout_estimate.png)
 .center[
 Role of hold out estimates
 ]
@@ -375,7 +369,6 @@ Role of hold out estimates
 
 
 ???
-What would be an appropriate caption for this?
 ---
 
 .tiny-code[
@@ -390,7 +383,7 @@ print(second_stage.coef_)
 
 ```python
 second_stage.score(transform_cv, y_train)
-0.95999999999999996```
+0.96```
 
 ```python
 second_stage.score(first_stage.transform(X_test), y_test)
@@ -398,8 +391,8 @@ second_stage.score(first_stage.transform(X_test), y_test)
 ```
 ]
 .center[
-![:scale 40%](images/img_17.png)
-![:scale 40%](images/img_18.png)
+![:scale 40%](images/holdout_stacking.png)
+![:scale 40%](images/holdout_naive.png)
 
 Hold out Stacking(left) and Naive Stacking (right)
 ]
@@ -426,8 +419,8 @@ Predicting%20good%20probabilities%20with%20supervised%20learning.pdf">Source</a>
 - Doesn’t require ground truth probabilities!
 
 .center[
-![:scale 30%](images/img_19.png)
-![:scale 30%](images/img_20.png)
+![:scale 30%](images/prob_table.png)
+![:scale 30%](images/calib_curve.png)
 
 Probability Table  and Calibration Curve 
 
@@ -486,7 +479,7 @@ print(prob_pred)
 [ 0.138  0.306  0.498  0.701  0.926]
 ```
 ]
-.center[![:scale 30%](images/img_21.png)
+.center[![:scale 30%](images/predprob_positive.png)
 .center[Predicted Probability vs Fraction of Samples]
 ]
 ]
@@ -496,7 +489,7 @@ print(prob_pred)
 class:spacious
 #Influence of number of bins
 
-.center[![:scale 70%](images/img_22.png)]
+.center[![:scale 70%](images/influence_bins.png)]
 .center[Figure depicting influence of number of bins]
 - Works here because dataset is big
 - Might become very noisy for larger datasets
@@ -506,31 +499,30 @@ class:spacious
 class:spacious
 # Comparing Models
 
-.center[![:scale 90%](images/img_23.png)]
+.center[![:scale 90%](images/calib_curve_models.png)]
 .center[Calibration curve on different models]
 ???
 ---
 # Brier Score (for binary classification)
 
 - “mean squared error of probability estimate”
-.center[![:scale 50%](images/img_24.png)]
+`$$ BS = \frac{\sum_{t=1}^{n} (\widehat{p} (y)-y)^{2}}{n}$$`
 
 .center[Different Models along with their Brier Score]
-.center[![:scale 70%](images/img_25.png)]
+.center[![:scale 70%](images/models_bscore.png)]
 ???
 ---
 # Fixing it: Calibrating a classifier
 - Build another model, mapping classifier probabilities to better probabilities!
 - 1d model! (or more for multi-class)
 
-
-.center[![:scale 50%](images/img_26.png)]
+`$$ f_{callib}(s(x)) \approx p(y)$$`
 
 
 
 - s(x) is score given by model, usually
 - Can also work with models that don’t even provide probabilities!
-Need model for f_callib, need to decide what data to train it on.
+Need model for $f_{callib}$, need to decide what data to train it on.
 - Can train on training set → Overfit
 - Can train using cross-validation → use data, slower
 
@@ -539,22 +531,23 @@ Need model for f_callib, need to decide what data to train it on.
 
 # Platt Scaling
 
-- Use a logistic sigmoid for F_callib
+- Use a logistic sigmoid for $f_{callib}$
 - Basically learning a 1d logistic regression
 - (+ some tricks)
 - Works well for SVMs
 
-.center[![:scale 50%](images/img_27.png)]
+`$$f_{platt} = \frac{1}{1 + exp(-ws(x))}$$`
+
 
 ???
 ---
 # Isotonic Regression
 
-- Very flexible way to specify F_callib
+- Very flexible way to specify $f_{callib}$
 - Learns arbitrary monotonically increasing step-functions in 1d.
 - Groups data into constant parts, steps in between.
 - Optimum monotone function on training data (wrt mse).
-.center[![:scale 40%](images/img_28.png)]
+.center[![:scale 40%](images/isotonic_regression.png)]
 .center[Isotonic fit vs Linear fit]
 
 ???
@@ -578,7 +571,7 @@ scores = rf.predict_proba(X_test)[:, 1]
 plot_calibration_curve(y_test, scores, n_bins=20)
 plt.title("{}: {:.3f}".format(clf.__class__.__name__, brier_score_loss(y_test, scores)))
 ```
-.center[![:scale 30%](images/img_29.png)]
+.center[![:scale 30%](images/random_forest.png)]
 .center[Random Forest Calibrated Classifier]
 ]
 ???
@@ -598,7 +591,7 @@ scores_iso = cal_rf_iso.predict_proba(X_test)[:, 1]
 class: spacious
 # Calibration on Random Forest
 
-.center[![:scale 90%](images/img_30.png)]
+.center[![:scale 90%](images/types_callib.png)]
 .center[Comparison of different types of calibration]
 
 ???
