@@ -123,7 +123,8 @@ FIXME bullet points!
 animation searching for split in tree?
 categorical data split?
 predition animation tree?
-add my tree visualization hack?
+min impurity decrease missing
+extra tree: only one thereshold per feature?
 
 ---
 class: spacious, middle
@@ -375,6 +376,15 @@ grid.fit(X_train, y_train)
 
 ???
 ---
+class:spacious
+# Relation to Nearest Neighbors
+- Predict average of neighbors – either by k, by epsilon ball or by leaf.
+- Trees are much faster to predict.
+- Both can’t extrapolate
+???
+FIXME plots
+
+---
 #Extrapolation
 .center[
 ![:scale 80%](images/ram_prices.png)
@@ -448,7 +458,7 @@ array([0.0, 0.0, 0.414, 0.586])
 ]
 
 ???
-- Unstable Tree -> Unstable feature importances.
+- Unstable Tree $\rightarrow$ Unstable feature importances.
 - Might take one or multiple from a group of correlated features.
 ---
 
@@ -459,7 +469,7 @@ array([0.0, 0.0, 0.414, 0.586])
 - 2 ^ n_values many possibilities
 - Possible to do in linear time exactly for gini index and binary classification.
 - Heuristics done in practice for multi-class.
-- Not in sklearn release version :(
+- Not in sklearn :(
 
 ???
 
@@ -481,16 +491,6 @@ class:spacious
 - Only in R so far (party)
 ???
 ---
-
-class:spacious
-# Relation to Nearest Neighbors
-- Predict average of neighbors – either by k, by epsilon ball or by leaf.
-- Trees are much faster to predict.
-- Both can’t extrapolate
-???
-FIXME plots
----
-
 # Different splitting methods
 .center[![:scale 80%](images/img_24.png)]
 
