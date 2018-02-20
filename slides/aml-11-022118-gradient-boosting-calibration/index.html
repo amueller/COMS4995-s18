@@ -124,6 +124,8 @@ Andreas C. Müller
 
 ???
 FIXME: XGBOOST!!
+FIXME cross-validated calibration
+FIXME multi-class calibration
 
 ---
 class: centre,middle
@@ -133,7 +135,18 @@ class: centre,middle
 
 # Gradient Boosting Algorithm
 
-0.1 \* ![:scale 22.5%](images/grad_boost_term_1.png) + 0.1\* ![:scale 22.5%](images/grad_boost_term_2.png) + 0.1\* ![:scale 20%](images/grad_boost_term_3.png)
+
+
+`$$ f_{1}(x) \approx y  $$`
+
+`$$ f_{2}(x) \approx y - f_{1}(x) $$`
+
+`$$ f_{3}(x) \approx y - f_{1}(x) - f_{2}(x)$$`
+
+$y \approx$ ![:scale 22.5%](images/grad_boost_term_1.png) + ![:scale 22.5%](images/grad_boost_term_2.png) + ![:scale 20%](images/grad_boost_term_3.png) + ...
+---
+# Gradient Boosting Algorithm
+
 
 
 `$$ f_{1}(x) \approx y  $$`
@@ -142,12 +155,16 @@ class: centre,middle
 
 `$$ f_{3}(x) \approx y - \alpha f_{1}(x) - \alpha f_{2}(x)$$`
 
+$y \approx \alpha$ ![:scale 22.5%](images/grad_boost_term_1.png) + $\alpha$ ![:scale 22.5%](images/grad_boost_term_2.png) + $\alpha$ ![:scale 20%](images/grad_boost_term_3.png) + ...
 
+Learning rate $\alpha$
 
+???
 - Iteratively add regression trees to model
 - Use log loss for classification
 - Discount update by learning rate
-???
+
+FIXME plot for regression models 
 Come back to this
 ---
 #GradientBoostingClassifier
@@ -396,19 +413,22 @@ Predicting%20good%20probabilities%20with%20supervised%20learning.pdf">Source</a>
 
 ???
 ---
+class: spacious
 #Calibration curve (Reliability diagram)
+.left-column[
+![:scale 80%](images/prob_table.png)
+]
+.right-column[
+![:scale 80%](images/calib_curve.png)
+
+]
+
+???
 - For binary classification only
 - Given a predicted ranking or probability from a supervised classifier, bin predictions.
 - Plot fraction of data that’s positive in each bin.
 - Doesn’t require ground truth probabilities!
 
-.center[
-![:scale 30%](images/prob_table.png)
-![:scale 30%](images/calib_curve.png)
-
-]
-
-???
 ---
 class: split-40
 # calibration_curve with sklearn
@@ -470,11 +490,11 @@ print(prob_pred)
 class:spacious
 #Influence of number of bins
 
-.center[![:scale 70%](images/influence_bins.png)]
-- Works here because dataset is big
-- Might become very noisy for larger datasets
+.center[![:scale 100%](images/influence_bins.png)]
 
 ???
+- Works here because dataset is big
+- Might become very noisy for larger datasets
 ---
 class:spacious
 # Comparing Models
@@ -485,7 +505,7 @@ class:spacious
 # Brier Score (for binary classification)
 
 - “mean squared error of probability estimate”
-`$$ BS = \frac{\sum_{t=1}^{n} (\widehat{p} (y)-y)^{2}}{n}$$`
+`$$ BS = \frac{\sum_{i=1}^{n} (\widehat{p} (y_i)-y_i)^{2}}{n}$$`
 
 .center[![:scale 70%](images/models_bscore.png)]
 ???
@@ -546,12 +566,12 @@ X_train_sub, X_val, y_train_sub, y_val = train_test_split(X_train, y_train,
 rf = RandomForestClassifier(n_estimators=100).fit(X_train_sub, y_train_sub)
 scores = rf.predict_proba(X_test)[:, 1]
 plot_calibration_curve(y_test, scores, n_bins=20)
-plt.title("{}: {:.3f}".format(clf.__class__.__name__, brier_score_loss(y_test, scores)))
 ```
 .center[![:scale 30%](images/random_forest.png)]
 ]
 ???
 ---
+# Calibration on Random Forest
 .smaller[
 ```python
 cal_rf = CalibratedClassifierCV(rf, cv="prefit", method='sigmoid')
@@ -562,10 +582,6 @@ cal_rf_iso = CalibratedClassifierCV(rf, cv="prefit", method='isotonic')
 cal_rf_iso.fit(X_val, y_val)
 scores_iso = cal_rf_iso.predict_proba(X_test)[:, 1]
 ```]
-???
----
-class: spacious
-# Calibration on Random Forest
 
 .center[![:scale 90%](images/types_callib.png)]
 
