@@ -102,7 +102,7 @@
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       .column:first-of-type {float:left}
       .column:last-of-type {float:right}
-      .remark-code, .remark-inline-code .tiny-code{
+      .tiny-code .remark-code, .remark-inline-code .tiny-code{
         font-size: 15px;
       }
       .split-40 .column:first-of-type {width: 50%}
@@ -123,7 +123,7 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
+FIXME: XGBOOST!!
 
 ---
 class: centre,middle
@@ -271,74 +271,66 @@ class: centre,middle
 # More ensembles: Stacking
 ???
 ---
-# Poor man’s Stacking
+# Simplified Stacking
  .tiny-code[
 ```python
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = make_moons(noise=.2, random_state=18)
+X, y = make_moons(noise=.4, random_state=16, n_samples=300)
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=0)
 
-voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', DecisionTreeClassifier(max_depth=3, random_state=0)),
-                          ('knn', KNeighborsClassifier(n_neighbors=3))],voting='soft')
+voting = VotingClassifier(
+   [('logreg', LogisticRegression(C=100)),
+    ('tree', DecisionTreeClassifier(max_depth=3)),
+    ('knn', KNeighborsClassifier(n_neighbors=3))],
+    voting='soft')
 voting.fit(X_train, y_train)
 lr, tree, knn = voting.estimators_
-print(("{:.2f} " * 4).format(voting.score(X_test, y_test),
-                             lr.score(X_test, y_test), tree.score(X_test, y_test),
-                             knn.score(X_test, y_test)))
 ```
 ]
 
-- Build multiple models
-- Train model on probabilities / scores produced
-
 .center[
-![:scale 60%](images/kneighbors_voting.png)
-]
-.center[
-KNeighborsClassifier with voting
+![:scale 90%](images/average_voting.png)
 ]
 
 ???
 ---
-# Poor man’s Stacking
- .tiny-code[
+# Simplified Stacking
+.tiny-code[
 ```python
-from sklearn.preprocessing import FunctionTransformer
-# we need to reshape the result from votingclassifier.transform because
-# of some annoyance in sklearn. We then keep only the probabilities of the positive classes!
-reshaper = FunctionTransformer(lambda X_: np.rollaxis(X_, 1).reshape(-1, 6)[:, 1::2], validate=False)
-stacking = make_pipeline(voting, reshaper,
-                         LogisticRegression(C=100))
+stacking = make_pipeline(voting, LogisticRegression(C=100))
 stacking.fit(X_train, y_train)
-stacking.score(X_train, y_train)
+print(stacking.score(X_train, y_train))
+print(stacking.score(X_test, y_test))
 ```
-```0.987```
+
+```
+0.90
+0.77
+```
+
+```python
+stacking.named_steps.logisticregression.coef_
+```
+
+```
+array([[ 0.487,  1.519,  3.686]])
+```
+]
+.left-column[
+<br />
+<br />
+![:scale 90%](images/average_voting.png)
+]
+.right-column[
+![:scale 90%](images/simple_stacking_result.png)
 ]
 
- .tiny-code[
-```python
-stacking.score(X_test, y_test)
-```
-```0.96```
-]
-.center[
-![:scale 20%](images/stacking_result.png)
-]
-.center[
-Result of Stacking
-]
 ???
 ---
 class:centre,middle
-.center[
-![:scale 80%](images/select_classif.png)
-]
-.center[
-Selecting the required classifier (3)
-]
 
- - Problem : Overfitting!
+## Problem : Overfitting!
 ???
 ---
 class:spacious
@@ -369,23 +361,24 @@ first_stage = make_pipeline(voting, reshaper)
 transform_cv = cross_val_predict(first_stage, X_train, y_train, cv=10, method="transform")
 second_stage = LogisticRegression(C=100).fit(transform_cv, y_train)
 print(second_stage.coef_)
-[[ 2.09  -1.424  7.93 ]]
+```
+```
+[[ 2.192  1.402  1.012]]
 ```
 
 ```python
-second_stage.score(transform_cv, y_train)
-0.96```
+print(second_stage.score(transform_cv, y_train))
+print(second_stage.score(first_stage.transform(X_test), y_test))
+```
 
-```python
-second_stage.score(first_stage.transform(X_test), y_test)
-1.0
+```
+0.813
+0.800
 ```
 ]
 .center[
-![:scale 40%](images/holdout_stacking.png)
-![:scale 40%](images/holdout_naive.png)
-
-Hold out Stacking(left) and Naive Stacking (right)
+![:scale 40%](images/simple_stacking_result.png)
+![:scale 40%](images/stacking_result.png)
 ]
 
 
@@ -413,8 +406,6 @@ Predicting%20good%20probabilities%20with%20supervised%20learning.pdf">Source</a>
 ![:scale 30%](images/prob_table.png)
 ![:scale 30%](images/calib_curve.png)
 
-Probability Table  and Calibration Curve 
-
 ]
 
 ???
@@ -423,7 +414,7 @@ class: split-40
 # calibration_curve with sklearn
 
 Using subsample of covertype dataset
-.column[
+.left-column[
 .tiny-code[
 ```python
 from sklearn.linear_model import LogisticRegressionCV
@@ -458,7 +449,7 @@ print(y_test[:10])
 ]
 ]
 
-.column[
+.right-column[
 .tiny-code[
 ```python
 from sklearn.calibration import calibration_curve
@@ -470,8 +461,7 @@ print(prob_pred)
 [ 0.138  0.306  0.498  0.701  0.926]
 ```
 ]
-.center[![:scale 30%](images/predprob_positive.png)
-.center[Predicted Probability vs Fraction of Samples]
+.center[![:scale 70%](images/predprob_positive.png)
 ]
 ]
 
@@ -481,7 +471,6 @@ class:spacious
 #Influence of number of bins
 
 .center[![:scale 70%](images/influence_bins.png)]
-.center[Figure depicting influence of number of bins]
 - Works here because dataset is big
 - Might become very noisy for larger datasets
 
@@ -491,7 +480,6 @@ class:spacious
 # Comparing Models
 
 .center[![:scale 90%](images/calib_curve_models.png)]
-.center[Calibration curve on different models]
 ???
 ---
 # Brier Score (for binary classification)
@@ -499,7 +487,6 @@ class:spacious
 - “mean squared error of probability estimate”
 `$$ BS = \frac{\sum_{t=1}^{n} (\widehat{p} (y)-y)^{2}}{n}$$`
 
-.center[Different Models along with their Brier Score]
 .center[![:scale 70%](images/models_bscore.png)]
 ???
 ---
@@ -539,7 +526,6 @@ Need model for $f_{callib}$, need to decide what data to train it on.
 - Groups data into constant parts, steps in between.
 - Optimum monotone function on training data (wrt mse).
 .center[![:scale 40%](images/isotonic_regression.png)]
-.center[Isotonic fit vs Linear fit]
 
 ???
 ---
@@ -563,7 +549,6 @@ plot_calibration_curve(y_test, scores, n_bins=20)
 plt.title("{}: {:.3f}".format(clf.__class__.__name__, brier_score_loss(y_test, scores)))
 ```
 .center[![:scale 30%](images/random_forest.png)]
-.center[Random Forest Calibrated Classifier]
 ]
 ???
 ---
@@ -583,7 +568,6 @@ class: spacious
 # Calibration on Random Forest
 
 .center[![:scale 90%](images/types_callib.png)]
-.center[Comparison of different types of calibration]
 
 ???
 ---
