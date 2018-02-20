@@ -197,22 +197,24 @@ plt.tight_layout()
 
 ???
 ---
+# Partial Dependence Plots
+
 .center[
-Plot depicting importance of features vs Partial Dependence
 ![:scale 70%](images/feat_impo_part_dep.png)
 ]
 
 ???
 ---
+# Bivariate Partial Dependence Plots
 .smaller[
 ```python
-fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_importances_)[-2:]],
-                                   feature_names=boston.feature_names,
-                                   n_jobs=3, grid_resolution=50)
+plot_partial_dependence(
+    gbrt, X_train, [np.argsort(gbrt.feature_importances_)[-2:]],
+    feature_names=boston.feature_names, n_jobs=3, grid_resolution=50)
 ```
 ]
 .center[
-![:scale 70%](images/feature_importance.png)
+![:scale 80%](images/feature_importance.png)
 ]
 
 ???
@@ -223,19 +225,11 @@ fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_impor
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
 for i in range(3):
     fig, axs = plot_partial_dependence(gbrt, X_train, range(4), n_cols=4,
-                                       feature_names=iris.feature_names, grid_resolution=50, label=i,
-                                       figsize=(8, 2))
-    fig.suptitle(iris.target_names[i])
-    for ax in axs: ax.set_xticks(())
-    for ax in axs[1:]: ax.set_ylabel("")
-    plt.tight_layout()
+                                       feature_names=iris.feature_names, grid_resolution=50, label=i)
 ```
 ]
 .center[
-![:scale 40%](images/feat_impo_part_dep_class.png)
-]
-.center[
-Feature Importance vs Partial Dependence (Classification)
+![:scale 50%](images/feat_impo_part_dep_class.png)
 ]
 ???
 
@@ -357,9 +351,6 @@ class:spacious
 ---
 # Hold-out estimates of Probabilities
 ![:scale 100%](images/holdout_estimate.png)
-.center[
-Role of hold out estimates
-]
 
 - Split 1 produces probabilities for Fold 1, split2 for Fold 2 etc.
 - Get a probability estimate for each data point!
