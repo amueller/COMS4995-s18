@@ -131,6 +131,7 @@ but has the goal of obtaining good probability estimates from any classifier.
 FIXME: XGBOOST!!
 FIXME early stopping
 FIXME GBRT: better explain log-loss
+FIXME: add example of calibrated and inaccurate vs accurate but not calibrated!
 
 ---
 class: centre,middle
@@ -340,6 +341,9 @@ class: spacious
 - Exact splits ~5x faster on single core
 - Appoximate splits, multi-core -> more speed!
 - Also check lightGBM (even faster?)
+- Both have GPU support
+- https://github.com/szilard/GBM-perf
+???
 ---
 # Early stopping
 
@@ -352,10 +356,10 @@ class: spacious
 class:spacious
 # When to use tree-based models
 - Model non-linear relationships
+- Doesn’t care about scaling, no need for feature engineering
 - Single tree: very interpretable (if small)
 - Random forests very robust, good benchmark
 - Gradient boosting often best performance with careful tuning
-- Doesn’t care about scaling, no need for feature engineering!
 
 ???
 ---
@@ -500,6 +504,7 @@ class: spacious
 
 ???
 - For binary classification only
+- you can be calibrated and inaccurate!
 - Given a predicted ranking or probability from a supervised classifier, bin predictions.
 - Plot fraction of data that’s positive in each bin.
 - Doesn’t require ground truth probabilities!
