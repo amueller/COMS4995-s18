@@ -129,9 +129,8 @@ Finally, a technique called calibration that looks somewhat similar to ensembles
 but has the goal of obtaining good probability estimates from any classifier.
 
 FIXME: XGBOOST!!
-FIXME cross-validated calibration
-FIXME multi-class calibration
-FIXME better explain log-loss
+FIXME early stopping
+FIXME GBRT: better explain log-loss
 
 ---
 class: centre,middle
@@ -145,6 +144,23 @@ A standard implementation that people use is XGBoost, but there's also an implem
 Last time we talked about Random forests, which builds many trees independently, each randomized in a different way, and then averages their predictions.
 Gradient boosting on the other hand builds trees one by one in a sequential manner, with each tree requiring the results of previous trees.
 Often, Gradient boosting is done with very small trees, or even decision stumps, which is trees of depth one, so a single split.
+
+---
+class: center, middle
+# Boosting (in General)
+
+???
+ - “Meta-algorithm” to create strong learners from weak learners.
+ - AdaBoost, GentleBoost, …
+ - Trees or stumps work best
+ - Gradient Boosting often the best of the bunch
+ - Many specialized algorithms (ranking etc)
+
+This is an instance of a more general family of models, called boosting models, which all iteratively
+try to improve a model built up from weak learners. Gradient boosting is this particular technique
+where we are trying to fit the residuals, and it's been found to work very well in practice, in particular
+if you're using shallow trees as the weak learners.
+In principle, you could use any model as a weak learner, but trees just work really well.
 
 ---
 
@@ -176,11 +192,6 @@ you can use 1 vs rest.
 
 So we're sequentially building up a model using what's called "weak learners", small trees, and create a more
 powerful composite model.
-This is an instance of a more general family of models, called boosting models, which all iteratively
-try to improve a model built up from weak learners. Gradient boosting is this particular technique
-where we are trying to fit the residuals, and it's been found to work very well in practice, in particular
-if you're using shallow trees as the weak learners.
-In principle, you could use any model as a weak learner, but trees just work really well.
 
 ---
 # Gradient Boosting Algorithm
@@ -300,24 +311,41 @@ for i in range(3):
 ---
 
 # XGBoost
-- Efficient implementation of gradient boosting
+`conda install -c conda-forge xgboost`
+
+```python
+from xgboost import XGBClassifier
+xgb = XGBClassifier()
+xgb.fit(X_train, y_train)
+xgb.score(X_test, y_test))
+```
+
+- supports missing values
+- supports multi-core
+
+???
+- Efficient implementation of gradient boosting (5x sklearn)
 - Improvements on original algorithm
 - https://arxiv.org/abs/1603.02754
 - Adds l1 and l2 penalty on leaf-weights
 - Fast approximate split finding
-- Can pip-install
 - Scikit-learn compatible interface
 
-???
 ---
-class:spacious
-#Boosting in General
- - “Meta-algorithm” to create strong learners from weak learners.
- - AdaBoost, GentleBoost, …
- - Trees or stumps work best
- - Gradient Boosting often the best of the bunch
- - Many specialized algorithms (ranking etc)
+class: spacious
 
+.center[
+![:scale 50%](images/xgboost_sklearn_bench.png)
+]
+- Exact splits ~5x faster on single core
+- Appoximate splits, multi-core -> more speed!
+- Also check lightGBM (even faster?)
+---
+# Early stopping
+
+- Adding trees can lead to overfitting
+- Stop adding trees when validation accuracy stops increasing
+- Optional in XGBoost and sklearn >= 0.20 (development)
 
 ???
 ---
@@ -635,8 +663,27 @@ scores_iso = cal_rf_iso.predict_proba(X_test)[:, 1]
 ???
 ---
 
-- Fixme add multi-class and calibration with cross-validation
+# Cross-validated Calibration
+
+```python
+cal_rf_iso_cv = CalibratedClassifierCV(rf, method='isotonic')
+cal_rf_iso_cv.fit(X_train, y_train)
+scores_iso_cv = cal_rf_iso_cv.predict_proba(X_test)[:, 1]
+```
+
+.center[![:scale 90%](images/types_callib_cv.png)]
+
 ???
+- kinda cheating, we have more trees now lol
+- we use all the data, get good probabilities. just time-consuming
+---
+# Multi-Class Calibration
+
+.center[![:scale 100%](images/multi_class_calibration.png)]
+
+???
+- per-class calibratoin
+- renormalization
 ---
 class: center, middle
 
