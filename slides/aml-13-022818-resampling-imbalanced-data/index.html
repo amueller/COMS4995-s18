@@ -109,7 +109,7 @@ class: center, middle
 
 # Working with Imbalanced Data
 
-03/20/17
+02/28/18
 
 Andreas C. Müller
 
@@ -152,7 +152,8 @@ class: spacious
 ```python
 # logistic regression on breast cancer, but change threshold
 data = load_breast_cancer()
-X_train, X_test, y_train, y_test = train_test_split(data.data, data.target, stratify=data.target, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(data.data, data.target,
+                                    stratify=data.target, random_state=0)
 lr = LogisticRegression().fit(X_train, y_train)
 y_pred = lr.predict(X_test)
 print(classification_report(y_test, y_pred))
@@ -199,7 +200,8 @@ class: center, middle
 import openml
 # mammography dataset https://www.openml.org/d/310
 data = openml.datasets.get_dataset(310)
-X, y = data.get_data(target=data.default_target_attribute)
+X, y = data.get_data(target=
+data.default_target_attribute)
 X.shape
 ```
 (11183, 6)
@@ -221,20 +223,22 @@ Note: Split one slide to two due to size constraints.
 
 # Mammography Data
 
+.smaller[
 ```python
 from sklearn.linear_model import LogisticRegression
-scores = cross_val_score(LogisticRegression(),
-                         X_train, y_train, cv=10, scoring='roc_auc')
+scores = cross_val_score(LogisticRegression(), X_train, y_train, cv=10,
+                          scoring='roc_auc')
 print(scores.mean())
 ```
-0.919622716696
+0.920
 ```python
 from sklearn.ensemble import RandomForestClassifier
 scores = cross_val_score(RandomForestClassifier(n_estimators=100),
                          X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.928533583411
+0.929
+]
 
 ???
 
@@ -317,22 +321,26 @@ print(np.bincount(y_train_subsample))
 ```python
 from imblearn.pipeline import make_pipeline as make_imb_pipeline
 undersample_pipe = make_imb_pipeline(RandomUnderSampler(), LogisticRegressionCV())
-scores = cross_val_score(undersample_pipe, X_train, y_train, cv=10, scoring='roc_auc')
+scores = cross_val_score(undersample_pipe, X_train, y_train,
+cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.916512922589
+0.917
 ```python
-undersample_pipe_rf = make_imb_pipeline(RandomUnderSampler(), RandomForestClassifier())
-scores = cross_val_score(undersample_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
+undersample_pipe_rf = make_imb_pipeline(RandomUnderSampler(),
+                                          RandomForestClassifier())
+scores = cross_val_score(undersample_pipe_rf, X_train, y_train, cv=10,
+                            scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.942668403733
+0.943
 
-- As accurate with fraction of samples!
-- Really good for large datasets
 ]
 
 ???
+
+- As accurate with fraction of samples!
+- Really good for large datasets
 
 ---
 
@@ -363,18 +371,20 @@ print(np.bincount(y_train_oversample))
 .smaller[
 ```python
 oversample_pipe = make_imb_pipeline(RandomOverSampler(), LogisticRegression())
-scores = cross_val_score(oversample_pipe, X_train, y_train, cv=10, scoring='roc_auc')
+scores = cross_val_score(oversample_pipe, X_train, y_train,
+cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.917755942193
+0.918
 ```python
-oversample_pipe_rf = make_imb_pipeline(RandomOverSampler(), RandomForestClassifier())
-scores = cross_val_score(oversample_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
+oversample_pipe_rf = make_imb_pipeline(RandomOverSampler(),
+RandomForestClassifier())
+scores = cross_val_score(oversample_pipe_rf, X_train, y_train,
+cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.916313332777
+0.916
 
-</br>
 </br>
 Logreg the same, Random Forest much worse than before
 ]
@@ -386,7 +396,7 @@ Logreg the same, Random Forest much worse than before
 # ROC Curves for LogReg
 
 .center[
-![:scale 85%](images/roc_curves_for_logreg.png)
+![:scale 75%](images/roc_curves_for_logreg.png)
 ]
 
 ???
@@ -442,14 +452,14 @@ scores = cross_val_score(LogisticRegression(class_weight='balanced'),
                          X_train, y_train, cv=10, scoring='roc_auc')
 print(scores.mean())
 ```
-0.917567920152
+0.918
 ```python
 from sklearn.ensemble import RandomForestClassifier
-scores = cross_val_score(RandomForestClassifier(n_estimators=100, class_weight='balanced'),
-                         X_train, y_train, cv=10, scoring='roc_auc')
+scores = cross_val_score(RandomForestClassifier(n_estimators=100,
+class_weight='balanced'),X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.91679851501
+0.917
 ]
 
 ???
@@ -481,21 +491,26 @@ def make_resampled_ensemble(estimator, n_estimators=100):
         est = clone(estimator)
         if hasattr(est, "random_state"):
             est.random_state = i
-        pipe = make_imb_pipeline(RandomUnderSampler(random_state=i, replacement=True),est)
+        pipe = make_imb_pipeline(RandomUnderSampler(random_state=i,
+                                  replacement=True),est)
         estimators.append(("est_i".format(i), pipe))
     return VotingClassifier(estimators, voting="soft")
 
-resampled_tree_test = make_resampled_ensemble(DecisionTreeClassifier(max_features='auto'))
-scores = cross_val_score(resampled_tree_test, X_train, y_train, cv=10, scoring='roc_auc')
+resampled_tree_test = make_resampled_ensemble(DecisionTreeClassifier
+                                              (max_features='auto'))
+scores = cross_val_score(resampled_tree_test, X_train, y_train, cv=10,
+                                                scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.960342658946
+0.960
 
-As cheap as undersampling, but much better results than anything else! </br>
-Didn't do anything for Logistic Regression.
+
 ]
 
 ???
+
+-As cheap as undersampling, but much better results than anything else! </br>
+-Didn't do anything for Logistic Regression.
 
 ---
 class: center, middle
@@ -548,21 +563,22 @@ X_train_enn_mode, y_train_enn_mode = enn_mode.fit_sample(X_train, y_train)
 
 ---
 
+.smaller[
 ```python
 enn_pipe = make_imb_pipeline(EditedNearestNeighbours(n_neighbors=5),
                              LogisticRegression())
 scores = cross_val_score(enn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.920155354576
+0.920
 ```python
-enn_pipe_rf = make_imb_pipeline(EditedNearestNeighbours(n_neighbors=5),
-                                RandomForestClassifier(n_estimators=100))
+enn_pipe_rf = make_imb_pipeline(EditedNearestNeighbours(n_neighbors
+                      = 5),RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(enn_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.944075344514
-
+0.944
+]
 ???
 
 ---
@@ -595,20 +611,21 @@ print(np.bincount(y_train_cnn))
 
 ---
 
+.smaller[
 ```python
 cnn_pipe = make_imb_pipeline(CondensedNearestNeighbour(), LogisticRegression())
 scores = cross_val_score(cnn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.919227113476
+0.919
 ```python
 cnn_pipe = make_imb_pipeline(CondensedNearestNeighbour(),
-                               RandomForestClassifier(n_estimators=100))
+                          RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(cnn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.948040750132
-
+0.948
+]
 ???
 
 ---
@@ -643,41 +660,48 @@ class: center, middle
 ???
 
 ---
+
 class: center, middle
 
 .center[
 ![:scale 100%](images/smote_2.png)
 ]
 
-.left-column[
-original
+???
+
+
+---
+
+class: center, middle
+
+.center[
+![:scale 100%](images/smote_3.png)
 ]
 
-.right-column[
-smote
-]
 
 ???
 
 ---
 
+.smaller[
 ```python
 smote_pipe = make_imb_pipeline(SMOTE(), LogisticRegression())
 scores = cross_val_score(smote_pipe, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.918776908461
+0.919
 ```python
-smote_pipe_rf = make_imb_pipeline(SMOTE(), RandomForestClassifier(n_estimators=100))
-scores = cross_val_score(smote_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
+smote_pipe_rf = make_imb_pipeline(SMOTE(),RandomForestClassifier(n_estimators=100))
+scores = cross_val_score(smote_pipe_rf,X_train,y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
-0.94679634593
+0.947
 ```python
 param_grid = {'smote__k_neighbors': [3, 5, 7, 9, 11, 15, 31]}
 search = GridSearchCV(smote_pipe_rf, param_grid, cv=10, scoring="roc_auc")
 search.fit(X_train, y_train)
 ```
+]
 
 ???
 
