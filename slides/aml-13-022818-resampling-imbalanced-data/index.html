@@ -572,8 +572,8 @@ print(np.mean(scores))
 ```
 0.920
 ```python
-enn_pipe_rf = make_imb_pipeline(EditedNearestNeighbours(n_neighbors
-                      = 5),RandomForestClassifier(n_estimators=100))
+enn_pipe_rf = make_imb_pipeline(EditedNearestNeighbours(n_neighbors= 5),
+                                  RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(enn_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
@@ -620,7 +620,7 @@ print(np.mean(scores))
 0.919
 ```python
 cnn_pipe = make_imb_pipeline(CondensedNearestNeighbour(),
-                          RandomForestClassifier(n_estimators=100))
+                              RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(cnn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
 print(np.mean(scores))
 ```
@@ -658,17 +658,6 @@ class: center, middle
 ]
 
 ???
-
----
-
-class: center, middle
-
-.center[
-![:scale 100%](images/smote_2.png)
-]
-
-???
-
 
 ---
 
