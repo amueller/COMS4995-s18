@@ -190,17 +190,16 @@ for y_pred in [y_pred_1, y_pred_2, y_pred_3]:
 class:split-40
 # Precision, Recall, f-score
 .left-column[
-`$$ \text{Precision} = \frac{TP}{TP+FP}$$`
-`$$\text{Recall} = \frac{TP}{TP+FN}$$`
-`$$\text{F} = 2. \frac{\text{precision}.\text{recall}}{\text{precision}+\text{recall}}$$`]
+`$$ \large\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}}$$`
+`$$\large\text{Recall} = \frac{\text{TP}}{\text{TP}+\text{FN}}$$`
+`$$\large\text{F} = 2. \frac{\text{precision}.\text{recall}}{\text{precision}+\text{recall}}$$`]
 .right-column[
 <br />
 Positive Predicted Value (PPV)
 <br />
 <br />
+<br />
 Sensitivity, coverage, true positive rate.
-<br />
-<br />
 <br />
 <br />
 All depend on definition of positive and negative.
@@ -533,21 +532,34 @@ print("\n".join(sorted(SCORERS.keys())))
 ```
 
 ```
-accuracy                    precision_macro
-adjusted_rand_score         precision_micro
-average_precision           precision_samples
-f1                          precision_weighted
-f1_macro                    r2
-f1_micro                    recall
-f1_samples                  recall_macro
-f1_weighted                 recall_micro
-log_loss                    recall_samples
-mean_absolute_error         recall_weighted
-mean_squared_error          roc_auc
+accuracy                     precision
+adjusted_mutual_info_score   precision_macro
+adjusted_rand_score          precision_micro
+average_precision            precision_samples
+completeness_score           precision_weighted
+explained_variance           r2
+f1                           recall
+f1_macro                     recall_macro
+f1_micro                     recall_micro
+f1_samples                   recall_samples
+f1_weighted                  recall_weighted
+fowlkes_mallows_score        roc_auc
+homogeneity_score            v_measure_score
+log_loss                    
+mean_absolute_error         
+mean_squared_error          
 median_absolute_error
-precision
+mutual_info_score
+neg_log_loss
+neg_mean_absolute_error
+neg_mean_squared_error
+neg_mean_squared_log_error
+neg_median_absolute_error
+normalized_mutual_info_score
 ```
 ]
+
+
 
 ???
 ---
@@ -579,8 +591,8 @@ print(grid.score(X_test, y_test))
 print(len(grid.best_estimator_.support_))
 ```
 ```
-{'C': 10.0, 'gamma': 0.074239049740163321}
-0.991111111111
+{'C': 10.0, 'gamma': 0.074}
+0.991
 498
 ```
 ```python
@@ -593,8 +605,8 @@ print((grid.predict(X_test) == y_test).mean())
 print(len(grid.best_estimator_.support_))
 ```
 ```
-{'C': 100.0, 'gamma': 0.0074239049740163323}
-0.977777777778
+{'C': 100.0, 'gamma': 0.007}
+0.978
 405
 ```]
 ???
