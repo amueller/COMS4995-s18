@@ -484,9 +484,10 @@ micro vs macro same for other metrics.
 - Hand &amp; Till, 2001, one vs one
 `$$ \frac{1}{c(c-1)}\sum_{j=1}^{c}\sum_{k \neq j}^{c} AUC(j,k)$$`
 - Provost &amp; Domingo, 2000, one vs rest
-`$$ \frac{\sum_{j=1}^{c}p(j) AUC(j,{rest}_j)}{c}$$`
+`$$ \frac{1}{c}\sum_{j=1}^{c}p(j) AUC(j,\text{rest}_j)$$`
 - https://github.com/scikit-learn/scikit-learn/pull/7663
 ???
+FIXME unify notation with slide on averaging
 ---
 # Summary of metrics for binary classification
 
