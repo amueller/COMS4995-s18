@@ -123,9 +123,9 @@ class: center, middle
 Andreas C. Müller
 
 ???
-FIXME micro vs macro average examples + formulas
+FIXME macro vs weighted average example
 FIXME balanced accuracy?
-FIXME summary of binary classification metrics?
+FIXME MAPE
 
 ---
 class: centre,middle
@@ -380,6 +380,20 @@ The Relationship Between Precision-Recall and ROC Curves
 https://www.biostat.wisc.edu/~page/rocpr.pdf
 ???
 ---
+
+# Summary of metrics for binary classification
+
+Threshold-based:
+- accuracy
+- precision, recall, f1
+
+Ranking:
+- average precision
+- ROC AUC
+
+???
+add log loss?
+---
 class: centre,middle
 # Multi-class classification
 ???
@@ -443,22 +457,25 @@ avg / total       0.96      0.96      0.96       450
 ]
 ???
 ---
-# Micro and Macro F1
-- Macro-average f1: Average f1 scores over classes
-- Micro-average f1: Average binary confusion matrices, then compute recall, precision once
+# Averaging strategies
+- "macro", "weighted", "micro" (multi-label), "samples" (multi-label)
+
+`$$\text{macro }\frac{1}{\left|L\right|} \sum_{l \in L} R(y_l, \hat{y}_l)$$`
+
+`$$\text{weighted } \frac{1}{n} \sum_{l \in L} n_l R(y_l, \hat{y}_l)$$`
+
+
 .smaller[
 ```python
-print("Micro average: ", f1_score(y_test, pred, average="micro"))
-print("Macro average: ", f1_score(y_test, pred, average="macro"))
+print("Micro average: ", recall_score(y_test, pred, average="weighted"))
+print("Macro average: ", recall_score(y_test, pred, average="macro"))
 ```
 ```
-Micro average: 0.953
-Macro average: 0.954
+Micro average: 0.964
+Macro average: 0.964
 ```
 ]
-Macro : "all classes are important"
 <br />
-Micro : "all samples are equally important"
 ???
 micro vs macro same for other metrics.
 
@@ -471,6 +488,20 @@ micro vs macro same for other metrics.
 - https://github.com/scikit-learn/scikit-learn/pull/7663
 ???
 ---
+# Summary of metrics for binary classification
+
+Threshold-based:
+- accuracy
+- precision, recall, f1 (macro average, weighted)
+
+Ranking:
+- OVR ROC AUC
+- OVO ROC AUC
+
+???
+
+---
+
 class: middle
 # Picking metrics
 
@@ -644,7 +675,11 @@ class:split-40
 ---
 class:spacious
 # Absolute vs Relative: MAPE
-`$$ MAPE = \frac{100}{n} \sum_{i=1}^{n}|\frac{y-\hat{y}}{y}|$$`
+`$$ \text{MAPE} = \frac{100}{n} \sum_{i=1}^{n}\left|\frac{y-\hat{y}}{y}\right|$$`
+
+.center[
+![:scale 50%](images/mape.png)
+]
 ???
 ---
 class: spacious
