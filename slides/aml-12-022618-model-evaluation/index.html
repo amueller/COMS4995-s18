@@ -518,9 +518,8 @@ class: middle
 # Using metrics in cross-validation
 .smaller[
 ```python
-X = digits.data / 16.   # data is between 0 and 16
-# 9 vs rest
-y = digits.target == 9
+X, y = make_blobs(n_samples=(2500, 500), cluster_std=[7.0, 2],
+                  random_state=22)
 
 # default scoring for classification is accuracy
 scores_default = cross_val_score(SVC(), X, y)
@@ -529,16 +528,16 @@ scores_default = cross_val_score(SVC(), X, y)
 explicit_accuracy =  cross_val_score(SVC(), X, y, scoring="accuracy")
 
 # using ROC AUC
-roc_auc =  cross_val_score(SVC(), X, digits.target == 9, scoring="roc_auc")
+roc_auc =  cross_val_score(SVC(), X, y, scoring="roc_auc")
 
 print("Default scoring: {}".format(scores_default))
 print("Explicit accuracy scoring: {}".format(explicit_accuracy))
 print("AUC scoring: {}".format(roc_auc))
 ```
 ```
-Default scoring: [ 0.9  0.9  0.9]
-Explicit accuracy scoring: [ 0.9  0.9  0.9]
-AUC scoring: [ 0.994  0.99   0.996]
+Default scoring: [ 0.92   0.904  0.913]
+Explicit accuracy scoring: [ 0.92   0.904  0.913]
+AUC scoring: [ 0.93   0.885  0.923]
 ```
 ]
 
