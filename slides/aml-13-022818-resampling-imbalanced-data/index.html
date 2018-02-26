@@ -97,6 +97,9 @@
       .invisible {
           visibility: hidden
       }
+      .tiny-code .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
     </style>
   </head>
@@ -114,7 +117,7 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
+FIXME: imblearn
 
 ---
 class: center, middle
@@ -147,28 +150,36 @@ class: spacious
 ---
 
 # Changing Thresholds
-
-.smaller[
+.tiny-code[
 ```python
-# logistic regression on breast cancer, but change threshold
 data = load_breast_cancer()
-X_train, X_test, y_train, y_test = train_test_split(data.data, data.target,
-                                    stratify=data.target, random_state=0)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    data.data, data.target, stratify=data.target, random_state=0)
+
 lr = LogisticRegression().fit(X_train, y_train)
 y_pred = lr.predict(X_test)
+
 print(classification_report(y_test, y_pred))
 ```
-.center[
-![:scale 25%](images/precision_recall_breast_cancer_1.png)
-]
-
+```
+          precision   recall  f1-score  support
+0              0.91     0.92      0.92       53  
+1              0.96     0.94      0.95       90
+avg/total      0.94     0.94      0.94      143
+```
 ```python
 y_pred = lr.predict_proba(X_test)[:, 1] > .85
+
 print(classification_report(y_test, y_pred))
 ```
-.center[
-![:scale 25%](images/precision_recall_breast_cancer_2.png)
-]
+```
+          precision   recall  f1-score  support
+0              0.84     1.00      0.91       53  
+1              1.00     0.89      0.94       90
+avg/total      0.94     0.93      0.93      143
+
+```
 ]
 
 ???
@@ -195,13 +206,13 @@ class: center, middle
 # Mammography Data
 
 .smaller[
-.wide-left-column[
+.left-column[
 ```python
 import openml
-# mammography dataset https://www.openml.org/d/310
+# mammography dataset
+# https://www.openml.org/d/310
 data = openml.datasets.get_dataset(310)
-X, y = data.get_data(target=
-data.default_target_attribute)
+X, y = data.get_data(target='class')
 X.shape
 ```
 (11183, 6)
@@ -210,9 +221,9 @@ np.bincount(y)
 ```
 array([10923,   260])
 ]
-.narrow-right-column[
+.right-column[
 .center[
-![:scale 130%](images/mammography_data.png)
+![:scale 100%](images/mammography_data.png)
 ]
 ]
 ]
@@ -228,14 +239,14 @@ Note: Split one slide to two due to size constraints.
 from sklearn.linear_model import LogisticRegression
 scores = cross_val_score(LogisticRegression(), X_train, y_train, cv=10,
                           scoring='roc_auc')
-print(scores.mean())
+scores.mean()
 ```
 0.920
 ```python
 from sklearn.ensemble import RandomForestClassifier
 scores = cross_val_score(RandomForestClassifier(n_estimators=100),
                          X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.929
 ]
@@ -272,13 +283,23 @@ Change the training procedure
 ???
 
 ---
-
+class: center, spacious
 
 # Sckit-learn vs resampling
 
+![:scale 55%](images/pipeline.png)
+
+???
 - The transform method only transforms X
 - Pipelines work by chaining transforms
 - To resample the data, we need to also change y
+
+---
+
+# Imbalance-Learn
+
+???
+FIXME 
 - Imbalance-learn extends scikit-learn interface with a
 “sample” method.
 - Imbalance-learn has a custom pipeline that allows
@@ -286,32 +307,32 @@ resampling.
 - Imbalance-learn: resampling is only performed during fitting
 - Warning: not everything in imbalance-learn is multiclass!
 
-???
-
 ---
 
 # Random Undersampling
 
-.smaller[
-- Drop data from the majority class randomly
-- Often untill balanced
-- Very fast training (data shrinks to 2x minority)
-- Loses data !
 ```python
 from imblearn.under_sampling import RandomUnderSampler
 rus = RandomUnderSampler(replacement=False)
-X_train_subsample, y_train_subsample = rus.fit_sample(X_train, y_train)
+X_train_subsample, y_train_subsample = rus.fit_sample(
+    X_train, y_train)
 print(X_train.shape)
 print(X_train_subsample.shape)
 print(np.bincount(y_train_subsample))
 ```
-(8387, 6) </br>
-(390, 6) </br>
+```
+(8387, 6)
+(390, 6)
 [195 195]
-]
+```
+
 
 ???
 
+- Drop data from the majority class randomly
+- Often untill balanced
+- Very fast training (data shrinks to 2x minority)
+- Loses data !
 
 ---
 
@@ -322,18 +343,25 @@ print(np.bincount(y_train_subsample))
 from imblearn.pipeline import make_pipeline as make_imb_pipeline
 undersample_pipe = make_imb_pipeline(RandomUnderSampler(), LogisticRegressionCV())
 scores = cross_val_score(undersample_pipe, X_train, y_train,
-cv=10, scoring='roc_auc')
-print(np.mean(scores))
+                         cv=10, scoring='roc_auc')
+np.mean(scores)
+# was 0.92 without
+```
 ```
 0.917
+```
+
 ```python
 undersample_pipe_rf = make_imb_pipeline(RandomUnderSampler(),
-                                          RandomForestClassifier())
+                                        RandomForestClassifier())
 scores = cross_val_score(undersample_pipe_rf, X_train, y_train, cv=10,
-                            scoring='roc_auc')
-print(np.mean(scores))
+                         scoring='roc_auc')
+np.mean(scores)
+# was 0.929 without
+```
 ```
 0.943
+```
 
 ]
 
@@ -344,25 +372,26 @@ print(np.mean(scores))
 
 ---
 
-# Random Oversmapling
+# Random Oversampling
 
-.smaller[
-- Repeat samples from the minority class randomly
-- Often untill balanced
-- Much slower (dataset grows to 2x majority)
 ```python
 from imblearn.over_sampling import RandomOverSampler
 ros = RandomOverSampler()
-X_train_oversample, y_train_oversample = ros.fit_sample(X_train, y_train)
+X_train_oversample, y_train_oversample = ros.fit_sample(
+    X_train, y_train)
 print(X_train.shape)
 print(X_train_oversample.shape)
 print(np.bincount(y_train_oversample))
 ```
-(8387, 6) </br>
-(16384, 6) </br>
+```
+(8387, 6)
+(16384, 6)
 [8192 8192]
-]
+```
 ???
+- Repeat samples from the minority class randomly
+- Often untill balanced
+- Much slower (dataset grows to 2x majority)
 
 ---
 
@@ -371,25 +400,23 @@ print(np.bincount(y_train_oversample))
 .smaller[
 ```python
 oversample_pipe = make_imb_pipeline(RandomOverSampler(), LogisticRegression())
-scores = cross_val_score(oversample_pipe, X_train, y_train,
-cv=10, scoring='roc_auc')
-print(np.mean(scores))
+scores = cross_val_score(oversample_pipe, X_train, y_train, cv=10,
+                         scoring='roc_auc')
+np.mean(scores)
 ```
 0.918
 ```python
 oversample_pipe_rf = make_imb_pipeline(RandomOverSampler(),
-RandomForestClassifier())
-scores = cross_val_score(oversample_pipe_rf, X_train, y_train,
-cv=10, scoring='roc_auc')
-print(np.mean(scores))
+                                       RandomForestClassifier())
+scores = cross_val_score(oversample_pipe_rf, X_train, y_train, cv=10,
+                         scoring='roc_auc')
+np.mean(scores)
 ```
 0.916
-
-</br>
-Logreg the same, Random Forest much worse than before
 ]
 
 ???
+Logreg the same, Random Forest much worse than undersampling (about same as doing nothing)
 
 ---
 
