@@ -237,19 +237,21 @@ Note: Split one slide to two due to size constraints.
 
 .smaller[
 ```python
+from sklearn.model_selection import cross_validate
 from sklearn.linear_model import LogisticRegression
-scores = cross_val_score(LogisticRegression(), X_train, y_train, cv=10,
-                          scoring='roc_auc')
-scores.mean()
+
+scores = cross_validate(LogisticRegression(),
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.920
+0.920, 0.630 
 ```python
 from sklearn.ensemble import RandomForestClassifier
-scores = cross_val_score(RandomForestClassifier(n_estimators=100),
-                         X_train, y_train, cv=10, scoring='roc_auc')
-np.mean(scores)
+scores = cross_validate(RandomForestClassifier(n_estimators=100),
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.929
+0.939, 0.722
 ]
 
 ???
@@ -367,14 +369,15 @@ print(np.bincount(y_train_subsample))
 .smaller[
 ```python
 from imblearn.pipeline import make_pipeline as make_imb_pipeline
+
 undersample_pipe = make_imb_pipeline(RandomUnderSampler(), LogisticRegressionCV())
-scores = cross_val_score(undersample_pipe, X_train, y_train,
-                         cv=10, scoring='roc_auc')
-np.mean(scores)
-# was 0.92 without
+scores = cross_validate(undersample_pipe,
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
+# was 0.920, 0.630 without
 ```
 ```
-0.917
+0.927, 0.527
 ```
 ]
 --
@@ -382,13 +385,13 @@ np.mean(scores)
 ```python
 undersample_pipe_rf = make_imb_pipeline(RandomUnderSampler(),
                                         RandomForestClassifier())
-scores = cross_val_score(undersample_pipe_rf, X_train, y_train, cv=10,
-                         scoring='roc_auc')
-np.mean(scores)
-# was 0.929 without
+scores = cross_validate(undersample_pipe_rf,
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
+# was 0.939, 0.722 without
 ```
 ```
-0.943
+0.951, 0.629
 ```
 
 ]
@@ -428,22 +431,22 @@ print(np.bincount(y_train_oversample))
 .smaller[
 ```python
 oversample_pipe = make_imb_pipeline(RandomOverSampler(), LogisticRegression())
-scores = cross_val_score(oversample_pipe, X_train, y_train, cv=10,
-                         scoring='roc_auc')
-np.mean(scores)
+scores = cross_validate(oversample_pipe,
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.918
+0.917, 0.585
 ]
 --
 .smaller[
 ```python
 oversample_pipe_rf = make_imb_pipeline(RandomOverSampler(),
                                        RandomForestClassifier())
-scores = cross_val_score(oversample_pipe_rf, X_train, y_train, cv=10,
-                         scoring='roc_auc')
-np.mean(scores)
+scores = cross_validate(oversample_pipe_rf,
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.916
+0.926, 0.715
 ]
 
 ???
@@ -479,7 +482,7 @@ FPR or Precision?
 `$$ \large\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}}$$`
 
 ???
-Fixme think of good explanation
+fIXME think of better explanation
 ---
 class: spacious
 
@@ -526,19 +529,17 @@ Weighted vote
 
 .smaller[
 ```python
-from sklearn.linear_model import LogisticRegression
-scores = cross_val_score(LogisticRegression(class_weight='balanced'),
-                         X_train, y_train, cv=10, scoring='roc_auc')
-scores.mean()
+scores = cross_validate(LogisticRegression(class_weight='balanced'),
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.918
+0.918, 0.587
 ```python
-from sklearn.ensemble import RandomForestClassifier
-rf = RandomForestClassifier(n_estimators=100, class_weight='balanced')
-scores = cross_val_score(rf, X_train, y_train, cv=10, scoring='roc_auc')
-np.mean(scores)
+scores = cross_validate(RandomForestClassifier(n_estimators=100, class_weight='balanced'),
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.917
+0.917, 0.701
 ]
 
 ???
@@ -568,10 +569,11 @@ from imblearn.ensemble import BalancedBaggingClassifier
 tree = DecisionTreeClassifier(max_features='auto')
 resampled_rf = BalancedBaggingClassifier(base_estimator=tree,
                                          n_estimators=100, random_state=0)
-scores = cross_val_score(resampled_rf, X_train, y_train, cv=10, scoring='roc_auc')
-np.mean(scores)
+scores = cross_validate(resampled_rf,
+                        X_train, y_train, cv=10, scoring=('roc_auc', 'average_precision'))
+scores['test_roc_auc'].mean(), scores['test_average_precision'].mean()
 ```
-0.960
+0.957, 0.654
 
 ]
 
