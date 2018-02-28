@@ -117,8 +117,8 @@ class: center, middle
 Andreas C. Müller
 
 ???
-FIXME: imblearn
-
+FIXME: undersampling / oversampling AUC and AP disagree a lot?!
+FIXME: class weights in trees
 ---
 class: center, middle
 
@@ -143,6 +143,7 @@ class: spacious
 # Why do we care?
 
 - Why should cost be symmetric?
+- All data is imbalanced
 - Detect rare events
 
 ???
@@ -160,7 +161,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 lr = LogisticRegression().fit(X_train, y_train)
 y_pred = lr.predict(X_test)
 
-print(classification_report(y_test, y_pred))
+classification_report(y_test, y_pred)
 ```
 ```
           precision   recall  f1-score  support
@@ -171,7 +172,7 @@ avg/total      0.94     0.94      0.94      143
 ```python
 y_pred = lr.predict_proba(X_test)[:, 1] > .85
 
-print(classification_report(y_test, y_pred))
+classification_report(y_test, y_pred)
 ```
 ```
           precision   recall  f1-score  support
@@ -253,14 +254,12 @@ np.mean(scores)
 
 ???
 
-Note: Split one slide to two due to size constraints.
-
 ---
 
 # Mammography Data
 
 .center[
-![:scale 85%](images/mammography_data_2.png)
+![:scale 85%](images/mammography_features23.png)
 ]
 
 ???
@@ -276,6 +275,8 @@ Note: Split one slide to two due to size constraints.
 ]
 
 .right-column[
+</br>
+</br>
 </br>
 Change the training procedure
 ]
@@ -295,11 +296,36 @@ class: center, spacious
 - To resample the data, we need to also change y
 
 ---
-
+class: spacious
 # Imbalance-Learn
 
+http://imbalanced-learn.org
+
+```
+pip install -U imbalanced-learn
+```
+
+Extends `sklearn` API
+
+---
+
+### Sampler
+
+To resample a data sets, each sampler implements:
+```python
+  data_resampled, targets_resampled = obj.sample(data, targets)
+```
+Fitting and sampling can also be done in one step:
+```python
+  data_resampled, targets_resampled = obj.fit_sample(data, targets)
+```
+--
+<br />
+<br />
+In Pipelines:
+Sampling only done in `fit`!
+
 ???
-FIXME 
 - Imbalance-learn extends scikit-learn interface with a
 “sample” method.
 - Imbalance-learn has a custom pipeline that allows
@@ -350,7 +376,9 @@ np.mean(scores)
 ```
 0.917
 ```
-
+]
+--
+.smaller[
 ```python
 undersample_pipe_rf = make_imb_pipeline(RandomUnderSampler(),
                                         RandomForestClassifier())
@@ -405,6 +433,9 @@ scores = cross_val_score(oversample_pipe, X_train, y_train, cv=10,
 np.mean(scores)
 ```
 0.918
+]
+--
+.smaller[
 ```python
 oversample_pipe_rf = make_imb_pipeline(RandomOverSampler(),
                                        RandomForestClassifier())
@@ -420,24 +451,35 @@ Logreg the same, Random Forest much worse than undersampling (about same as doin
 
 ---
 
-# ROC Curves for LogReg
+# Curves for LogReg
 
 .center[
-![:scale 75%](images/roc_curves_for_logreg.png)
+![:scale 100%](images/curves_logreg.png)
 ]
 
 ???
 
 ---
 
-# ROC Curves for Random Forest
+# Curves for Random Forest
 
 .center[
-![:scale 75%](images/roc_curves_for_rf.png)
+![:scale 100%](images/curves_rf.png)
 ]
 
 ???
 
+---
+# ROC or PR?
+
+FPR or Precision?
+
+`$$ \large\text{FPR} = \frac{\text{FP}}{\text{FP}+\text{TN}}$$`
+
+`$$ \large\text{Precision} = \frac{\text{TP}}{\text{TP}+\text{FP}}$$`
+
+???
+Fixme think of good explanation
 ---
 class: spacious
 
@@ -456,7 +498,7 @@ class: spacious
 
 `$$\min_{w \in ℝ^{p}}-C \sum_{i=1}^n\log(\exp(-y_iw^T \textbf{x}_i) + 1) + ||w||_2^2$$`
 
-`$$ \min_{w \in \mathbb{R}^p} -\sum_{i=1}^n C_{y_i} \log(\exp(-y_i w^T \mathbf{x}_i) + 1) + ||w||^2_2 $$`
+`$$ \min_{w \in \mathbb{R}^p} -C \sum_{i=1}^n c_{y_i} \log(\exp(-y_i w^T \mathbf{x}_i) + 1) + ||w||^2_2 $$`
 
 Similar for linear and non-linear SVM
 
@@ -465,6 +507,16 @@ Similar for linear and non-linear SVM
 ---
 
 # Class weights in trees
+
+Gini Index: 
+
+`$$H_\text{gini}(X_m) = \sum_{k\in\mathcal{Y}} p_{mk} (1 - p_{mk})$$`
+
+`$$H_\text{gini}(X_m) = \sum_{k\in\mathcal{Y}} c_k p_{mk} (1 - p_{mk})$$`
+
+Prediction:
+
+Weighted vote
 
 ???
 
@@ -477,14 +529,14 @@ Similar for linear and non-linear SVM
 from sklearn.linear_model import LogisticRegression
 scores = cross_val_score(LogisticRegression(class_weight='balanced'),
                          X_train, y_train, cv=10, scoring='roc_auc')
-print(scores.mean())
+scores.mean()
 ```
 0.918
 ```python
 from sklearn.ensemble import RandomForestClassifier
-scores = cross_val_score(RandomForestClassifier(n_estimators=100,
-class_weight='balanced'),X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+rf = RandomForestClassifier(n_estimators=100, class_weight='balanced')
+scores = cross_val_score(rf, X_train, y_train, cv=10, scoring='roc_auc')
+np.mean(scores)
 ```
 0.917
 ]
@@ -499,38 +551,27 @@ class: spacious
 - Random resampling separate for each instance in
 an ensemble!
 - Paper: “Exploratory Undersampling for Class Imbalance Learning”
-- Not in sklearn (yet), not totally easy with
-imbalance-learn (but soon).
-
+- Not in sklearn (yet)
+- Easy with imblearn
 ???
 
 ---
 
-# Quick & Dirty Easy Ensemble
+# Easy Ensemble with imblearn
 
 .smaller[
 ```python
-from sklearn.base import clone
 
-def make_resampled_ensemble(estimator, n_estimators=100):
-    estimators = []
-    for i in range(n_estimators):
-        est = clone(estimator)
-        if hasattr(est, "random_state"):
-            est.random_state = i
-        pipe = make_imb_pipeline(RandomUnderSampler(random_state=i,
-                                  replacement=True),est)
-        estimators.append(("est_i".format(i), pipe))
-    return VotingClassifier(estimators, voting="soft")
+from sklearn.tree import DecisionTreeClassifier
+from imblearn.ensemble import BalancedBaggingClassifier
 
-resampled_tree_test = make_resampled_ensemble(DecisionTreeClassifier
-                                              (max_features='auto'))
-scores = cross_val_score(resampled_tree_test, X_train, y_train, cv=10,
-                                                scoring='roc_auc')
-print(np.mean(scores))
+tree = DecisionTreeClassifier(max_features='auto')
+resampled_rf = BalancedBaggingClassifier(base_estimator=tree,
+                                         n_estimators=100, random_state=0)
+scores = cross_val_score(resampled_rf, X_train, y_train, cv=10, scoring='roc_auc')
+np.mean(scores)
 ```
 0.960
-
 
 ]
 
@@ -542,7 +583,12 @@ print(np.mean(scores))
 ---
 class: center, middle
 
-## Smart resampling
+![:scale 100%](images/roc_vs_pr.png)
+
+---
+class: center, middle
+
+# Smart resampling
 ## (based on nearest neighbour heuristics from the 70's)
 
 ???
@@ -595,14 +641,14 @@ X_train_enn_mode, y_train_enn_mode = enn_mode.fit_sample(X_train, y_train)
 enn_pipe = make_imb_pipeline(EditedNearestNeighbours(n_neighbors=5),
                              LogisticRegression())
 scores = cross_val_score(enn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.920
 ```python
 enn_pipe_rf = make_imb_pipeline(EditedNearestNeighbours(n_neighbors= 5),
                                   RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(enn_pipe_rf, X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.944
 ]
@@ -642,14 +688,14 @@ print(np.bincount(y_train_cnn))
 ```python
 cnn_pipe = make_imb_pipeline(CondensedNearestNeighbour(), LogisticRegression())
 scores = cross_val_score(cnn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.919
 ```python
 cnn_pipe = make_imb_pipeline(CondensedNearestNeighbour(),
                               RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(cnn_pipe, X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.948
 ]
@@ -672,11 +718,11 @@ class: center, middle
   – Pick random neighbor from k neighbors.</br>
   – Pick point on line connecting the two uniformly</br>
   – Repeat.</br>
-- Leads to very large datasets (oversampling)
-- Can be combined with undersampling strategies
 
 
 ???
+- Leads to very large datasets (oversampling)
+- Can be combined with undersampling strategies
 
 ---
 
@@ -703,13 +749,13 @@ class: center, middle
 ```python
 smote_pipe = make_imb_pipeline(SMOTE(), LogisticRegression())
 scores = cross_val_score(smote_pipe, X_train, y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.919
 ```python
 smote_pipe_rf = make_imb_pipeline(SMOTE(),RandomForestClassifier(n_estimators=100))
 scores = cross_val_score(smote_pipe_rf,X_train,y_train, cv=10, scoring='roc_auc')
-print(np.mean(scores))
+np.mean(scores)
 ```
 0.947
 ```python
