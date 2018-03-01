@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Clustering and Mixture Models
+
+03/21/18
+
+Andreas C. Müller
+
+???
+N/A
+
+---
+
+class: center, middle
+
+# Clustering
+
+???
+
+---
+.center[
+![:scale 70%](images/cluster_intro_1.png)
+]
+
+???
+
+---
+.center[
+![:scale 70%](images/cluster_intro_2.png)
+]
+
+???
+
+---
+.center[
+![:scale 70%](images/cluster_intro_3.png)
+]
+
+???
+
+---
+Group into 4 clusters
+
+.center[
+![:scale 70%](images/cluster_intro_4.png)
+]
+
+???
+
+---
+
+# Clustering
+
+- Group data into a partitioning:
+- Identify groups by assigning “cluster labels” to
+each data point.
+- Points within a cluster should be “similar”.
+- Points in different cluster should be “different”.
+- Number of clusters might be pre-specified.
+- Notations of “similar” and “different” depend on
+algorithm or user specified metrics.
+
+???
+
+---
+
+# Goals of Clustering
+
+- Data Exploration
+  - Are there coherent groups ?
+  - How many groups are there ?
+- Data Partitioning
+  - Divide data by group before further processing
+- Unsupervised feature extraction
+  - Derive features from clusters or cluster distances
+
+???
+
+---
+
+class: center, middle
+
+# Clustering Algorithms
+
+???
+
+---
+
+class: center, middle
+
+# K-Means
+
+???
+
+---
+
+# K-Means Algorithm
+
+.narrow-right-column[
+.smaller[
+- Pick number of clusters k.
+- Pick k random points as
+“cluster center”
+- While cluster centers change:
+  1. Assign each data point to it’s closest cluster center
+  2. Recompute cluster centers as the mean of the assigned points.
+]
+]
+
+.wide-left-column[
+.center[
+![:scale 80%](images/kmeans.png)
+]
+]
+
+???
+
+---
+class: spacious
+# Objective function for K-Means
+
+- Finds a local minimum of minimizing squared distances (exact solution is
+NP hard):
+`$$ \min_{\mathbf{c}_j \in \mathbf{R}^p, j=1,..,k} \sum_i ||\mathbf{x}_i - \mathbf{c}_{x_i}||^2 $$`
+$\mathbf{c}_{x_i}$ is the cluster center $c_j$ closest to $x_i$
+- New data points can be assigned cluster membership based on existing clusters.
+
+???
+
+---
+
+# K-Means API
+
+
+.narrow-right-column[
+.center[
+![:scale 120%](images/kmeans_api.png)
+]
+]
+
+.wide-left-column[
+.smaller[
+```python
+X, y = make_blobs(centers=4, random_state=1)
+
+km = KMeans(n_clusters=5, random_state=0)
+km.fit(X)
+print(km.cluster_centers_.shape)
+print(km.labels_.shape)
+# predict is the same as labels_ on training data
+# but can be applied to new data
+print(km.predict(X).shape)
+plt.scatter(X[:, 0], X[:, 1], c=km.labels_)
+plt.gca().set_aspect("equal")
+```
+(5, 2) </br>
+(100,) </br>
+(100,)
+]
+]
+
+???
+
+---
+
+# Restriction of Cluster Shapes
+
+- Clusters are Voronoi-diagrams of centers
+- Clusters are always convex in space
+
+.left-column[
+![:scale 80%](images/cluster_shapes_1.png)
+]
+.right-column[
+![:scale 90%](images/cluster_shapes_2.png)
+]
+
+???
+
+---
+
+# Limitations of K-Means
+
+.center[
+![:scale 50%](images/kmeans_limitations_1.png)
+]
+
+- Cluster boundaries are always in the middle of the centers
+
+???
+
+---
+
+# Limitations of K-Means
+
+.center[
+![:scale 50%](images/kmeans_limitations_2.png)
+]
+
+ - Can’t model covariances well
+
+???
+
+---
+# Limitations of K-Means
+
+.center[
+![:scale 50%](images/kmeans_limitations_3.png)
+]
+
+- Only simple cluster shapes
+
+???
+
+---
+
+# Computational Properties
+
+- Naive implementation:
+  - Each iteration computes n_cluster * n_samples
+distances.
+- Fast exact algorithms:
+  - Elkans, Ying-Yang (compute cluster distances and
+use triangle inequality)
+- Many approximate algorithms, in particular minibatch K-Means: Much faster, online version
+(partial_fit)
+
+???
+
+---
+
+# Initialization
+
+- Random centers fast but not great.
+- K-means++ (default):
+Greedily add “furthest way” point
+- By default K-means in sklearn does 10 random
+restarts with different initializations.
+- For large datasets, K-means++ initialization may take
+much longer than clustering.
+- Consider using random, in particular for
+MiniBatchKMeans
+
+???
+
+---
+
+# Feature Extraction using K-Means
+
+- Cluster membership → categorical feature
+- Cluster distanced → continuous feature
+- Examples:
+  - Partitioning low-dimensional space (similar to using basis functions)
+  - Extracting features from high-dimensional spaces, for image patches, see
+  http://ai.stanford.edu/~acoates/papers/coatesleeng_aistats_2011.pdf
+
+???
+
+---
+
+class: center, middle
+
+# Agglomerative Clustering
+
+???
+
+---
+
+# Agglomerative Clustering
+
+- Start with all points in their own cluster.
+- Greedily merge the two most similar clusters.
+- Creates a hierarchical clustering from with cluster
+sizes from n_samples to single cluster.
+
+.center[
+![:scale 80%](images/agglomerative_clustering.png)
+]
+
+???
+
+---
+class: spacious
+
+# Dendograms
+
+.left-column[
+![:scale 100%](images/dendograms_1.png)
+]
+
+.left-column[
+![:scale 80%](images/dendograms_2.png)
+]
+
+???
+
+---
+
+# Merging Criteria
+
+- Complete Link
+  - Smallest maximum distance
+- Average Linkage
+  - Smallest average distance between all pairs in the clusters
+- Single Link
+  - Smallest minimum distance
+- Ward (default in sklearn)
+  - Smallest increase in within-cluster variance
+  - Leads to more equally sized clusters.
+
+???
+
+---
+
+.center[
+![:scale 100%](images/merging_criteria.png)
+]
+
+complete : [41 31 20  7  1] </br>
+average : [31  9 30 29  1] </br>
+ward : [30 33 20  6 11]
+
+???
+
+---
+
+# Pros and Cons
+
+- Can restrict to input “topology” given by any
+graph, for example neighborhood graph.
+- Fast with sparse connectivity, otherwise O(log(n) n
+** 2 )
+- Some linkage criteria an lead to very imbalanced
+cluster sized (can be pro or con)
+- Hierarchical clustering gives more holistic view, can
+help with picking the number of clusters.
+
+???
+
+---
+class: center, middle
+
+# DBSCAN
+
+???
+
+---
+
+# Algorithm
+
+.left-column[
+.smaller[
+- Clusters are formed by “core samples”
+- Sample is “core sample” if more than min_samples is
+within epsilon - “dense region”
+- Start with a core sample
+- Recursively walk neighbors that are core-samples and
+add to cluster.
+- Also add samples within epsilon that are not core
+samples (but don’t recurse)
+- If can’t reach any more points, pick another core
+sample, start new cluster.
+- Remaining points are labeled outliers
+]
+]
+
+.right-column[
+.center[
+![:scale 80%](images/dbscan_algo.png)
+]
+]
+
+???
+
+---
+
+# Illustration
+
+.center[
+![:scale 70%](images/dbscan_illustration.png)
+]
+
+???
+
+---
+
+# Pros and Cons
+
+- Allows complex cluster shapes
+- Can detect outliers
+- Needs two parameters to adjust, eps is hard to
+pick (can be done based on number of clusters
+though).
+- Can learn arbitrary cluster shapes
+
+.center[
+![:scale 40%](images/dbscan_pro_con.png)
+]
+
+???
+
+---
+class: center, middle
+
+# (Gaussian) Mixture Models
+
+???
+
+---
+
+# Mixture Models
+
+- Generative model – find p(X).
+- Assume form of data generating process
+- Mixture model assumption:
+  - Data is mixture of small number of known distributions.
+  - Each mixture component distribution can be learned "simply"
+  - Each point comes from one particular component
+- We learn the component parameters and weights of
+components
+
+` $$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k p_k(\mathbf{x} | \theta) $$ `
+
+???
+
+---
+
+# Gaussian Mixture Models
+
+- Each component is created by a Gaussian distribution.
+- There is a multinomial distribution over the components
+
+`$$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k) $$`
+
+- Non-convex optimization.
+- Alternately assign points to components and compute mean
+and variance (EM algorithm).
+- Initialized with K-means, random restarts
+
+???
+
+---
+
+`$$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k) $$`
+
+.center[
+![:scale 40%](images/gmm1.png)
+]
+
+.center[
+![:scale 40%](images/gmm2.png)
+]
+
+???
+
+---
+
+# Goals of Mixture Models
+
+- Create parametric density model.
+- Allows for testing how “likely” a new point is.
+- Clustering (each components is one cluster).
+- Feature Extraction
+
+.center[
+![:scale 80%](images/gmm2.png)
+]
+
+???
+
+---
+
+# Examples
+
+.wide-left-column[
+.smaller[
+```python
+from sklearn.mixture import GaussianMixture
+gmm = GaussianMixture(n_components=3)
+gmm.fit(X)
+print(gmm.means_)
+print(gmm.covariances_)
+```
+```
+[[-2.286 -4.674]
+ [-0.377  6.947]
+ [ 8.685  5.206]]
+[[[  6.651   2.066]
+  [  2.066  13.759]]
+ [[  5.467  -3.341]
+  [ -3.341   4.666]]
+ [[  1.481  -1.1  ]
+  [ -1.1     4.191]]]
+```
+]
+]
+
+
+.narrow-right-column[
+.center[
+![:scale 80%](images/mm_examples_1.png)
+]
+.center[
+![:scale 80%](images/mm_examples_2.png)
+]
+]
+
+???
+
+---
+
+# Probability Estimates
+
+.left-column[
+.smaller[
+```python
+gmm.predict_proba(X)
+```
+```
+array([[ 1.   ,  0.   ,  0.   ],
+       [ 0.   ,  0.   ,  1.   ],
+       ...,
+       [ 1.   ,  0.   ,  0.   ],
+       [ 0.001,  0.999,  0.   ]])
+```
+.center[
+![:scale 60%](images/prob_est1.png)
+]
+]
+]
+
+.right-column[
+.smaller[
+```python
+# log probability under the model
+print(gmm.score(X))
+print(gmm.score_samples(X).shape)
+```
+```
+-5.508
+(500,)
+```
+
+.center[
+![:scale 60%](images/prob_est2.png)
+]
+]
+]
+
+???
+
+---
+class: spacious
+
+# Notes
+
+- In high dimensions, covariance=”full” might not
+work.
+- Try covariance=”diagonal”, covariance=”tied”.
+- Restart with different initializations (default=1)
+
+???
+
+---
+class:spacious
+# GMM vs KMeans
+
+.left-column[
+.center[
+![:scale 97%](images/gmm_vs_kmeans_1.png)
+]
+]
+
+.right-column[
+.center[
+![:scale 100%](images/gmm_vs_kmeans_2.png)
+]
+]
+
+GMM can be more unstable, is more expensive to compute.
+
+???
+
+---
+
+# Bayesian Infinite Mixtures
+
+- Bayesian treatment:
+  - Add priors on mixture coefficients and Gaussians.
+  - Can “unselect” components if they don’t contribute.
+  - Possibly more robust
+- Infinite Mixtures:
+  - Replace Dirichlet Prior over mixture coefficients by Dirichlet Process.
+  - “automatically” finds number of components (based on parameter of
+the prior).
+- Both implemented in BayesianGaussianMixture
+- Use variational inference (as opposed to gibbs sampling)
+- In practice: need to specify upper limit of components
+
+???
+
+---
+
+.center[
+![:scale 100%](images/bim_1.png)
+]
+
+???
+
+---
+
+.center[
+![:scale 85%](images/bim_2.png)
+]
+
+http://scikit-learn.org/dev/auto_examples/cluster/plot_cluster_comparison.html
+
+???
+
+---
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
