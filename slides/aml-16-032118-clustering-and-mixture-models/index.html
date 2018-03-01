@@ -120,7 +120,7 @@ N/A
 
 class: center, middle
 
-## Clustering
+# Clustering
 
 ???
 
@@ -187,7 +187,7 @@ algorithm or user specified metrics.
 
 class: center, middle
 
-## Clustering Algorithms
+# Clustering Algorithms
 
 ???
 
@@ -195,7 +195,7 @@ class: center, middle
 
 class: center, middle
 
-## K-Means
+# K-Means
 
 ???
 
@@ -288,33 +288,36 @@ plt.gca().set_aspect("equal")
 
 # Limitations of K-Means
 
-.smaller[
-.left-column[
-![:scale 50%](images/kmeans_limitations_1.png) </br>
-Cluster boundaries are always in the
-middle of the centers
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-Only simple cluster shapes
+.center[
+![:scale 50%](images/kmeans_limitations_1.png)
 ]
-.right-column[
-![:scale 60%](images/kmeans_limitations_2.png) </br>
-Can’t model covariances well
 
-</br>
-</br>
-![:scale 70%](images/kmeans_limitations_3.png)
-
-]
-]
+- Cluster boundaries are always in the middle of the centers
 
 ???
 
-Note: An odd format to get the slide similar to old slide. Could be better.
+---
+
+# Limitations of K-Means
+
+.center[
+![:scale 50%](images/kmeans_limitations_2.png)
+]
+
+ - Can’t model covariances well
+
+???
+
+---
+# Limitations of K-Means
+
+.center[
+![:scale 50%](images/kmeans_limitations_3.png)
+]
+
+- Only simple cluster shapes
+
+???
 
 ---
 
@@ -364,7 +367,7 @@ MiniBatchKMeans
 
 class: center, middle
 
-## Agglomerative Clustering
+# Agglomerative Clustering
 
 ???
 
@@ -444,7 +447,7 @@ help with picking the number of clusters.
 ---
 class: center, middle
 
-## DBSCAN
+# DBSCAN
 
 ???
 
@@ -506,7 +509,7 @@ though).
 ---
 class: center, middle
 
-## (Gaussian) Mixture Models
+# (Gaussian) Mixture Models
 
 ???
 
@@ -585,15 +588,17 @@ gmm.fit(X)
 print(gmm.means_)
 print(gmm.covariances_)
 ```
-[[-2.286 -4.674] </br>
- [-0.377  6.947] </br>
- [ 8.685  5.206]] </br>
-[[[  6.651   2.066] </br>
-  [  2.066  13.759]] </br>
- [[  5.467  -3.341] </br>
-  [ -3.341   4.666]] </br>
- [[  1.481  -1.1  ] </br>
-  [ -1.1     4.191]]] </br>
+```
+[[-2.286 -4.674]
+ [-0.377  6.947]
+ [ 8.685  5.206]]
+[[[  6.651   2.066]
+  [  2.066  13.759]]
+ [[  5.467  -3.341]
+  [ -3.341   4.666]]
+ [[  1.481  -1.1  ]
+  [ -1.1     4.191]]]
+```
 ]
 ]
 
@@ -638,9 +643,10 @@ array([[ 1.   ,  0.   ,  0.   ],
 print(gmm.score(X))
 print(gmm.score_samples(X).shape)
 ```
-</br>
--5.50838313166 </br>
+```
+-5.508
 (500,)
+```
 
 .center[
 ![:scale 60%](images/prob_est2.png)
