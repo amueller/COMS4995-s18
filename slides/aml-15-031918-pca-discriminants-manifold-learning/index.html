@@ -136,7 +136,7 @@ class: centre,middle
 ---
 # PCA objective(s)
 Restricted rank reconstruction
-`$$\large\text{min}_{X', \text{rank}(X') = r}\|X-X'\|$$`
+`$$\large\min_{X', \text{rank}(X') = r}\|X-X'\|$$`
 .center[
 ![:scale 45%](images/pca-intuition.png)
 ]
@@ -246,8 +246,8 @@ print(lr.score(X_train, y_train))
 print(lr.score(X_test, y_test))
 ```
 ```
-0.992957746479
-0.944055944056
+0.993
+0.944
 ```
 ```python
 pca_lr = make_pipeline(StandardScaler(), PCA(n_components=2), LogisticRegression(C=10000))
@@ -256,8 +256,8 @@ print(pca_lr.score(X_train, y_train))
 print(pca_lr.score(X_test, y_test))
 ```
 ```
-0.960093896714
-0.923076923077
+0.961
+0.923
 ```
 ]
 ???
@@ -273,8 +273,8 @@ print(pca_lr.score(X_train, y_train))
 print(pca_lr.score(X_test, y_test))
 ```
 ```
-0.981220657277
-0.958041958042
+0.981
+0.958
 ```]
 
 ???
@@ -495,7 +495,7 @@ class:center
 ---
 # Summary
 - PCA good for visualization, exploring correlations
-- PCA can sometimes help with classi cation as regularization or for feature extraction.
+- PCA can sometimes help with classification as regularization or for feature extraction.
 - Manifold learning makes nice pictures.
 - LDA is a handy supervised alternative to PCA that also yields a rotation of the input space.
 ???
