@@ -114,8 +114,8 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
-
+FIXME - see inline fixmes
+VB GMM: explain better? better example? or leave out?
 ---
 
 class: center, middle
@@ -241,7 +241,7 @@ NP hard):
 
 .narrow-right-column[
 .center[
-![:scale 120%](images/kmeans_api.png)
+![:scale 100%](images/kmeans_api.png)
 ]
 ]
 
@@ -291,7 +291,7 @@ Clusters are Voronoi-diagrams of centers
 # Limitations of K-Means
 
 .center[
-![:scale 70%](images/kmeans_limitations_1.png)
+![:scale 60%](images/kmeans_limitations_1.png)
 ]
 
 - Cluster boundaries equidistant to centers
@@ -304,7 +304,7 @@ Clusters are Voronoi-diagrams of centers
 # Limitations of K-Means
 
 .center[
-![:scale 50%](images/kmeans_limitations_2.png)
+![:scale 60%](images/kmeans_limitations_2.png)
 ]
 
  - Can’t model covariances well
@@ -315,7 +315,7 @@ Clusters are Voronoi-diagrams of centers
 # Limitations of K-Means
 
 .center[
-![:scale 50%](images/kmeans_limitations_3.png)
+![:scale 60%](images/kmeans_limitations_3.png)
 ]
 
 - Only simple cluster shapes
@@ -380,14 +380,14 @@ class: center, middle
 
 - Start with all points in their own cluster.
 - Greedily merge the two most similar clusters.
-- Creates a hierarchical clustering from with cluster
-sizes from n_samples to single cluster.
 
 .center[
 ![:scale 80%](images/agglomerative_clustering.png)
 ]
 
 ???
+- Creates a hierarchical clustering from with cluster
+sizes from n_samples to single cluster.
 
 ---
 class: spacious
@@ -484,7 +484,7 @@ sample, start new cluster.
 ]
 
 ???
-
+FIXME horrible slide
 ---
 
 # Illustration
@@ -499,19 +499,16 @@ sample, start new cluster.
 
 # Pros and Cons
 
-- Allows complex cluster shapes
-- Can detect outliers
-- Needs two parameters to adjust, eps is hard to
-pick (can be done based on number of clusters
-though).
 - Can learn arbitrary cluster shapes
+- Can detect outliers
+- Needs two parameters to adjust
 
 .center[
-![:scale 40%](images/dbscan_pro_con.png)
+![:scale 50%](images/dbscan_pro_con.png)
 ]
 
 ???
-
+eps is related to number of clusters, so not much worse than kmeans or agglomerative
 ---
 class: center, middle
 
@@ -540,10 +537,9 @@ components
 
 # Gaussian Mixture Models
 
-- Each component is created by a Gaussian distribution.
-- There is a multinomial distribution over the components
-
 `$$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k) $$`
+
+`$$ k \sim \text{Mult}(\pi), x \sim \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k)$$`
 
 - Non-convex optimization.
 - Alternately assign points to components and compute mean
@@ -551,6 +547,10 @@ and variance (EM algorithm).
 - Initialized with K-means, random restarts
 
 ???
+- Each component is created by a Gaussian distribution.
+- There is a multinomial distribution over the components
+
+FIXME algorithm deserves a bit more explanation?
 
 ---
 
@@ -567,19 +567,21 @@ and variance (EM algorithm).
 ???
 
 ---
+class: spacious
+# Why Mixture Models?
+<br />
+<br />
 
-# Goals of Mixture Models
+- Clustering (components are clusters)
 
+- Parametric density model
+
+???
 - Create parametric density model.
 - Allows for testing how “likely” a new point is.
 - Clustering (each components is one cluster).
 - Feature Extraction
 
-.center[
-![:scale 80%](images/gmm2.png)
-]
-
-???
 
 ---
 
@@ -619,7 +621,7 @@ print(gmm.covariances_)
 ]
 
 ???
-
+FIXME need captions!
 ---
 
 # Probability Estimates
@@ -673,22 +675,13 @@ work.
 - Restart with different initializations (default=1)
 
 ???
-
+FIXME examples
 ---
-class:spacious
+class:center
 # GMM vs KMeans
 
-.left-column[
-.center[
-![:scale 100%](images/gmm_vs_kmeans_1.png)
-]
-]
-
-.right-column[
-.center[
-![:scale 100%](images/gmm_vs_kmeans_2.png)
-]
-]
+![:scale 47%](images/gmm_vs_kmeans_1.png)<br />
+![:scale 47%](images/gmm_vs_kmeans_2.png)
 
 
 ???
