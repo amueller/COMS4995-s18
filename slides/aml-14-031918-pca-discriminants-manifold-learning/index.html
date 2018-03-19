@@ -382,6 +382,7 @@ class: centre,middle
 ![:scale 90%](images/manifold-learning-structure.png)
 ???
 Learn underlying “manifold” structure, use for dimensionality reduction.
+# FIXME white padding on image?!
 ---
 # Pros and Cons
 - For visualization only
@@ -401,14 +402,35 @@ Learn underlying “manifold” structure, use for dimensionality reduction.
 ???
 ---
 # t-SNE
+
+`$$p_{j\mid i} = \frac{\exp(-\lVert\mathbf{x}_i - \mathbf{x}_j\rVert^2 / 2\sigma_i^2)}{\sum_{k \neq i} \exp(-\lVert\mathbf{x}_i - \mathbf{x}_k\rVert^2 / 2\sigma_i^2)}$$`
+--
+
+`$$p_{ij} = \frac{p_{j\mid i} + p_{i\mid j}}{2N}$$`
+
+--
+
+`$$q_{ij} = \frac{(1 + \lVert \mathbf{y}_i - \mathbf{y}_j\rVert^2)^{-1}}{\sum_{k \neq i} (1 + \lVert \mathbf{y}_i - \mathbf{y}_k\rVert^2)^{-1}}$$`
+
+--
+
+`$$KL(P||Q) = \sum_{i \neq j} p_{ij} \log \frac{p_{ij}}{q_{ij}}$$`
+
+???
+
 - Starts with a random embedding
 - Iteratively updates points to make “close” points close.
 - Global distances are less important, neighborhood counts.
 - Good for getting coarse view of topology.
 - Can be good for  nding interesting data point
-???
-class:split-40
+- t distribution heavy-tailed so no overcrowding.
+- (low perplexity: only close neighbors)
 ---
+class:center
+![:scale 63%](images/tsne-embeddings-digits.png)
+???
+---
+class:split-40
 .smaller[```python
 from sklearn.manifold import TSNE
 from sklearn.datasets import load_digits
@@ -425,34 +447,39 @@ X_pca = PCA(n_components=2).fit_transform(X)
 class:split-40
 # Tuning t-SNE perplexity
 .left-column[
-![:scale 60%](images/tsne-tuning-10.png)
-![:scale 60%](images/tsne-tuning-30.png)]
+![:scale 70%](images/tsne-tuning-2.png)
+![:scale 70%](images/tsne-tuning-5.png)]
 .right-column[
-![:scale 60%](images/tsne-tuning-100.png)
-![:scale 60%](images/tsne-tuning-300.png)]
-.reset-column[.center[
-http://distill.pub/2016/misread-tsne/
-]]
+![:scale 70%](images/tsne-tuning-30.png)
+![:scale 70%](images/tsne-tuning-300.png)]
 ???
 - Important parameter: perplexity
 - Intuitively: bandwidth of neighbors to consider 
-<br /> 
-(low perplexity: only close neighbors)
+- (low perplexity: only close neighbors)
+- smaller datasets try lower perplexity
+- authors say 30 always works well.
 
----
-class:center
-![:scale 63%](images/tsne-embeddings-digits.png)
-???
 ---
 class:spacious
 ![:scale 25%](images/tsne-moons.png) ![:scale 55%](images/tsne-perplexity.png)
 ???
 ---
+class: center, middle, spacious
+# Play around online
+
+http://distill.pub/2016/misread-tsne/
+???
+interactive javascript un
+---
 class: middle
 # Discriminant Analysis
 ???
 ---
+class: spacious
 # Linear Discriminant Analysis aka Fisher Discriminant
+
+`$$    P(y=k | X) = \frac{P(X | y=k) P(y=k)}{P(X)} = \frac{P(X | y=k) P(y = k)}{ \sum_{l} P(X | y=l) \cdot P(y=l)}$$`
+???
 - Generative model: assumes each class has Gaussian distribution
 - Covariances are the same for all classes.
 - Very fast: only compute means and invert covariance matrix (works well if n_features << n_samples)
@@ -460,9 +487,23 @@ class: middle
 - Imagine: transform space by covariance matrix, then nearest centroid.
 - No parameters to tune!
 - Don’t confuse with Latent Dirichlet Allocation (LDA)
-???
+
+--
+
+`$$ p(X | y=k) = \frac{1}{(2\pi)^n |\Sigma|^{1/2}}\exp\left(-\frac{1}{2} (X-\mu_k)^t \Sigma^{-1} (X-\mu_k)\right) $$`
+
+--
+
+`$$    \log\left(\frac{P(y=k|X)}{P(y=l | X)}\right) = 0 \Leftrightarrow (\mu_k-\mu_l)\Sigma^{-1} X = \frac{1}{2} (\mu_k^t \Sigma^{-1} \mu_k - \mu_l^t \Sigma^{-1} \mu_l) $$`
+
+
 ---
+class: spacious
 # Quadratic Discriminant Analysis
+.padding-top[
+`$$ p(X | y=k) = \frac{1}{(2\pi)^n |\Sigma_k|^{1/2}}\exp\left(-\frac{1}{2} (X-\mu_k)^t \Sigma_k^{-1} (X-\mu_k)\right) $$`
+]
+???
 - Each class is Gaussian, but separate covariance matrices!
 - More flexible (quadratic decision boundary), but less robust: have less points per covariance matrix.
 - Can’t think of it as transformation of the space.
@@ -481,7 +522,7 @@ class:center
 ???
 ---
 class:center
-# PCA vs Fisher Discriminants
+# PCA vs Linear Discriminants
 ![:scale 100%](images/pca-lda.png)
 ???
 ---
@@ -494,8 +535,9 @@ class:center
 - PCA good for visualization, exploring correlations
 - PCA can sometimes help with classification as regularization or for feature extraction.
 - Manifold learning makes nice pictures.
-- LDA is a handy supervised alternative to PCA that also yields a rotation of the input space.
+- LDA is a supervised alternative to PCA.
 ???
+LDA also  also yields a rotation of the input spacA
 ---
 class: center, middle
 
