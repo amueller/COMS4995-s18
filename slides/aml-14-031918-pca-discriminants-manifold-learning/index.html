@@ -116,9 +116,11 @@ class: center, middle
 
 ### W4995 Applied Machine Learning
 
-# PCA, Discriminants, Manifold Learning
+# Dimensionality Reduction
 
-03/05/18
+## PCA, Discriminants, Manifold Learning
+
+03/19/18
 
 Andreas C. Müller
 
@@ -135,52 +137,43 @@ class: centre,middle
 ???
 ---
 # PCA objective(s)
-Restricted rank reconstruction
 `$$\large\min_{X', \text{rank}(X') = r}\|X-X'\|$$`
 .center[
 ![:scale 45%](images/pca-intuition.png)
 ]
 ???
+Restricted rank reconstruction
 ---
 class:split-40
 # PCA objective(s)
-Find directions of maximum variance.
 .left-column[
 `$$\large\max\limits_{u_1 \in R^p, \| u_1 \| = 1} \text{var}(Xu_1)$$`
 `$$\large\max\limits_{u_1 \in R^p, \| u_1 \| = 1} u_1^T \text{cov} (X) u_1$$`
-Subtract projection onto u1, iterate to find more components. 
-<br />
-<br />
-Only well-defined up to sign / direction of arrow!]
+]
 .smaller.right-column[
-Find projection (onto one vector) that maximizes the variance observed in the data.
 .center[
 ![:scale 90%](images/pca-intuition.png)
 ]
 ]
 ???
+Find directions of maximum variance.
+(Find projection (onto one vector) that maximizes the variance observed in the data.)
+
+Subtract projection onto u1, iterate to find more components. 
+Only well-defined up to sign / direction of arrow!
 ---
-class: spacious
 # PCA Computation
-Center X (subtract mean).
-<br />
-In practice: Also scale to unit variance. 
-<br />
-Compute singular value decomposition:
-![:scale 90%](images/pca-computation.png)
+- Center X (subtract mean).
+- In practice: Also scale to unit variance. 
+- Compute singular value decomposition:
+![:scale 100%](images/pca-computation.png)
 ???
 ---
-class: center, spacious
-# Back to intuition
-![:scale 55%](images/pca-intuition.png)
-???
----
-class: center, spacious
+class: center
 # Whitening
-![:scale 80%](images/whitening.png)
-<br />
-Same as using PCA without whitening, then doing StandardScaler.
+![:scale 100%](images/whitening.png)
 ???
+Same as using PCA without whitening, then doing StandardScaler.
 ---
 class: split-40
 # PCA for Visualization
@@ -197,11 +190,11 @@ components = pca.components_
 plt.imshow(components.T)
 plt.yticks(range(len(cancer.feature_names)), cancer.feature_names)
 plt.colorbar()
-```]
-.right-column[
+```
 ![:scale 80%](images/pca-for-visualization-cancer-data.png)
-<br /> 
-![:scale 50%](images/pca-for-visualization-components-color-bar.png)]
+]
+.right-column[
+![:scale 90%](images/pca-for-visualization-components-color-bar.png)]
 ???
 ---
 class:spacious
@@ -214,9 +207,8 @@ plt.xlabel("first principal component")
 plt.ylabel("second principal component")
 ```]
 .center[![:scale 45%](images/scaled-pca-for-visualization-cancer-data.png)]
-<br />
-Imagine one feature with very large scale. Without scaling, it’s guaranteed to be the first principal component!
 ???
+Imagine one feature with very large scale. Without scaling, it’s guaranteed to be the first principal component!
 ---
 class:split-40
 # Inspecting components
@@ -227,14 +219,14 @@ plt.yticks(range(len(cancer.feature_names)), cancer.feature_names)
 plt.colorbar()
 ```]
 .smaller.left-column[
-![:scale 60%](images/inspecting-pca-scaled-components.png)
-<br />
-Direction (sign) of component is meaningless!]
+![:scale 70%](images/inspecting-pca-scaled-components.png)
+]
 
 .right-column[
 ![:scale 100%](images/inspecting-pca-scaled-components-2.png)]
 
 ???
+Direction (sign) of component is meaningless!
 ---
 # PCA for regularization
 .tiny-code[
@@ -278,6 +270,7 @@ print(pca_lr.score(X_test, y_test))
 ```]
 
 ???
+Could obviously also do cross-validation + grid-search
 ---
 class:split-40
 # Interpreting coefficients
@@ -285,10 +278,6 @@ class:split-40
 pca = pca_lr.named_steps['pca']
 lr = pca_lr.named_steps['logisticregression']
 coef_pca = pca.inverse_transform(lr.coef_)```]
-<br /> 
-Rotating coefficients back into input space. Makes sense because model is linear! Otherwise more tricky.
-<br />
-<br />
 .center[Comparing PCA + Logreg vs plain Logreg:]
 <br /> 
 .left-column[
@@ -298,18 +287,20 @@ Rotating coefficients back into input space. Makes sense because model is linear
 ![:scale 100%](images/logreg+noPCA.png)
 ]
 ???
+Rotating coefficients back into input space. Makes sense because model is linear! Otherwise more tricky.
 ---
 class:split-40
 # PCA is Unsupervised!
 .left-column[
 ![:scale 100%](images/pca-is-unsupervised-1.png)
 ]
+--
 .right-column[
 ![:scale 100%](images/pca-is-unsupervised-2.png)
 ]
+???
 Dropping the first two principal components will result in random model!
 All information is in the smallest principal component!
-???
 
 ---
 # PCA for feature extraction
@@ -325,31 +316,35 @@ from sklearn.neighbors import KNeighborsClassifier
 # split the data into training and test sets
 X_train, X_test, y_train, y_test = train_test_split(
     X_people, y_people, stratify=y_people, random_state=0)
+print(X_train.shape)
 # build a KNeighborsClassifier using one neighbor
 knn = KNeighborsClassifier(n_neighbors=1)
 knn.fit(X_train, y_train)
-print("Test set score of 1-nn: {:.2f}".format(knn.score(X_test, y_test)))
+knn.score(X_test, y_test)
 ```
-
 ```
-Test set score of 1-nn: 0.23
+(1547, 5655)
+0.23
 ```
+]
+--
+.tiny-code[
 ```python
 pca = PCA(n_components=100, whiten=True, random_state=0).fit(X_train)
 X_train_pca = pca.transform(X_train)
 X_test_pca = pca.transform(X_test)
-print("X_train_pca.shape: {}".format(X_train_pca.shape))
+X_train_pca.shape
 ```
 ```
-X_train_pca.shape: (1547, 100)
+(1547, 100)
 ```
 ```python
 knn = KNeighborsClassifier(n_neighbors=1)
 knn.fit(X_train_pca, y_train)
-print("Test set accuracy: {:.2f}".format(knn.score(X_test_pca, y_test)))
+knn.score(X_test_pca, y_test))
 ```
 ```
-Test set accuracy: 0.31
+0.31
 ```
 ]
 ???
@@ -384,10 +379,9 @@ class: centre,middle
 # Manifold Learning
 ???
 ---
-![:scale 80%](images/manifold-learning-structure.png)
-<br />
-Learn underlying “manifold” structure, use for dimensionality reduction.
+![:scale 90%](images/manifold-learning-structure.png)
 ???
+Learn underlying “manifold” structure, use for dimensionality reduction.
 ---
 # Pros and Cons
 - For visualization only
@@ -423,26 +417,28 @@ X = digits.data / 16.
 X_tsne = TSNE().fit_transform(X)
 X_pca = PCA(n_components=2).fit_transform(X)
 ```]
-.left-column[![:scale 90%](images/tsne-digits.png)]
-.right-column[![:scale 90%](images/pca-digits.png)]
+.left-column[![:scale 95%](images/pca-digits.png)]
+--
+.right-column[![:scale 95%](images/tsne-digits.png)]
 ???
 ---
 class:split-40
-# Tuning t-SNE
+# Tuning t-SNE perplexity
+.left-column[
+![:scale 60%](images/tsne-tuning-10.png)
+![:scale 60%](images/tsne-tuning-30.png)]
+.right-column[
+![:scale 60%](images/tsne-tuning-100.png)
+![:scale 60%](images/tsne-tuning-300.png)]
+.reset-column[.center[
+http://distill.pub/2016/misread-tsne/
+]]
+???
 - Important parameter: perplexity
 - Intuitively: bandwidth of neighbors to consider 
 <br /> 
 (low perplexity: only close neighbors)
 
-.left-column[
-![:scale 55%](images/tsne-tuning-10.png)
-![:scale 55%](images/tsne-tuning-30.png)]
-http://distill.pub/2016/misread-tsne/
-.right-column[
-![:scale 53%](images/tsne-tuning-100.png)
-![:scale 53%](images/tsne-tuning-300.png)]
-
-???
 ---
 class:center
 ![:scale 63%](images/tsne-embeddings-digits.png)
@@ -485,6 +481,7 @@ class:center
 ???
 ---
 class:center
+# PCA vs Fisher Discriminants
 ![:scale 100%](images/pca-lda.png)
 ???
 ---
