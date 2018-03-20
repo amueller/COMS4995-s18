@@ -458,7 +458,8 @@ class:spacious
 .tiny-code[
 ```python
 from sklearn.model_selection import cross_val_predict
-first_stage = make_pipeline(voting, reshaper)
+# take only probabilities of positive classes for more interpretable coefficients
+first_stage = make_pipeline(voting, FunctionTransformer(lambda X: X[:, 1::2]))
 transform_cv = cross_val_predict(first_stage, X_train, y_train, cv=10, method="transform")
 second_stage = LogisticRegression(C=100).fit(transform_cv, y_train)
 print(second_stage.coef_)
