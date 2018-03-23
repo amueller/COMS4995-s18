@@ -531,9 +531,20 @@ class: center, middle
 ---
 
 # Algorithm
-
 .left-column[
-.smaller[
+![:scale 100%](images/DBSCAN-Illustration.svg)
+]
+.right-column[
+- eps: neighborhood radius
+- min_samples: 4
+<br /><br />
+
+- A: Core
+- B, C: not core
+- N: noise
+
+]
+???
 - Clusters are formed by “core samples”
 - Sample is “core sample” if more than min_samples is
 within epsilon - “dense region”
@@ -544,18 +555,9 @@ add to cluster.
 samples (but don’t recurse)
 - If can’t reach any more points, pick another core
 sample, start new cluster.
-- Remaining points are labeled outliers
+- If newly picked point has not enough neighbors, label outlier
+- Outliers can later be relabeled to belong to a cluster.
 ]
-]
-
-.right-column[
-.center[
-![:scale 80%](images/dbscan_algo.png)
-]
-]
-
-???
-FIXME horrible slide
 ---
 
 # Illustration
@@ -565,7 +567,7 @@ FIXME horrible slide
 ]
 
 ???
-
+FIXME add epsilon circles to points?
 ---
 
 # Pros and Cons
