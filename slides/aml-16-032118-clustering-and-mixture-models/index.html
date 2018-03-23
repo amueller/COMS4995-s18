@@ -549,6 +549,7 @@ and variance (EM algorithm).
 ???
 - Each component is created by a Gaussian distribution.
 - There is a multinomial distribution over the components
+- non-convex, depends on initialization
 
 FIXME algorithm deserves a bit more explanation?
 
@@ -614,14 +615,15 @@ print(gmm.covariances_)
 .narrow-right-column[
 .center[
 ![:scale 80%](images/mm_examples_1.png)
-]
+]]
+--
+.narrow-right-column[
 .center[
 ![:scale 80%](images/mm_examples_2.png)
 ]
 ]
 
 ???
-FIXME need captions!
 ---
 
 # Probability Estimates
@@ -665,17 +667,13 @@ print(gmm.score_samples(X).shape)
 ???
 
 ---
-class: spacious
+# Covariance restrictions
 
-# Notes
-
-- In high dimensions, covariance=”full” might not
-work.
-- Try covariance=”diagonal”, covariance=”tied”.
-- Restart with different initializations (default=1)
-
+![:scale 100%](images/covariance_types.png)
 ???
-FIXME examples
+In high dimensions or with few samples, fitting the whole
+(n_features ** 2) covariance matrix can be unstable.
+We can restric it to be spherical, diagonal, tied or full.
 ---
 class:center
 # GMM vs KMeans
