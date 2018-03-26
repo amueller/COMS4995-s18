@@ -569,7 +569,10 @@ sample, start new cluster.
 ???
 FIXME add epsilon circles to points?
 ---
+![:scale 100%](images/dbscan_animation.gif)
 
+by David Sheehan <a href="https://dashee87.github.io/data%20science/general/Clustering-with-Scikit-with-GIFs/">dashee87.github.io</a>
+---
 # Pros and Cons
 
 - Can learn arbitrary cluster shapes
@@ -593,7 +596,11 @@ class: center, middle
 
 # Mixture Models
 
-- Generative model – find p(X).
+- Generative model: find p(X).
+
+` $$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k p_k(\mathbf{x} | \theta) $$ `
+
+???
 - Assume form of data generating process
 - Mixture model assumption:
   - Data is mixture of small number of known distributions.
@@ -602,10 +609,6 @@ class: center, middle
 - We learn the component parameters and weights of
 components
 
-` $$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k p_k(\mathbf{x} | \theta) $$ `
-
-???
-
 ---
 
 # Gaussian Mixture Models
@@ -613,18 +616,22 @@ components
 `$$ p(\mathbf{x}) = \sum_{j=1}^k \pi_k \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k) $$`
 
 `$$ k \sim \text{Mult}(\pi), x \sim \mathcal{N}(\mathbf{x}, \mu_k, \Sigma_k)$$`
-
-- Non-convex optimization.
-- Alternately assign points to components and compute mean
-and variance (EM algorithm).
-- Initialized with K-means, random restarts
-
 ???
 - Each component is created by a Gaussian distribution.
 - There is a multinomial distribution over the components
 - non-convex, depends on initialization
 
 FIXME algorithm deserves a bit more explanation?
+
+--
+
+- Non-convex optimization.
+- Initialized with K-means, random restarts.
+- Optimization (EM algorithm):
+    - Soft-assign points to components.
+    - Compute mean and variance of components.
+    - Iterate
+
 
 ---
 
