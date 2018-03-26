@@ -394,17 +394,22 @@ Clusters are Voronoi-diagrams of centers
 ???
 
 ---
+class: spacious
 
 # Computational Properties
 
-- Naive implementation:
-  - Each iteration computes n_cluster * n_samples
-distances.
+- Naive implementation (Lloyd's):
+  - n_cluster * n_samples distance calculations per iteration
+
+--
+
 - Fast exact algorithms:
-  - Elkans, Ying-Yang (compute cluster distances and
-use triangle inequality)
-- Many approximate algorithms, in particular minibatch K-Means: Much faster, online version
-(partial_fit)
+  - Elkan's, Ying-Yang
+
+--
+
+- Approximate algorithms:
+  - minibatch K-Means
 
 ???
 
@@ -412,18 +417,17 @@ use triangle inequality)
 
 # Initialization
 
-- Random centers fast but not great.
+- Random centers fast.
 - K-means++ (default):
 Greedily add “furthest way” point
 - By default K-means in sklearn does 10 random
 restarts with different initializations.
-- For large datasets, K-means++ initialization may take
-much longer than clustering.
-- Consider using random, in particular for
-MiniBatchKMeans
+- K-means++ initialization may take much longer than clustering.
 
 ???
-
+FIXME slide for kmeans++, computational cost of kmeans++
+- Consider using random, in particular for
+MiniBatchKMeans
 ---
 
 # Feature Extraction using K-Means
@@ -507,20 +511,26 @@ ward : [31 30 20 10  9]
 ???
 
 ---
-
+class: spacious
 # Pros and Cons
 
-- Can restrict to input “topology” given by any
-graph, for example neighborhood graph.
+- Can restrict to input “topology”  graph.
+--
+
 - Fast with sparse connectivity, otherwise O(log(n) n
 ** 2 )
-- Some linkage criteria an lead to very imbalanced
-cluster sized (can be pro or con)
-- Hierarchical clustering gives more holistic view, can
-help with picking the number of clusters.
+
+--
+
+- Some linkage criteria an lead to very imbalanced cluster sizes
+
+--
+
+- Hierarchical clustering gives more holistic view than single clustering.
 
 ???
-
+common graph: neighborhood in input space, neighborhood in image
+hierachy / dendrogram can help picking number of clusters.
 ---
 class: center, middle
 
@@ -790,7 +800,13 @@ the prior).
 ]
 
 ???
+---
+# Summary
 
+- KMeans: Classic, simple. Only convex cluster shapes, determined by cluster centers.
+- Agglomerative: Can take input topology into account, can produce hierarchy.
+- DBSCAN: Arbitrary cluster shapes, can detect outliers.
+- Gaussian Mixture Models: Can model covariance, soft clustering, can be hard to fit.
 ---
 
 .center[
