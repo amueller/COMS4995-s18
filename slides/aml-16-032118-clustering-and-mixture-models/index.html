@@ -123,14 +123,17 @@ class: center, middle
 # Clustering
 
 ???
+Today we're gonna talk about clustering and mixture models, mostly clustering algorithms.
+Next time we'll talk about evaluation of clustering.
 
+The ideas is that you start out with a bunch of data points, and the assumption is that they fall into groups or clusters, and the goal is to discover these underlying groups.
 ---
 .center[
 ![:scale 70%](images/cluster_intro_1.png)
 ]
 
 ???
-
+For example you want to find that these points belong to the same groups, and these, and these.
 ---
 .center[
 ![:scale 70%](images/cluster_intro_2.png)
@@ -144,6 +147,11 @@ class: center, middle
 ]
 
 ???
+The cluster algorithms have many parameters, and one of the most common ones is the number of clusters.
+In this dataset I drew here, it's quite obvious that there are three groups,
+and if it's this obvious there is usually a way to figure out how many groups
+there are. But for many algorithms, you need to specify the number of groups in
+advance.
 
 ---
 
@@ -154,21 +162,47 @@ class: center, middle
 ???
 Group into 4 clusters
 
----
 
+If you misspecify the number of groups you'd get something like this. We're not
+gonna talk about how to tune these parameters today, but in general you either
+need to have some prior knowledge about the data, or you need to inspect the
+results manually to see if the parameters are good.  We're gonna talk more
+about this next time.
+
+Often, you don't know the number of clusters, or if there are even clusters in
+the data. Very rarely is the case as clear as in this example.  Still there
+might be a reasonable grouping, so there is no "right" amount of clusters, but
+you might still get something out of the clustering.
+---
+class: spacious
 # Clustering
 
-- Group data into a partitioning:
-- Identify groups by assigning “cluster labels” to
-each data point.
+- Partition data into groups (clusters)
 - Points within a cluster should be “similar”.
 - Points in different cluster should be “different”.
-- Number of clusters might be pre-specified.
-- Notations of “similar” and “different” depend on
-algorithm or user specified metrics.
 
 ???
 
+
+So you want to partition the data, so that each data point belongs to exactly one of the groups.
+And you want to define groups such that points in the same cluster are similar, and points in different clusters are different.
+And the different algorithms define how they measure similarity in different ways.
+
+What we're really interested in is the partitioning of the data, though the way
+it's implemented in the scikit-learn API is that you predict an integer for
+each data point, so the clusters are numbered 0.. n_clusters -1. So we'd label
+these points with 0, these with one, and so on. But you should keep in mind
+that the number themselves have no meaning, renumbering the clusters
+corresponds to the same clustering.  We're really only interested in which
+points have the same labels and which points have different labels.
+
+
+- Number of clusters might be pre-specified.
+- Notations of “similar” and “different” depend on
+algorithm or user specified metrics.
+- Identify groups by assigning “cluster labels” to
+each data point.
+FIXME!
 ---
 
 # Goals of Clustering
@@ -176,13 +210,33 @@ algorithm or user specified metrics.
 - Data Exploration
   - Are there coherent groups ?
   - How many groups are there ?
+
+--
+
 - Data Partitioning
   - Divide data by group before further processing
+
+--
+
 - Unsupervised feature extraction
   - Derive features from clusters or cluster distances
 
 ???
+So why would we want to use a clustering algorithm? The main usage that I've
+come across is exporation of the data and understanding the structure of the
+data. Are there similar groups within the data? What are these? How many are
+there?  You can also use clustering to summarize or compress the data by
+representing each group by a single prototype, say the center.
+You can also use clustering if you want to divide your data, for example if you
+want to know different parts of the dataset behave fundamentally differently,
+so you could for example cluster a dataset, and then apply, say, a linear
+model, to each cluster. That would create a more powerfull model than just
+learning a linear model on the whole dataset.
 
+
+Another use is unsupervised feature extraction. You can also use clustering to derive a different representation of the data.
+
+An often cited application of clustering is customer segmentation, though I'd say data exploration or feature extraction are more common.
 ---
 
 class: center, middle
@@ -190,7 +244,7 @@ class: center, middle
 # Clustering Algorithms
 
 ???
-
+So now let's start discussing some of the standard algorithms.
 ---
 
 class: center, middle
@@ -198,7 +252,8 @@ class: center, middle
 # K-Means
 
 ???
-
+One of the most basic and most well-known ones is kmeans.
+Here k stands for the number of clusters you're trying to find.
 ---
 
 # K-Means Algorithm
@@ -221,7 +276,16 @@ class: center, middle
 ]
 
 ???
+The algorithm proceeds like this: you pick the number of clusters k,
+then you randomly pick k data points from the data, and declare those as cluster centers.
+Then, you label each data point according to which cluster center it is closest to.
+Finally, you recompute the cluster centers as the means of the clusters, and you iterate.
+The algorithm always converges, which is when the assignment of the points to the clusters doesn't change any more.
+Often you might want to not wait until full convergence, but just stop if the cluster centers don't move much between iterations.
 
+So you can see the green cluster center moving towards the red here until it has captured all the points in this group.
+Questions?
+Who has seen this before?
 ---
 class: spacious
 # Objective function for K-Means
@@ -234,6 +298,13 @@ $\mathbf{c}_{x_i}$ is the cluster center $c_j$ closest to $x_i$
 NP hard):
 - New data points can be assigned cluster membership based on existing clusters.
 
+Here is what this algorithms actually optimizes, the objective function.
+It's the sum of the distances of the cluster centers to all the points in the clusters.
+So the clusters centers are c_j and we want to find cluster centers such that the sum of the distance of each point to its closest cluster center is minimized.
+This is an NP hard problem, so we can't really hope to solve it exactly, but we can run the k-means algorithm that we just discussed, and it will provide us with some local minimum of this objective.
+There's a couple of nice things about this algorith;
+It's very easy to write down and understand. Each cluster is represented by a center, which makes things simple, and you can reassign any new point you observe to a cluster by just computing the distances to all the cluster centers.
+So in this case, if we build a model on some data that we collected, we can easily apply this clustering to new data points. That's not the case for all clustering algorithms.
 ---
 
 # K-Means API
