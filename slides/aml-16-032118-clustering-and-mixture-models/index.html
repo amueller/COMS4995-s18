@@ -114,8 +114,13 @@ class: center, middle
 Andreas C. Müller
 
 ???
-FIXME - see inline fixmes
+Today we're gonna talk about clustering and mixture models, mostly clustering algorithms.
+Next time we'll talk about evaluation of clustering.
+
 VB GMM: explain better? better example? or leave out?
+
+FIXME: order of slides weird, in particular K-Means (also agglomerative and others lol)
+FIXME: linkage explanation diagram
 ---
 
 class: center, middle
@@ -123,8 +128,7 @@ class: center, middle
 # Clustering
 
 ???
-Today we're gonna talk about clustering and mixture models, mostly clustering algorithms.
-Next time we'll talk about evaluation of clustering.
+
 
 The ideas is that you start out with a bunch of data points, and the assumption is that they fall into groups or clusters, and the goal is to discover these underlying groups.
 ---
@@ -478,23 +482,24 @@ class: spacious
 ]
 
 ???
-
+Done with scipy!
+FIXME dendrogram code!
 ---
 
 # Merging (Linkage) Criteria
 
-- Complete Link
+- Complete Linkage
   - Smallest maximum distance
 - Average Linkage
   - Smallest average distance between all pairs in the clusters
-- Single Link
+- Single Linkage
   - Smallest minimum distance
 - Ward (default in sklearn)
   - Smallest increase in within-cluster variance
   - Leads to more equally sized clusters.
 
 ???
-
+single linkage = cutting longest edge in minimum spanning tree.
 ---
 # Linkage Criteria
 
@@ -509,7 +514,7 @@ ward : [31 30 20 10  9]
 ```
 
 ???
-
+FIXME single linkage!
 ---
 class: spacious
 # Pros and Cons
@@ -801,12 +806,22 @@ the prior).
 
 ???
 ---
+class: some-space
 # Summary
 
-- KMeans: Classic, simple. Only convex cluster shapes, determined by cluster centers.
-- Agglomerative: Can take input topology into account, can produce hierarchy.
-- DBSCAN: Arbitrary cluster shapes, can detect outliers.
-- Gaussian Mixture Models: Can model covariance, soft clustering, can be hard to fit.
+- KMeans<br/>Classic, simple. Only convex cluster shapes, determined by cluster centers.
+--
+
+- Agglomerative<br/>Can take input topology into account, can produce hierarchy.
+--
+
+- DBSCAN<br/>Arbitrary cluster shapes, can detect outliers.
+--
+
+- Gaussian Mixture Models<br/>Can model covariance, soft clustering, can be hard to fit.
+
+???
+KMeans requires initialization, as do GMMs.
 ---
 
 .center[
