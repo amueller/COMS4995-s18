@@ -118,6 +118,7 @@ Which algorithm do we use, and how do we set the parameters?
 That's a bit more of an art than a science, unfortunately.
 But I want to give you some tools to do better than just guessing.
 
+FIXME illustration of clustering picking up on different concepts?
 ---
 class: center, middle
 
@@ -244,10 +245,10 @@ define derived metrics
 ---
 # Mutual Information
 
-`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}log\frac{P(i,j)}{P(i)P'(j)}$$`
+`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\log\frac{P(i,j)}{P(i)P'(j)}$$`
 
 `$$ =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
-log\frac{N|U_i \cap V_j|}{|U_i||V_j|}$$`
+\log\frac{N|U_i \cap V_j|}{|U_i||V_j|}$$`
 
 
 ???
@@ -274,14 +275,9 @@ the other partition, the mutual information is still one.
 
 `$$ NMI(U,V) = \frac{MI(U,V)}{\sqrt{H(U)H(V)}}$$`
 
-`$$ AMI = \frac{MI - E[MI]}{max(H(U),H(V))-E[MI]} $$`
-
----
-.center[![:scale 70%](images/ari_nmi_ami_digits.png)]
-- ARI, AMI and NMI for k-Means on “digits” dataset. ARI and AMI penalize too many clusters.
+`$$ AMI = \frac{MI - E[MI]}{\max(H(U),H(V))-E[MI]} $$`
 
 ???
-
 Similar to the rand index, the mutual information depends on the number
 of samples and size of the clusters, and it's common to adjust it for chance,
 to give it a more universal scale.
@@ -358,10 +354,10 @@ tricky to do in your head, but not that complicated really.
 ---
 # Adjusted Rand Index (ARI)
 
-`$$ AdjustedIndex = \frac{Index-ExpectedIndex}{MaxIndex-ExpectedIndex}  $$`
+`$$ AdjustedIndex = \frac{\text{Index}-\text{ExpectedIndex}}{\text{MaxIndex}-\text{ExpectedIndex}}$$`
 
-`$$ARI = \frac{\sum_{ij}\binom{n_{ij}}{2} - \frac{[\sum_{i}\binom{a_{i}}{2}\sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}
-{\frac{1}{2}[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}] -\frac{[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}$$`
+`$$ARI = \frac{\sum_{ij}\binom{n_{ij}}{2} - \frac{\sum_{i}\binom{a_{i}}{2}\sum_{j}\binom{b_{j}}{2}}{\binom{n}{2}}}
+{\frac{1}{2}\left(\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}\right) -\frac{\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}}{\binom{n}{2}}}$$`
 
 
 ???
@@ -389,6 +385,14 @@ The most common use of this is to compare a particular clustering to a ground-tr
 clustering.
 
 ---
+# KMeans on digits dataset
+.center[![:scale 70%](images/ari_nmi_ami_digits.png)]
+
+???
+- ARI, AMI and NMI for k-Means on “digits” dataset. ARI and AMI penalize too many clusters.
+
+
+---
 
 class:center,middle
 
@@ -400,7 +404,7 @@ class:center,middle
 # Silhouette Score
 
 - For each sample:
-`$$ s = \frac{b-a}{max(a,b)} $$`
+`$$ s = \frac{b-a}{\max(a,b)} $$`
 
 - a is the mean distance to samples in same cluster
 
@@ -415,65 +419,9 @@ class:center,middle
 ![:scale 60%](images/ari_silhoutte.png)]
 ???
 ---
-class: center,middle
-# Picking the number of clusters
 ???
+FIXME Calinski-Harabaz
 ---
-class: spacious
-# With metrics
-
-- Either cross-validation or evaluated on whole
-dataset.
-- If you have the label, why are your doing
-clustering?
-
-???
----
-.center[
-![:scale 80%](images/number_clusters.png)]
-
-- What's the right number of clusters?
-???
----
-
-# Silhouette Plots
-
-.center[
-![:scale 70%](images/silhouette_plots.png)
-]
-- Plot sorted silhouette score for each sample in each cluster
-
-- http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
-
-???
----
-.center[
-![:scale 50%](images/number_clusters_gaussians.png)
-]
-
-.left-column[What’s the right number of clusters?]
-.right-column[Generated as mixture of 10 Gaussians.
-So what?]
-
-???
-
----
-.center[
-![:scale 60%](images/more_silhouette_plots.png)
-]
-
-???
----
-# Digits Dataset
-
-.center[
-![:scale 80%](images/silhouette_digits.png)
-]
-
-???
-
----
-
 # Cluster Stability
 - For comparing clustering algorithms / parameters
 (with different number of clusters for example)
@@ -535,6 +483,65 @@ def cluster_stability(X, est, n_iter=20, random_state=None):
 .center[![:scale 80%](images/cluster_stability_2.png)]
 ???
 ---
+class: center,middle
+# Picking the number of clusters
+???
+---
+class: spacious
+# With metrics
+
+- Either cross-validation or evaluated on whole
+dataset.
+- If you have the label, why are your doing
+clustering?
+
+???
+---
+.center[
+![:scale 80%](images/number_clusters.png)]
+
+- What's the right number of clusters?
+???
+---
+
+# Silhouette Plots
+
+.center[
+![:scale 70%](images/silhouette_plots.png)
+]
+- Plot sorted silhouette score for each sample in each cluster
+
+- http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
+
+???
+---
+.center[
+![:scale 50%](images/number_clusters_gaussians.png)
+]
+
+.left-column[What’s the right number of clusters?]
+.right-column[Generated as mixture of 10 Gaussians.
+So what?]
+
+???
+
+---
+.center[
+![:scale 60%](images/more_silhouette_plots.png)
+]
+
+???
+---
+# Digits Dataset
+
+.center[
+![:scale 80%](images/silhouette_digits.png)
+]
+
+???
+
+---
+
 # Digits Dataset
 
 .center[
