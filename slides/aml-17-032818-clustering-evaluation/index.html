@@ -109,7 +109,7 @@ class: center, middle
 
 # Evaluating Clustering
 
-03/27/18
+03/28/18
 
 Andreas C. Müller
 ---
@@ -123,13 +123,14 @@ class: spacious
 
 - Compare clustering against "Ground Truth".
 
-- Usually classification datasets.
-
-- Often used for papers on clustering algorithms.
-
 - Unclear what the assumptions are.
 
 - Impossible to do in practice.
+
+???
+- Usually classification datasets.
+
+- Often used for papers on clustering algorithms.
 
 - Compare partitions, not labels!
 
@@ -162,6 +163,36 @@ class:spacious
 ]
 ???
 ---
+# Mutual Information
+
+`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}log\frac{P(i,j)}{P(i)P'(j)}$$`
+
+`$$ =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
+log\frac{N|U_i \cap V_j|}{|U_i||V_j|}$$`
+
+
+???
+- Between 0 and 1 but not normalized or adjusted. If V is subpartition of U still = 1
+
+---
+#NMI and AMI
+
+`$$ NMI(U,V) = \frac{MI(U,V)}{\sqrt{H(U)H(V)}}$$`
+
+`$$ AMI = \frac{MI - E[MI]}{max(H(U),H(V))-E[MI]} $$`
+
+---
+.center[![:scale 70%](images/ari_nmi_ami_digits.png)]
+- ARI, AMI and NMI for k-Means on “digits” dataset. ARI and AMI penalize too many clusters.
+
+???
+- Penalizes overpartitioning (via entropy)
+- Adjusts for chance – any two random partitions have
+expected AMI of 0
+FIXME haven't introduce ARI yet
+FIXME definition of entropy?
+FIXME use max both times?
+---
 # Rand Index
 
 - Computed of partitions C1, C2 over the same elements (say {0, …, n-1})
@@ -182,7 +213,7 @@ class:spacious
 `$$R([0,0,0,1],[1,1,0,0]) = R\{\{0,1\},\{2,3\}\},\{\{0,1\},\{2,3\}\}$$`
 `$$ = \frac{2+4}{6} = 1 $$`
 
-`$$R([0,1,0,1],[1,2,0,0]) = \{\{0,2\},\{1,3\}\},\{\{0,1\},\{2\},\{3\}\}$$`
+`$$R([0,1,0,1],[0,0,1,2]) = \{\{0,2\},\{1,3\}\},\{\{0,1\},\{2\},\{3\}\}$$`
 `$$ = \frac{0+3}{6} = \frac{1}{2} $$`
 
 ???
@@ -194,35 +225,12 @@ class:spacious
 `$$ARI = \frac{\sum_{ij}\binom{n_{ij}}{2} - \frac{[\sum_{i}\binom{a_{i}}{2}\sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}
 {\frac{1}{2}[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}] -\frac{[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}$$`
 
+
+???
 - Maximum of 1, 0 on expectation (can become negative!)
 [Don’t learn the formula]
-???
 ---
-# Mutual Information
 
-`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}log\frac{P(i,j)}{P(i)P'(j)}$$`
-
-`$$ =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
-log\frac{|U_i \cap V_j|}{|U_i||V_j|}$$`
-
-- Between 0 and 1 but not normalized or adjusted. If V is subpartition of U still = 1
-
-???
----
-#NMI and AMI
-
-`$$ NMI(U,V) = \frac{MI(U,V)}{\sqrt{H(U)H(V)}}$$`
-- Penalizes overpartitioning (via entropy)
-
-`$$ AMI = \frac{MI - E[MI]}{max(H(U),H(V))-E[MI]} $$`
-- Adjusts for chance – any two random partitions have
-expected AMI of 0
----
-.center[![:scale 70%](images/ari_nmi_ami_digits.png)]
-- ARI, AMI and NMI for k-Means on “digits” dataset. ARI and AMI penalize too many clusters.
-
-???
----
 class:center,middle
 
 #Unsupervised Evaluation
