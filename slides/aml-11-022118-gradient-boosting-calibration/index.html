@@ -102,7 +102,7 @@
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       .column:first-of-type {float:left}
       .column:last-of-type {float:right}
-      .remark-code, .remark-inline-code .tiny-code{
+      .tiny-code .remark-code, .remark-inline-code .tiny-code{
         font-size: 15px;
       }
       .split-40 .column:first-of-type {width: 50%}
@@ -123,17 +123,85 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
+We'll continue tree-based models, talking about boosting.
+Another ensemble technique called stacking.
+Finally, a technique called calibration that looks somewhat similar to ensembles
+but has the goal of obtaining good probability estimates from any classifier.
 
+FIXME: XGBOOST!!
+FIXME early stopping
+FIXME GBRT: better explain log-loss
+FIXME: add example of calibrated and inaccurate vs accurate but not calibrated!
+FIXME: calibration: what are the estimators fit to, and why does fitting it to 0 and 1 create probabilities in between
+
+Partial dependence plot. how is that different from feature importances.
+calibration curve plotting: bins are different for hist and calibration curve?
+slide 27: maybe put probabilities on x axis?
+calibration curve: blue histogram is number of total points, y axis not labeled
 ---
 class: centre,middle
 # Gradient Boosting
 ???
+Gradient boosting is one of the most successfull supervised machine learning methods in practice.
+It's often used in kaggle to win competition, it's used for credit scoring, it's one of the standard tools of the trade.
+It's one of the best of-the-shelf models
+A standard implementation that people use is XGBoost, but there's also an implementation in scikit-learn, and we'll talk about both of them.
+
+Last time we talked about Random forests, which builds many trees independently, each randomized in a different way, and then averages their predictions.
+Gradient boosting on the other hand builds trees one by one in a sequential manner, with each tree requiring the results of previous trees.
+Often, Gradient boosting is done with very small trees, or even decision stumps, which is trees of depth one, so a single split.
+
+---
+class: center, middle
+# Boosting (in General)
+
+???
+ - “Meta-algorithm” to create strong learners from weak learners.
+ - AdaBoost, GentleBoost, …
+ - Trees or stumps work best
+ - Gradient Boosting often the best of the bunch
+ - Many specialized algorithms (ranking etc)
+
+This is an instance of a more general family of models, called boosting models, which all iteratively
+try to improve a model built up from weak learners. Gradient boosting is this particular technique
+where we are trying to fit the residuals, and it's been found to work very well in practice, in particular
+if you're using shallow trees as the weak learners.
+In principle, you could use any model as a weak learner, but trees just work really well.
+
 ---
 
 # Gradient Boosting Algorithm
 
-0.1 \* ![:scale 22.5%](images/grad_boost_term_1.png) + 0.1\* ![:scale 22.5%](images/grad_boost_term_2.png) + 0.1\* ![:scale 20%](images/grad_boost_term_3.png)
+
+
+`$$ f_{1}(x) \approx y  $$`
+
+`$$ f_{2}(x) \approx y - f_{1}(x) $$`
+
+`$$ f_{3}(x) \approx y - f_{1}(x) - f_{2}(x)$$`
+
+--
+
+$y \approx$ ![:scale 22.5%](images/grad_boost_term_1.png) + ![:scale 22.5%](images/grad_boost_term_2.png) + ![:scale 20%](images/grad_boost_term_3.png) + ...
+???
+Let's look at the regression case first.
+We start by building a single tree f1 to try to predict the output y. But we
+strongly restrict f1, so it will be rather bad at predicting y.
+Next, we'll look at the residual of this first model, so y - f1(x).
+We now train a new model f2 to try and predict this residual, in other words to correct the mistakes made by f1.
+Again, this will be a very simple model, so it will still not be able to fix all errors.
+Then, we look at the residual of both of the models together, so y - f1(x) - f2(x), so the mistakes that could not be fixed by f2,
+and we build f3 to fix that, and so on.
+This is natural for regression. For classification this is not as clear.
+For binary classification you use log-loss, or rather you apply the logistic function to get a binary prediction, for multi-class
+you can use 1 vs rest.
+
+So we're sequentially building up a model using what's called "weak learners", small trees, and create a more
+powerful composite model.
+
+---
+# Gradient Boosting Algorithm
+
 
 
 `$$ f_{1}(x) \approx y  $$`
@@ -142,13 +210,26 @@ class: centre,middle
 
 `$$ f_{3}(x) \approx y - \alpha f_{1}(x) - \alpha f_{2}(x)$$`
 
+$y \approx \alpha$ ![:scale 22.5%](images/grad_boost_term_1.png) + $\alpha$ ![:scale 22.5%](images/grad_boost_term_2.png) + $\alpha$ ![:scale 20%](images/grad_boost_term_3.png) + ...
+<br />
+<br />
+Learning rate $\alpha, i.e. 0.1$
 
-
+???
 - Iteratively add regression trees to model
 - Use log loss for classification
 - Discount update by learning rate
-???
+
+FIXME plot for regression models 
 Come back to this
+---
+#GradientBoostingRegressor
+
+.center[
+![:scale 50%](images/grad_boost_regression_steps.png)
+]
+???
+
 ---
 #GradientBoostingClassifier
 
@@ -159,12 +240,11 @@ Come back to this
 
 ---
 class:spacious
-# Gradient Boosting
- - Many shallow trees
- - learning_rate ↔ n_estimators
- - Slower to train than RF (serial), but much faster to predict
- - Small model size
- - Uses one-vs-rest for multi-class!
+# Gradient Boosting Advantages
+
+- Slower to train than RF (serial), but much faster to predict
+- Small model size
+- Typically more accurate than Random Forests
 ???
 ---
 
@@ -179,40 +259,43 @@ class:spacious
 
 # Partial Dependence Plots
 - Marginal dependence of prediction on one or two features
+
 .smaller[
 ```python
-boston = load_boston()
-X_train, X_test, y_train, y_test = 
-train_test_split(boston.data, boston.target,random_state=0)
-gbrt = GradientBoostingRegressor().fit(X_train, y_train)
-gbrt.score(X_test, y_test)
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
-fig, axs = plot_partial_dependence(gbrt, X_train, np.argsort(gbrt.feature_import
-                                      ances_)[-6:],feature_names=boston.feature_name
-                                      s,n_jobs=3, grid_resolution=50)
-plt.tight_layout()
+boston = load_boston()
+X_train, X_test, y_train, y_test = train_test_split(
+    boston.data, boston.target,random_state=0)
+
+gbrt = GradientBoostingRegressor().fit(X_train, y_train)
+
+fig, axs = plot_partial_dependence(
+    gbrt, X_train, np.argsort(gbrt.feature_importances_)[-6:],
+    feature_names=boston.feature_names, n_jobs=3,
+    grid_resolution=50)
 ```
-```0.819```
 ]
 
 ???
 ---
+# Partial Dependence Plots
+
 .center[
-Plot depicting importance of features vs Partial Dependence
 ![:scale 70%](images/feat_impo_part_dep.png)
 ]
 
 ???
 ---
+# Bivariate Partial Dependence Plots
 .smaller[
 ```python
-fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_importances_)[-2:]],
-                                   feature_names=boston.feature_names,
-                                   n_jobs=3, grid_resolution=50)
+plot_partial_dependence(
+    gbrt, X_train, [np.argsort(gbrt.feature_importances_)[-2:]],
+    feature_names=boston.feature_names, n_jobs=3, grid_resolution=50)
 ```
 ]
 .center[
-![:scale 70%](images/feature_importance.png)
+![:scale 80%](images/feature_importance.png)
 ]
 
 ???
@@ -223,53 +306,65 @@ fig, axs = plot_partial_dependence(gbrt, X_train, [np.argsort(gbrt.feature_impor
 from sklearn.ensemble.partial_dependence import plot_partial_dependence
 for i in range(3):
     fig, axs = plot_partial_dependence(gbrt, X_train, range(4), n_cols=4,
-                                       feature_names=iris.feature_names, grid_resolution=50, label=i,
-                                       figsize=(8, 2))
-    fig.suptitle(iris.target_names[i])
-    for ax in axs: ax.set_xticks(())
-    for ax in axs[1:]: ax.set_ylabel("")
-    plt.tight_layout()
+                                       feature_names=iris.feature_names, grid_resolution=50, label=i)
 ```
 ]
 .center[
-![:scale 40%](images/feat_impo_part_dep_class.png)
-]
-.center[
-Feature Importance vs Partial Dependence (Classification)
+![:scale 50%](images/feat_impo_part_dep_class.png)
 ]
 ???
 
 ---
 
 # XGBoost
-- Efficient implementation of gradient boosting
+`conda install -c conda-forge xgboost`
+
+```python
+from xgboost import XGBClassifier
+xgb = XGBClassifier()
+xgb.fit(X_train, y_train)
+xgb.score(X_test, y_test))
+```
+
+- supports missing values
+- supports multi-core
+
+???
+- Efficient implementation of gradient boosting (5x sklearn)
 - Improvements on original algorithm
 - https://arxiv.org/abs/1603.02754
 - Adds l1 and l2 penalty on leaf-weights
 - Fast approximate split finding
-- Can pip-install
 - Scikit-learn compatible interface
 
+---
+class: spacious
+
+.center[
+![:scale 50%](images/xgboost_sklearn_bench.png)
+]
+- Exact splits ~5x faster on single core
+- Appoximate splits, multi-core -> more speed!
+- Also check lightGBM (even faster?)
+- Both have GPU support
+- https://github.com/szilard/GBM-perf
 ???
 ---
-class:spacious
-#Boosting in General
- - “Meta-algorithm” to create strong learners from weak learners.
- - AdaBoost, GentleBoost, …
- - Trees or stumps work best
- - Gradient Boosting often the best of the bunch
- - Many specialized algorithms (ranking etc)
+# Early stopping
 
+- Adding trees can lead to overfitting
+- Stop adding trees when validation accuracy stops increasing
+- Optional in XGBoost and sklearn >= 0.20 (development)
 
 ???
 ---
 class:spacious
 # When to use tree-based models
 - Model non-linear relationships
+- Doesn’t care about scaling, no need for feature engineering
 - Single tree: very interpretable (if small)
 - Random forests very robust, good benchmark
 - Gradient boosting often best performance with careful tuning
-- Doesn’t care about scaling, no need for feature engineering!
 
 ???
 ---
@@ -277,74 +372,66 @@ class: centre,middle
 # More ensembles: Stacking
 ???
 ---
-# Poor man’s Stacking
+# Simplified Stacking
  .tiny-code[
 ```python
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = make_moons(noise=.2, random_state=18)
+X, y = make_moons(noise=.4, random_state=16, n_samples=300)
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=0)
 
-voting = VotingClassifier([('logreg', LogisticRegression(C=100)),('tree', DecisionTreeClassifier(max_depth=3, random_state=0)),
-                          ('knn', KNeighborsClassifier(n_neighbors=3))],voting='soft')
+voting = VotingClassifier(
+   [('logreg', LogisticRegression(C=100)),
+    ('tree', DecisionTreeClassifier(max_depth=3)),
+    ('knn', KNeighborsClassifier(n_neighbors=3))],
+    voting='soft')
 voting.fit(X_train, y_train)
 lr, tree, knn = voting.estimators_
-print(("{:.2f} " * 4).format(voting.score(X_test, y_test),
-                             lr.score(X_test, y_test), tree.score(X_test, y_test),
-                             knn.score(X_test, y_test)))
 ```
 ]
 
-- Build multiple models
-- Train model on probabilities / scores produced
-
 .center[
-![:scale 60%](images/kneighbors_voting.png)
-]
-.center[
-KNeighborsClassifier with voting
+![:scale 90%](images/average_voting.png)
 ]
 
 ???
 ---
-# Poor man’s Stacking
- .tiny-code[
+# Simplified Stacking
+.tiny-code[
 ```python
-from sklearn.preprocessing import FunctionTransformer
-# we need to reshape the result from votingclassifier.transform because
-# of some annoyance in sklearn. We then keep only the probabilities of the positive classes!
-reshaper = FunctionTransformer(lambda X_: np.rollaxis(X_, 1).reshape(-1, 6)[:, 1::2], validate=False)
-stacking = make_pipeline(voting, reshaper,
-                         LogisticRegression(C=100))
+stacking = make_pipeline(voting, LogisticRegression(C=100))
 stacking.fit(X_train, y_train)
-stacking.score(X_train, y_train)
+print(stacking.score(X_train, y_train))
+print(stacking.score(X_test, y_test))
 ```
-```0.987```
+
+```
+0.90
+0.77
+```
+
+```python
+stacking.named_steps.logisticregression.coef_
+```
+
+```
+array([[ 0.487,  1.519,  3.686]])
+```
+]
+.left-column[
+<br />
+<br />
+![:scale 90%](images/average_voting.png)
+]
+.right-column[
+![:scale 90%](images/simple_stacking_result.png)
 ]
 
- .tiny-code[
-```python
-stacking.score(X_test, y_test)
-```
-```0.96```
-]
-.center[
-![:scale 20%](images/stacking_result.png)
-]
-.center[
-Result of Stacking
-]
 ???
 ---
 class:centre,middle
-.center[
-![:scale 80%](images/select_classif.png)
-]
-.center[
-Selecting the required classifier (3)
-]
 
- - Problem : Overfitting!
+## Problem : Overfitting!
 ???
 ---
 class:spacious
@@ -357,9 +444,6 @@ class:spacious
 ---
 # Hold-out estimates of Probabilities
 ![:scale 100%](images/holdout_estimate.png)
-.center[
-Role of hold out estimates
-]
 
 - Split 1 produces probabilities for Fold 1, split2 for Fold 2 etc.
 - Get a probability estimate for each data point!
@@ -374,27 +458,29 @@ Role of hold out estimates
 .tiny-code[
 ```python
 from sklearn.model_selection import cross_val_predict
-first_stage = make_pipeline(voting, reshaper)
+# take only probabilities of positive classes for more interpretable coefficients
+first_stage = make_pipeline(voting, FunctionTransformer(lambda X: X[:, 1::2]))
 transform_cv = cross_val_predict(first_stage, X_train, y_train, cv=10, method="transform")
 second_stage = LogisticRegression(C=100).fit(transform_cv, y_train)
 print(second_stage.coef_)
-[[ 2.09  -1.424  7.93 ]]
+```
+```
+[[ 2.192  1.402  1.012]]
 ```
 
 ```python
-second_stage.score(transform_cv, y_train)
-0.96```
+print(second_stage.score(transform_cv, y_train))
+print(second_stage.score(first_stage.transform(X_test), y_test))
+```
 
-```python
-second_stage.score(first_stage.transform(X_test), y_test)
-1.0
+```
+0.813
+0.800
 ```
 ]
 .center[
-![:scale 40%](images/holdout_stacking.png)
-![:scale 40%](images/holdout_naive.png)
-
-Hold out Stacking(left) and Naive Stacking (right)
+![:scale 40%](images/simple_stacking_result.png)
+![:scale 40%](images/stacking_result.png)
 ]
 
 
@@ -412,27 +498,29 @@ Predicting%20good%20probabilities%20with%20supervised%20learning.pdf">Source</a>
 
 ???
 ---
+class: spacious
 #Calibration curve (Reliability diagram)
-- For binary classification only
-- Given a predicted ranking or probability from a supervised classifier, bin predictions.
-- Plot fraction of data that’s positive in each bin.
-- Doesn’t require ground truth probabilities!
-
-.center[
-![:scale 30%](images/prob_table.png)
-![:scale 30%](images/calib_curve.png)
-
-Probability Table  and Calibration Curve 
+.left-column[
+![:scale 80%](images/prob_table.png)
+]
+.right-column[
+![:scale 80%](images/calib_curve.png)
 
 ]
 
 ???
+- For binary classification only
+- you can be calibrated and inaccurate!
+- Given a predicted ranking or probability from a supervised classifier, bin predictions.
+- Plot fraction of data that’s positive in each bin.
+- Doesn’t require ground truth probabilities!
+
 ---
 class: split-40
 # calibration_curve with sklearn
 
 Using subsample of covertype dataset
-.column[
+.left-column[
 .tiny-code[
 ```python
 from sklearn.linear_model import LogisticRegressionCV
@@ -467,7 +555,7 @@ print(y_test[:10])
 ]
 ]
 
-.column[
+.right-column[
 .tiny-code[
 ```python
 from sklearn.calibration import calibration_curve
@@ -479,8 +567,7 @@ print(prob_pred)
 [ 0.138  0.306  0.498  0.701  0.926]
 ```
 ]
-.center[![:scale 30%](images/predprob_positive.png)
-.center[Predicted Probability vs Fraction of Samples]
+.center[![:scale 70%](images/predprob_positive.png)
 ]
 ]
 
@@ -489,26 +576,23 @@ print(prob_pred)
 class:spacious
 #Influence of number of bins
 
-.center[![:scale 70%](images/influence_bins.png)]
-.center[Figure depicting influence of number of bins]
-- Works here because dataset is big
-- Might become very noisy for larger datasets
+.center[![:scale 100%](images/influence_bins.png)]
 
 ???
+- Works here because dataset is big
+- Might become very noisy for larger datasets
 ---
 class:spacious
 # Comparing Models
 
 .center[![:scale 90%](images/calib_curve_models.png)]
-.center[Calibration curve on different models]
 ???
 ---
 # Brier Score (for binary classification)
 
 - “mean squared error of probability estimate”
-`$$ BS = \frac{\sum_{t=1}^{n} (\widehat{p} (y)-y)^{2}}{n}$$`
+`$$ BS = \frac{\sum_{i=1}^{n} (\widehat{p} (y_i)-y_i)^{2}}{n}$$`
 
-.center[Different Models along with their Brier Score]
 .center[![:scale 70%](images/models_bscore.png)]
 ???
 ---
@@ -548,7 +632,6 @@ Need model for $f_{callib}$, need to decide what data to train it on.
 - Groups data into constant parts, steps in between.
 - Optimum monotone function on training data (wrt mse).
 .center[![:scale 40%](images/isotonic_regression.png)]
-.center[Isotonic fit vs Linear fit]
 
 ???
 ---
@@ -569,13 +652,12 @@ X_train_sub, X_val, y_train_sub, y_val = train_test_split(X_train, y_train,
 rf = RandomForestClassifier(n_estimators=100).fit(X_train_sub, y_train_sub)
 scores = rf.predict_proba(X_test)[:, 1]
 plot_calibration_curve(y_test, scores, n_bins=20)
-plt.title("{}: {:.3f}".format(clf.__class__.__name__, brier_score_loss(y_test, scores)))
 ```
 .center[![:scale 30%](images/random_forest.png)]
-.center[Random Forest Calibrated Classifier]
 ]
 ???
 ---
+# Calibration on Random Forest
 .smaller[
 ```python
 cal_rf = CalibratedClassifierCV(rf, cv="prefit", method='sigmoid')
@@ -586,19 +668,33 @@ cal_rf_iso = CalibratedClassifierCV(rf, cv="prefit", method='isotonic')
 cal_rf_iso.fit(X_val, y_val)
 scores_iso = cal_rf_iso.predict_proba(X_test)[:, 1]
 ```]
-???
----
-class: spacious
-# Calibration on Random Forest
 
 .center[![:scale 90%](images/types_callib.png)]
-.center[Comparison of different types of calibration]
 
 ???
 ---
 
-- Fixme add multi-class and calibration with cross-validation
+# Cross-validated Calibration
+
+```python
+cal_rf_iso_cv = CalibratedClassifierCV(rf, method='isotonic')
+cal_rf_iso_cv.fit(X_train, y_train)
+scores_iso_cv = cal_rf_iso_cv.predict_proba(X_test)[:, 1]
+```
+
+.center[![:scale 90%](images/types_callib_cv.png)]
+
 ???
+- kinda cheating, we have more trees now lol
+- we use all the data, get good probabilities. just time-consuming
+---
+# Multi-Class Calibration
+
+.center[![:scale 100%](images/multi_class_calibration.png)]
+
+???
+- per-class calibratoin
+- renormalization
 ---
 class: center, middle
 

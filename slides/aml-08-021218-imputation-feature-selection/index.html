@@ -114,7 +114,8 @@ class: center, middle
 Andreas C. Müller
 
 ???
-N/A
+FIXME random forest code is confusing because I tried to simplify it. Also: we haven't seen those yet?!
+FIXME mutual information needs better explanation
 
 ---
 class: spacious
@@ -308,9 +309,10 @@ class: smaller
 .smaller[
 ```python
 rf = RandomForestRegressor(n_estimators=100)
+X_imputed = X_train.copy()
 
 for i in range(10):
-    last = X_train.copy()
+    last = X_imputed.copy()
     for feature in range(X_train.shape[1]):
         inds_not_f = np.arange(X_train.shape[1])
         inds_not_f = inds_not_f[inds_not_f != feature]
