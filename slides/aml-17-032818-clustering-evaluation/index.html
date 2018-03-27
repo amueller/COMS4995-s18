@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Evaluating Clustering
+
+03/27/18
+
+Andreas C. Müller
+---
+class: center, middle
+
+# Evaluation Measures
+???
+---
+class: spacious
+#Supervised evaluation
+
+- Compare clustering against "Ground Truth".
+
+- Usually classification datasets.
+
+- Often used for papers on clustering algorithms.
+
+- Unclear what the assumptions are.
+
+- Impossible to do in practice.
+
+- Compare partitions, not labels!
+
+---
+class:spacious
+# Thinking in Partitions
+
+- Partition: set expressed as a union of disjoint sets.
+
+- Y=[0, 0, 0,  1, 1, 1] → C={{0, 1, 2}, {3, 4, 5}}
+
+- Y=[0, 1, 0, 1, 2, 2] → C={{0, 2}, {1, 3}, {4, 5}}
+
+- Partition given by [1, 0, 1, 0] and [0, 1, 0, 1] are the same!
+
+???
+---
+# Contingency Matrix
+
+- Same as confusion matrix – but different!
+
+- Rows correspond to one partition, columns the other.
+
+- Doesn’t need to be square.
+
+- Both of these mean identical partitions:
+
+.center[
+![:scale 20%](images/contingency_matrix_1.png)  ![:scale 20%](images/contingency_matrix_2.png)
+]
+???
+---
+# Rand Index
+
+- Computed of partitions C1, C2 over the same elements (say {0, …, n-1})
+
+`$$ R(C1,C2) = \frac{a+b}{\binom{n}{2}}  $$`
+
+- $a$ :  Number of pairs of points in the same set in C1 and in C2
+
+- $b$ : Number of pairs of points in the different sets in C1 and in C2
+
+- $\binom{n}{2}$ : Number of possible pairs
+
+- Between 0 and 1
+???
+---
+# Rand Index Example
+
+`$$R([0,0,0,1],[1,1,0,0]) = R\{\{0,1\},\{2,3\}\},\{\{0,1\},\{2,3\}\}$$`
+`$$ = \frac{2+4}{6} = 1 $$`
+
+`$$R([0,1,0,1],[1,2,0,0]) = \{\{0,2\},\{1,3\}\},\{\{0,1\},\{2\},\{3\}\}$$`
+`$$ = \frac{0+3}{6} = \frac{1}{2} $$`
+
+???
+---
+# Adjusted Rand Index (ARI)
+
+`$$ AdjustedIndex = \frac{Index-ExpectedIndex}{MaxIndex-ExpectedIndex}  $$`
+
+`$$ARI = \frac{\sum_{ij}\binom{n_{ij}}{2} - \frac{[\sum_{i}\binom{a_{i}}{2}\sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}
+{\frac{1}{2}[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}] -\frac{[\sum_{i}\binom{a_{i}}{2} + \sum_{j}\binom{b_{j}}{2}]}{\binom{n}{2}}}$$`
+
+- Maximum of 1, 0 on expectation (can become negative!)
+[Don’t learn the formula]
+???
+---
+# Mutual Information
+
+`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}log\frac{P(i,j)}{P(i)P'(j)}$$`
+
+`$$ =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
+log\frac{|U_i \cap V_j|}{|U_i||V_j|}$$`
+
+- Between 0 and 1 but not normalized or adjusted. If V is subpartition of U still = 1
+
+???
+---
+#NMI and AMI
+
+`$$ NMI(U,V) = \frac{MI(U,V)}{\sqrt{H(U)H(V)}}$$`
+- Penalizes overpartitioning (via entropy)
+
+`$$ AMI = \frac{MI - E[MI]}{max(H(U),H(V))-E[MI]} $$`
+- Adjusts for chance – any two random partitions have
+expected AMI of 0
+---
+.center[![:scale 70%](images/ari_nmi_ami_digits.png)]
+- ARI, AMI and NMI for k-Means on “digits” dataset. ARI and AMI penalize too many clusters.
+
+???
+---
+class:center,middle
+
+#Unsupervised Evaluation
+
+???
+---
+
+# Silhouette Score
+
+- For each sample:
+`$$ s = \frac{b-a}{max(a,b)} $$`
+
+- a is the mean distance to samples in same cluster
+
+- b is the mean distance to samples in nearest cluster
+
+- For whole clustering: average over all samples
+
+- Prefers compact clusters (like k-means) 
+???
+---
+.center[
+![:scale 60%](images/ari_silhoutte.png)]
+???
+---
+class: center,middle
+# Picking the number of clusters
+???
+---
+class: spacious
+# With metrics
+
+- Either cross-validation or evaluated on whole
+dataset.
+- If you have the label, why are your doing
+clustering?
+
+???
+---
+.center[
+![:scale 80%](images/number_clusters.png)]
+
+- What's the right number of clusters?
+???
+---
+
+# Silhouette Plots
+
+.center[
+![:scale 70%](images/silhouette_plots.png)
+]
+- Plot sorted silhouette score for each sample in each cluster
+
+- http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
+
+???
+---
+.center[
+![:scale 50%](images/number_clusters_gaussians.png)
+]
+
+.left-column[What’s the right number of clusters?]
+.right-column[Generated as mixture of 10 Gaussians.
+So what?]
+
+???
+
+---
+.center[
+![:scale 60%](images/more_silhouette_plots.png)
+]
+
+???
+---
+# Digits Dataset
+
+.center[
+![:scale 80%](images/silhouette_digits.png)
+]
+
+???
+
+---
+
+# Cluster Stability
+- For comparing clustering algorithms / parameters
+(with different number of clusters for example)
+
+- Clustering stability: an overview (U. v. Luxburg)
+https://arxiv.org/abs/1007.1075
+
+- Try multiple random samplings / perturbations
+
+- The configuration that yields the most consistent
+result among perturbations is best.
+
+???
+---
+
+# Stability Intuition
+
+.center[
+![:scale 80%](images/stability_intuition.png)
+]
+
+???
+---
+.smaller[
+```python
+def cluster_stability(X, est, n_iter=20, random_state=None):
+    labels = []
+    indices = []
+    for i in range(n_iter):
+        # draw bootstrap samples, store indices
+        sample_indices = rng.randint(0, X.shape[0], X.shape[0])
+        indices.append(sample_indices)
+        est = clone(est)
+        if hasattr(est, "random_state"):
+            # randomize estimator if possible
+            est.random_state = rng.randint(1e5)
+        X_bootstrap = X[sample_indices]
+        est.fit(X_bootstrap)
+        # store clustering outcome using original indices
+        relabel = -np.ones(X.shape[0], dtype=np.int)
+        relabel[sample_indices] = est.labels_
+        labels.append(relabel)
+    scores = []
+    for l, i in zip(labels, indices):
+        for k, j in zip(labels, indices):
+            # we also compute the diagonal which is a bit silly
+            in_both = np.intersect1d(i, j)
+            scores.append(adjusted_rand_score(l[in_both], k[in_both]))
+    return np.mean(scores)
+```]
+???
+---
+.center[![:scale 70%](images/cluster_stability.png)]
+- Outcome depends critically on initialization and n_iter.
+- This is kmeans++ with n_iter=10
+
+???
+---
+.center[![:scale 80%](images/cluster_stability_2.png)]
+???
+---
+# Digits Dataset
+
+.center[
+![:scale 70%](images/digits_dataset_ncluster_scan.png)
+]
+???
+---
+# Stability of different algorithms
+.center[
+![:scale 70%](images/cluster_stability_different_algos.png
+)
+]
+Digits Dataset
+---
+# Adult Dataset
+.center[
+![:scale 70%](images/adult_dataset_ncluster_scan.png)
+]
+???
+---
+# Labeled Faces in the Wild
+.center[![:scale 70%](images/labfaces_ncluster_scan.png)]
+- With PCA, 100 components. Without whitening: no stable clusters!
+
+???
+---
+class:spacious
+#Qualitative Evaluation(aka eyeballing)
+
+- Look at low-dim visualization
+
+- Look at individual points
+
+- Look at cluster centers (if available)
+
+???
+---
+# Digits
+
+.center[
+![:scale 100%](images/digits_eyeball.png)
+]
+???
+---
+# K-Means cluster centers
+
+.center[
+![:scale 70%](images/kmeans_cluster_centers_digits.png)
+]
+
+.smaller[
+```python
+fig, axes = plt.subplots(2, 5, subplot_kw={'xticks': (), 'yticks': ()},
+                        figsize=(10, 5))
+km = KMeans(n_clusters=10).fit(digits.data)
+for ax, center in zip(axes.ravel(), km.cluster_centers_):
+    ax.imshow(center.reshape(8, 8), cmap='gray_r')
+fig.suptitle("K-Means cluster centers")
+```]
+???
+---
+
+# Agglomerative Clusters
+.center[
+![:scale 90%](images/agglomerative_clusters.png)
+]
+???
+---
+# DBSCAN Clusters
+.center[
+![:scale 70%](images/dbscan_clusters.png)
+]
+
+- Each column corresponds to one of 10 clusters, “first” 5 samples are shown.
+- Number on top gives clusters size
+???
+---
+
+#For feature extraction
+
+.smaller[
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+
+km = KMeans(n_init=1, init="random")
+pipe = make_pipeline(km, LogisticRegression())
+
+param_grid = {'kmeans__n_clusters': [10, 50, 100, 200, 500]}
+grid = GridSearchCV(pipe, param_grid, cv=5, verbose=True)
+grid.fit(X, y_people)
+```]
+
+.center[
+![:scale 40%](images/param_kmeans_nclusters.png)
+]
+
+???
+---
+class: spacious
+# So what is n_clusters?
+
+- As preprocessing
+  
+  – The one that makes the whole pipeline work best.
+  
+  – Larger is often better.
+
+- For exploratory analysis:
+  
+  – The one that tells you the most about the data.
+
+- For most datasets, there is no “correct” number of
+clusters.
+???
+---
+class:center,middle
+
+If you want semantics from clustering,
+you need manual confirmation.
+
+Clustering might not pick up
+on what you thought it would.
+???
+---
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
