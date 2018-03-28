@@ -293,7 +293,7 @@ define derived metrics
 ---
 # Mutual Information
 
-`$$\Large MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\log\frac{P(i,j)}{P(i)P'(j)}$$`
+`$$\Large MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}P(i,j)\log\frac{P(i,j)}{P(i)P'(j)}$$`
 
 `$$\Large =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
 \log\frac{N|U_i \cap V_j|}{|U_i||V_j|}$$`
@@ -304,7 +304,9 @@ define derived metrics
 
 A very common metric is mutual information. which is the mutual information
 of the discrete distributions given by the partitions (or the contingency table).
+
 FIXME unify notation (second equation only?)
+FIXME define P(i), P(i, j)
 Mutual information is a standard information theoretic measure for relating
 two distributions, providing a measure of how interdependent they are.
 There we just create distributions corresponding to the partitions and compare those.
@@ -338,11 +340,13 @@ so zero on expecation.
 These two usually behave pretty similarly. There is other variants of NMI,
 for example dividing by the maximum, as I did here for AMI.
 
+
 - Penalizes overpartitioning (via entropy)
 - Adjusts for chance – any two random partitions have
 expected AMI of 0
 FIXME definition of entropy?
 FIXME use max both times?
+FIXME explain expectation better!
 ---
 # Rand Index
 
