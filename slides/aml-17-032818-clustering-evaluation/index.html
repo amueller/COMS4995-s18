@@ -120,6 +120,8 @@ But I want to give you some tools to do better than just guessing.
 
 FIXME illustration of clustering picking up on different concepts?
 FIXME talk about http://datamining.rutgers.edu/publication/internalmeasures.pdf
+FIXME Calinski-Harabaz
+FIXME S_Dbw? https://pdfs.semanticscholar.org/dc44/df745fbf5794066557e52074d127b31248b2.pdf
 ---
 class: center, middle
 
@@ -211,18 +213,56 @@ and 1,0,1,0 are the same, so if you compare these two clusterings,
 they should be regarded as exactly the same clustering.
 ---
 # Contingency Matrix
+For clusterings `$X_i$` and `$Y_j$`, `$n_{ij}=|X_i \cap Y_j|$`
 
-- Same as confusion matrix – but different!
+`$$
+\begin{array}{c|cccc|c}
+    {{} \atop X}\!\diagdown\!^Y &
+    Y_1&
+    Y_2&
+    \ldots&
+    Y_s&
+    \text{Sums}
+    \\
+    \hline
+    X_1&
+    n_{11}&
+    n_{12}&
+    \ldots&
+    n_{1s}&
+    a_1
+    \\
+    X_2&
+    n_{21}&
+    n_{22}&
+    \ldots&
+    n_{2s}&
+    a_2
+    \\
+    \vdots&
+    \vdots&
+    \vdots&
+    \ddots&
+    \vdots&
+    \vdots
+    \\
+    X_r&
+    n_{r1}&
+    n_{r2}&
+    \ldots&
+    n_{rs}&
+    a_r
+    \\
+    \hline
+    \text{Sums}&
+    b_1&
+    b_2&
+    \ldots&
+    b_s&
+    \end{array}$$`
+    
 
-- Rows correspond to one partition, columns the other.
 
-- Doesn’t need to be square.
-
-- Both of these mean identical partitions:
-
-.center[
-![:scale 20%](images/contingency_matrix_1.png)  ![:scale 20%](images/contingency_matrix_2.png)
-]
 ???
 The most basic way to compare two different clustering results, say yours
 and the ground truth, or two different algorithms, is the contingency matrix.
@@ -239,16 +279,23 @@ mean that the two clusterings produce the same partition, i.e. they are identica
 Also, contingency matrices do not need to be square. If you run clustering
 on a dataset, you don't usually know the number of clusters so you want
 to compare different clusterings with different numbers of clusters.
-FIXME (needs formula / example)
+FIXME needs example
 
 Now that we have this basic representation of cluster overlap, we can
 define derived metrics 
 ---
+# Contingency Matrix
+- Both of these mean identical partitions:
+
+.center[
+![:scale 20%](images/contingency_matrix_1.png) ![:scale 20%](images/contingency_matrix_2.png)
+]
+---
 # Mutual Information
 
-`$$MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\log\frac{P(i,j)}{P(i)P'(j)}$$`
+`$$\Large MI(U,V)=\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\log\frac{P(i,j)}{P(i)P'(j)}$$`
 
-`$$ =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
+`$$\Large =\sum\limits_{i=1}^{|U|}\sum\limits_{j=1}^{|V|}\frac{|U_i \cap V_j|}{N}
 \log\frac{N|U_i \cap V_j|}{|U_i||V_j|}$$`
 
 
@@ -265,7 +312,6 @@ There we just create distributions corresponding to the partitions and compare t
 We can rewrite this uing the contingency matrix, the probability P(i, j) is
 just the the entry n_ij divided by the number of samples, and P(i) and P(j) are the
 row and column sums divided by the number of samples.
-FIXME missing N in numerator!!
 
 Mutual information is also always between zero and one, with one being
 perfect information. However, if one partition is a sub-partitioning of
@@ -295,19 +341,18 @@ for example dividing by the maximum, as I did here for AMI.
 - Penalizes overpartitioning (via entropy)
 - Adjusts for chance – any two random partitions have
 expected AMI of 0
-FIXME haven't introduce ARI yet
 FIXME definition of entropy?
 FIXME use max both times?
 ---
 # Rand Index
 
-- Computed of partitions C1, C2 over the same elements (say {0, …, n-1})
+- Computed of partitions U, V over the same elements (say {0, …, n-1})
 
-`$$ R(C1,C2) = \frac{a+b}{\binom{n}{2}}  $$`
+`$$ R(U, V) = \frac{r+s}{\binom{n}{2}}  $$`
 
-- $a$ :  Number of pairs of points in the same set in C1 and in C2
+- $r$ :  Number of pairs of points in the same set in U and in V
 
-- $b$ : Number of pairs of points in the different sets in C1 and in C2
+- $s$ : Number of pairs of points in the different sets in U and in V
 
 - $\binom{n}{2}$ : Number of possible pairs
 
@@ -338,17 +383,16 @@ For a second example, let's look at these two partitions, 0,1,0,1 and 1,2,0,0.
 Here there's no pair of points that is in the same set in both of them.
 There are three pairs of points that are in different sets in both of them,
 (1,2), (2,3) and (0,3). So the rand index is 3/6, so 1/2.
-FIXME should be 0,0,1,2!!!
 
 Alright, so the rand index is about matching pairs of points, which is slightly
 tricky to do in your head, but not that complicated really.
 ---
 # Rand Index Example
 
-`$$R([0,0,0,1],[1,1,0,0]) = R\{\{0,1\},\{2,3\}\},\{\{0,1\},\{2,3\}\}$$`
+`$$R([0,0,1,1],[1,1,0,0]) = R\left(\{\{0,1\},\{2,3\}\},\{\{0,1\},\{2,3\}\} \right)$$`
 `$$ = \frac{2+4}{6} = 1 $$`
 
-`$$R([0,1,0,1],[0,0,1,2]) = \{\{0,2\},\{1,3\}\},\{\{0,1\},\{2\},\{3\}\}$$`
+`$$R([0,1,0,1],[0,0,1,2]) = R(\{\{0,2\},\{1,3\}\},\{\{0,1\},\{2\},\{3\}\})$$`
 `$$ = \frac{0+3}{6} = \frac{1}{2} $$`
 
 ???
@@ -416,26 +460,75 @@ class:center,middle
 - Prefers compact clusters (like k-means) 
 ???
 ---
+
 .center[
 ![:scale 60%](images/ari_silhoutte.png)]
 ???
+
 ---
+.center[
+![:scale 80%](images/number_clusters.png)]
+
+- What's the right number of clusters?
 ???
-FIXME Calinski-Harabaz
+---
+
+# Silhouette Plots
+
+.center[
+![:scale 70%](images/silhouette_plots.png)
+]
+- Plot sorted silhouette score for each sample in each cluster
+
+- http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
+
+???
+---
+.center[
+![:scale 60%](images/number_clusters_gaussians.png)
+]
+
+
+
+???
+What’s the right number of clusters?
+Generated as mixture of 10 Gaussians.
+So what?
+---
+.center[
+![:scale 60%](images/more_silhouette_plots.png)
+]
+
+???
+---
+# Digits Dataset
+
+.center[
+![:scale 80%](images/silhouette_digits.png)
+]
+
+???
+
+
 ---
 # Cluster Stability
-- For comparing clustering algorithms / parameters
-(with different number of clusters for example)
+
+
+
+- Try multiple random samplings / perturbations
+- Measure consistency
 
 - Clustering stability: an overview (U. v. Luxburg)
 https://arxiv.org/abs/1007.1075
+
+???
+- For comparing clustering algorithms / parameters
+(with different number of clusters for example)
 
 - Try multiple random samplings / perturbations
 
 - The configuration that yields the most consistent
 result among perturbations is best.
-
-???
 ---
 
 # Stability Intuition
@@ -473,8 +566,11 @@ def cluster_stability(X, est, n_iter=20, random_state=None):
             scores.append(adjusted_rand_score(l[in_both], k[in_both]))
     return np.mean(scores)
 ```]
+
 ???
+FIXME too complex to show
 ---
+
 .center[![:scale 70%](images/cluster_stability.png)]
 - Outcome depends critically on initialization and n_iter.
 - This is kmeans++ with n_iter=10
@@ -484,64 +580,9 @@ def cluster_stability(X, est, n_iter=20, random_state=None):
 .center[![:scale 80%](images/cluster_stability_2.png)]
 ???
 ---
-class: center,middle
-# Picking the number of clusters
-???
----
-class: spacious
-# With metrics
 
-- Either cross-validation or evaluated on whole
-dataset.
-- If you have the label, why are your doing
-clustering?
 
-???
----
-.center[
-![:scale 80%](images/number_clusters.png)]
 
-- What's the right number of clusters?
-???
----
-
-# Silhouette Plots
-
-.center[
-![:scale 70%](images/silhouette_plots.png)
-]
-- Plot sorted silhouette score for each sample in each cluster
-
-- http://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
-
-???
----
-.center[
-![:scale 50%](images/number_clusters_gaussians.png)
-]
-
-.left-column[What’s the right number of clusters?]
-.right-column[Generated as mixture of 10 Gaussians.
-So what?]
-
-???
-
----
-.center[
-![:scale 60%](images/more_silhouette_plots.png)
-]
-
-???
----
-# Digits Dataset
-
-.center[
-![:scale 80%](images/silhouette_digits.png)
-]
-
-???
-
----
 
 # Digits Dataset
 
@@ -550,12 +591,11 @@ So what?]
 ]
 ???
 ---
-# Stability of different algorithms
+# Stability on Digits Dataset
 .center[
 ![:scale 70%](images/cluster_stability_different_algos.png
 )
 ]
-Digits Dataset
 ---
 # Adult Dataset
 .center[
@@ -610,14 +650,14 @@ fig.suptitle("K-Means cluster centers")
 ![:scale 90%](images/agglomerative_clusters.png)
 ]
 ???
+- Each column corresponds to one of 10 clusters, “first” 5 samples are shown.
+- Number on top gives clusters size
 ---
 # DBSCAN Clusters
 .center[
-![:scale 70%](images/dbscan_clusters.png)
+![:scale 90%](images/dbscan_clusters.png)
 ]
 
-- Each column corresponds to one of 10 clusters, “first” 5 samples are shown.
-- Number on top gives clusters size
 ???
 ---
 
