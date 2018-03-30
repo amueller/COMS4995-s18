@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# NMF; Outlier detection
+
+04/02/18
+
+Andreas C. Müller
+???
+---
+class: center, middle
+
+# Non-Negative Matrix Factorization
+???
+---
+#Matrix Factorization
+
+<br>
+
+.center[
+![:scale 80%](images/matrix_factorization.png)
+]
+
+???
+---
+#PCA
+
+<br>
+
+.center[
+![:scale 80%](images/pca.png)
+]
+???
+---
+class:spacious
+# Other Matrix Factorizations
+    
+- PCA: principal components orthogonal, minimize
+squared loss
+
+- Sparse PCA: components orthogonal and sparse
+
+- ICA: independent components
+
+- Non-negative matrix factorization (NMF):
+latent representation and latent features are nonnegative.
+
+???
+---
+#NMF
+
+<br>
+
+.center[
+![:scale 80%](images/nmf.png)
+]
+
+???
+---
+# Why NMF?
+
+- Data points are composed into positive sums
+
+- Positive weights can be easier to interpret
+
+- No “cancellation” like in PCA
+
+- No sign ambiguity like in PCA
+
+- Can learn over-complete representation (n_components > n_features) by asking for sparsity (in either W or H)
+
+- Can be viewed as “soft clustering”: each point is
+positive linear combination of weights.
+
+???
+---
+.center[
+PCA (ordered by projection, not eigenvalue)
+
+![:scale 70%](images/pca_projection.png)
+]
+
+.center[
+NMF (ordered by hidden representation)
+![:scale 70%](images/nmf_hid_rep.png)
+]
+
+???
+---
+# Downsides of NMF
+
+- Can only be applied to non-negative data
+
+- Whether components are interpretable is hit/miss
+
+- Non-convex optimization, requires initialization
+
+- Can be slow on large datasets
+
+- Not orthogonal
+
+.center[
+NMF (ordered by hidden representation)
+![:scale 60%](images/nmf_downsides.png)
+]
+???
+---
+
+.center[
+NMF with 20 components on MNIST
+
+![:scale 60%](images/nmf_20_mnist.png)
+]
+
+.center[
+NMF with 5 components on MNIST
+
+![:scale 60%](images/nmf_5_mnist.png)
+]
+
+???
+---
+class:spacious
+# Applications of NMF
+
+- Text analysis (next week)
+
+- Signal processing
+
+- Speech and Audio (see
+https://librosa.github.io/librosa/generated/librosa.decompose.decompose.html#
+librosa.decompose.decompose
+)
+
+- Source separation
+
+- Gene expression analysis
+
+
+???
+---
+class:center,middle
+#Outlier Detection
+
+???
+---
+#Motivation
+
+- Find points that are “different” within the training set (and in the future).
+
+- “Novelty detection” - no outliers in the training set.
+
+- Outliers are not labeled! (otherwise it’s just imbalanced classification)
+
+- Often used interchangeably in practice.
+
+.left-column[
+![:scale 100%](images/outlier_detection.png)
+]
+
+.right-column[
+![:scale 100%](images/novelty_detection.png)
+]
+
+
+???
+---
+class:spacious
+# Applications
+
+-  Fraud detection (credit cards, click fraud, ...)
+
+-  Network failure detection
+
+- Intrusion detection in networks
+
+- Defect detection (engineering etc…)
+
+- News? Intelligence?
+
+???
+---
+class:spacious
+# Basic idea
+
+- Model data distribution
+
+- For outlier detection: be robust in modelling
+
+- Nonparametric or parametric method
+
+- Apply at test-time, threshold likelihood.
+
+- Task is generally ill-defined (unless you know the
+real data distribution).
+???
+---
+#Elliptic Envelope
+
+- Gaussian model
+
+- Fit robust covariance matrix and mean
+
+.center[
+![:scale 60%](images/elliptic_envelope.png)
+]
+
+???
+---
+#Elliptic Envelope
+
+- Only works if Gaussian assumption is reasonable
+
+- Preprocessing with PCA might help sometimes.
+
+.smaller[
+```python
+from sklearn.covariance import EllipticEnvelope
+ee = EllipticEnvelope(contamination=.1).fit(X)
+pred = ee.predict(X)
+print(pred)
+print(np.mean(pred == -1))
+```]
+
+.smaller[
+```python
+[ 1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+ -1  1  1  1 -1 -1  1 -1  1  1 -1  1 -1 -1 -1  1  1 -1 -1 -1 -1  1 -1  1  1]
+0.104
+
+```]
+
+???
+---
+.center[
+![:scale 90%](images/elliptic_envelope_plot.png)
+]
+
+???
+---
+#Kernel Density
+
+- Non-parametric density model
+
+- Gaussian blob on each data point
+
+- Need to adjust kernel bandwidth
+
+- Doesn’t work well in high dimensions
+
+- Unsupervised model, so how to pick?
+
+
+.left-column[
+![:scale 80%](images/kernel_density_1.png)
+]
+
+.right-column[
+![:scale 80%](images/kernel_density_2.png)
+]
+
+???
+---
+
+.smaller[
+```python
+kde = KernelDensity(bandwidth=3)
+kde.fit(X_train_noise)
+pred = kde.score_samples(X_train_noise)
+pred = (pred > np.percentile(pred, 10)).astype(int)
+```]
+
+.center[
+![:scale 70%](images/kernel_density_bw3.png)
+]
+???
+---
+
+# One Class SVM
+
+- Also uses Gaussian kernel to cover data.
+
+- Only select support vectors (not all points)
+
+- Need to select gamma
+
+- Specify outlier ratio (contamination) via nu
+(actually “fraction of training mistakes”)
+
+.smaller[
+```python
+from sklearn.svm import OneClassSVM
+scaler = StandardScaler()
+X_train_noise_scaled = scaler.fit_transform(X_train_noise)
+oneclass = OneClassSVM(nu=.1).fit(X_train_noise_scaled)
+pred = oneclass.predict(X_train_noise_scaled).astype(np.int)
+```]
+
+???
+---
+.center[
+![:scale 80%](images/one_class_svm_plot.png)
+]
+
+???
+---
+class:center,middle
+
+#Isolation Forests
+
+???
+---
+#Idea
+
+- Build random trees
+
+- Outliers are easier to isolate from the rest
+
+.center[
+![:scale 60%](images/isolation_forests.png)
+]
+
+- Measure as Path length!
+
+???
+---
+class:center,middle
+.left-column[
+![:scale 100%](images/isolation_forests.png)
+]
+
+.right-column[
+![:scale 100%](images/avgpathlen_numtrees.png)
+]
+???
+---
+#Normalizing the Path Length
+
+- Average path length of unsuccessful search in Binary Search Tree:
+
+`$$ c(n) = 2H(n-1) - (\frac{2(n-1)}{n}) $$` 
+
+H = Harmonic number
+
+`$$ s(x,n) = 2^{-\frac{E(h(x))}{c(n)}} $$` 
+
+h = depth in tree
+
+- s &lt; 0.5 : definite inlier
+
+- s close to 1: outlier
+
+???
+---
+class:spacious
+# Building the forest
+
+- Subsample dataset for each tree
+
+- Default sample size of 256 works surprisingly well
+
+- Stop growing tree at depth log_2(sample size) – so 8
+
+- No bootstrapping usually
+
+- More trees are better – default 100
+
+- Need to specify contamination rate
+
+???
+---
+.center[![:scale 90%](images/building_forest_1.png)]
+???
+---
+.center[![:scale 90%](images/building_forest_2.png)]
+???
+---
+class:spacious
+# Other density based-models
+
+- PCA
+
+- GMMs
+
+- Robust PCA (not in sklearn :-()
+
+- Any other probabilistic model - “robust” is better.
+
+???
+---
+.center[
+![:scale 60%](images/other_density_models_1.png)
+]
+
+.center[
+![:scale 60%](images/other_density_models_2.png)
+]
+
+.center[
+![:scale 60%](images/other_density_models_3.png)
+]
+???
+---
+class:spacious
+# Summary
+
+- Isolation Forest works great!
+
+- Density models are great if they are correct.
+
+- Estimating bandwidth can be tricky in the
+unsupervised setting.
+
+- Validation of results requires manual inspection.
+
+???
+---
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
