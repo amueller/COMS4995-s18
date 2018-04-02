@@ -116,6 +116,7 @@ Andreas C. Müller
 FIXME matrix factorization should be approximately equal, not equal
 FIXME list KL divergence loss for NMF
 FIXME related gaussian model and Kernel density to GMM?
+FIXME talk more about all outliers are different in different ways vs classification (add example where outlier is better?)
 ---
 class: center, middle
 
@@ -295,7 +296,7 @@ class:center,middle
 
 - Outliers are not labeled! (otherwise it’s just imbalanced classification)
 
-- Often used interchangeably in practice.
+- Often outlier detection and novelty detection used interchangeably in practice.
 
 ---
 class:spacious
@@ -312,6 +313,9 @@ class:spacious
 - News? Intelligence?
 
 ???
+- usual assumption: all outliers are different in a different way.
+- Often people use classification datasets for outlier detection:
+ that's a bit strange. See homework results.
 ---
 class:spacious
 # Basic idea
@@ -536,6 +540,7 @@ class:spacious
 - Any other probabilistic model - “robust” is better.
 
 ???
+robust only needed for outlier detection, not novelty detection.
 ---
 .center[
 ![:scale 60%](images/other_density_models_1.png)
