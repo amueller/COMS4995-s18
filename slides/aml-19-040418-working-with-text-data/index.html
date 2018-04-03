@@ -335,7 +335,7 @@ array([ 0.046])
 lr.score(X_val, y_val)
 ```
 ```
-0.88192000000000004
+0.882
 ```
 
 ]
@@ -526,7 +526,7 @@ array([ 0.046])
 lr.score(X_val_df4, y_val)
 ```
 ```
-0.88095999999999997
+0.881
 ```
 ]
 
@@ -673,7 +673,7 @@ X_val3msw = vect3msw.transform(text_val)
 lr3msw.score(X_val3msw, y_val)
 ```
 ```
-0.88319999999999999
+0.883
 ```
 ```python
 plt.figure(figsize=(15, 4))
@@ -689,9 +689,9 @@ plot_important_features(lr3msw.coef_.ravel(), np.array(vect3msw.get_feature_name
 
 # Tf-idf rescaling
 
-$$ tf\text{-}idf(t,d) = tf(t,d)\cdot idf(t)$$
+$$ \text{tf-idf}(t,d) = \text{tf}(t,d)\cdot \text{idf}(t)$$
 
-$$ idf(t) = log\frac{1+n_d}{1+df(d,t)} + 1$$
+$$ \text{idf}(t) = \log\frac{1+n_d}{1+\text{df}(d,t)} + 1$$
 
 Where, $n_d$ is the total number of documents and $df(d,t)$ is the number of documents containing term $t$
 
@@ -809,7 +809,7 @@ X_val_char = char_vect.transform(text_val)
 lr_char.score(X_val_char, y_val)
 ```
 ```
-0.88112000000000001
+0.881
 ```
 
 ]
