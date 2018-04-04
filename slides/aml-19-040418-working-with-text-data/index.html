@@ -134,14 +134,18 @@ Andreas C. Müller
   * Fixed number of features
   * Contiguous
   * Categorical
+
+--
+
 - Next up:
   * No pre-defined features
   * Free text
   * Images
   * (Audio: not this class)
-  * Need to create fixed-length description
+
 
 ???
+* Need to create fixed-length description
 ---
 # Typical Text Data
 
@@ -171,19 +175,17 @@ Andreas C. Müller
 ???
 ---
 
-# Features from Text:  
 # Bag of Words
 
 <br>
 .center[
-![:scale 60%](images/bag_of_words.png)
+![:scale 70%](images/bag_of_words.png)
 ]
 ???
 ---
 # Toy Example
 
-.smaller[Consider two documents in a dataset
-]
+
 
 
 .smaller[
@@ -214,18 +216,20 @@ array([[1, 0, 1, 0, 0, 0, 1, 1],
 ]
 
 ???
+Consider two documents in a dataset "malory"
+
 ---
+class: spacious
+
 # "bag"
 
-<br>
 
-
-.smaller[
 ```python
 print(malory)
 print(vect.inverse_transform(X)[0])
 print(vect.inverse_transform(X)[1])
 ```
+
 ```
 ['Do you want ants?', 'Because that’s how you get ants.']
 ['ants' 'do' 'want' 'you']
@@ -233,60 +237,74 @@ print(vect.inverse_transform(X)[1])
 ```
 
 
-]
-
-
 ???
 ---
 class: center, middle
 
-# Text classification example: IMDB Movie Reviews
+# Text classification example:
+# IMDB Movie Reviews
 
 ---
 
 # Data loading
 
-.tiny-code[
 
 ```python
 from sklearn.datasets import load_files
 reviews_train = load_files("../data/aclImdb/train/")
 
-text_train, y_train = reviews_train.data, reviews_train.target
-print("type of text_train: {}".format(type(text_train)))
-print("length of text_train: {}".format(len(text_train)))
-print("class balance: {}".format(np.bincount(y_train)))
-print("text_train[1]:\n{}".format(text_train[1]))
+text_trainval, y_trainval = reviews_train.data, reviews_train.target
+print("type of text_train: {}".format(type(text_trainval)))
+print("length of text_train: {}".format(len(text_trainval)))
+print("class balance: {}".format(np.bincount(y_trainval)))
+
 ```
+
 ```
-type of text_train: <class 'list'>
-length of text_train: 25000
+type of text_trainval: <class 'list'>
+length of text_trainval: 25000
 class balance: [12500 12500]
-text_train[1]:
-b'Words can\'t describe how bad this movie is. I can\'t explain it by writing only. You have too see it for yourself to get at grip of how 
-horrible a movie really can be. Not that I recommend you to do that. There are so many clich\xc3\xa9s, mistakes (and all other negative 
-things you can imagine) here that will just make you cry. To start with the technical first, there are a LOT of mistakes regarding the 
-airplane. I won\'t list them here, but just mention the coloring of the plane. They didn\'t even manage to show an airliner in the colors
-of a fictional airline, but instead used a 747 painted in the original Boeing livery. Very bad. The plot is stupid and has been done many 
-times before, only much, much better. There are so many ridiculous moments here that i lost count of it really early. Also, I was on the 
-bad guys\' side all the time in the movie, because the good guys were so stupid. "Executive Decision" should without a doubt be you\'re 
-choice over this one, even the "Turbulence"-movies are better. In fact, every other movie in the world is better than this one.'
 ```
+???
+FIXME: in notebook rename train -> trainval, train_sub -> train
+---
 
-
-
+# Data loading
+```python
+print("text_train[1]:\n{}".format(text_trainval[1].decode()))
+```
+.smaller[
+```
+text_train[1]:
+'Words can't describe how bad this movie is. I can't explain it by
+writing only. You have too see it for yourself to get at grip of how
+horrible a movie really can be. Not that I recommend you to do that.
+There are so many clichés, mistakes (and all other negative things
+you can imagine) here that will just make you cry. To start with the
+technical first, there are a LOT of mistakes regarding the airplane. I 
+won't list them here, but just mention the coloring of the plane. They
+didn't even manage to show an airliner in the colors of a fictional
+airline, but instead used a 747 painted in the original Boeing livery.
+Very bad. The plot is stupid and has been done many times before, only
+much, much better. There are so many ridiculous moments here that i
+lost count of it really early. Also, I was on the bad guys' side all
+the time in the movie, because the good guys were so stupid. "Executive
+Decision" should without a doubt be you're choice over this one, even the
+"Turbulence"-movies are better. In fact, every other movie in the world is
+better than this one.'
+```
 ]
-
+???
+all the code is in the github repo.
 ---
 # Vectorization
-.tiny-code[
 
 ```python
-text_train = [doc.replace(b"<br />", b" ") for doc in text_train]
-text_train_sub, text_val, y_train_sub, y_val = train_test_split(
-    text_train, y_train, stratify=y_train, random_state=0)
+text_train_val = [doc.replace(b"<br />", b" ") for doc in text_train_val]
+text_train, text_val, y_train_, y_val = train_test_split(
+    text_trainval, y_trainval, stratify=y_trainval, random_state=0)
 vect = CountVectorizer()
-X_train = vect.fit_transform(text_train_sub)
+X_train = vect.fit_transform(text_train)
 X_val = vect.transform(text_val)
 X_train
 ```
@@ -296,6 +314,8 @@ X_train
   with 2580448 stored elements in Compressed Sparse Row format>
 ```
 
+---
+# Vocabulary
 
 ```python
 feature_names = vect.get_feature_names()
@@ -303,27 +323,39 @@ print(feature_names[:10])
 print(feature_names[20000:20020])
 print(feature_names[::2000])
 ```
+
+--
+
+.smaller[
 ```
 ['00', '000', '0000000000001', '00001', '00015', '000s', '001', '003830', '006', '007']
-['eschews', 'escort', 'escorted', 'escorting', 'escorts', 'escpecially', 'escreve', 'escrow', 
-'esculator', 'ese', 'eser', 'esha', 'eshaan', 'eshley', 'esk', 'eskimo', 'eskimos', 'esmerelda', 'esmond', 'esophagus']
-['00', 'ahoy', 'aspects', 'belting', 'bridegroom', 'cements', 'commas', 'crowds', 'detlef', 'druids', 'eschews', 'finishing', 'gathering', 
-'gunrunner', 'homesickness', 'inhumanities', 'kabbalism', 'leech', 'makes', 'miki', 'nas', 'organ', 'pesci', 'principally', 'rebours', 
-'robotnik', 'sculptural', 'skinkons', 'stardom', 'syncer', 'tools', 'unflagging', 'waaaay', 'yanks']
+```
+]
+--
+.smaller[
+```
+['eschews', 'escort', 'escorted', 'escorting', 'escorts', 'escpecially', 'escreve',
+ 'escrow', 'esculator', 'ese', 'eser', 'esha', 'eshaan', 'eshley', 'esk', 'eskimo',
+ 'eskimos', 'esmerelda', 'esmond', 'esophagus']
+['00', 'ahoy', 'aspects', 'belting', 'bridegroom', 'cements', 'commas', 'crowds',
+ 'detlef', 'druids', 'eschews', 'finishing', 'gathering',  'gunrunner', 'homesickness',
+ 'inhumanities', 'kabbalism', 'leech', 'makes', 'miki', 'nas', 'organ', 'pesci',
+ 'principally', 'rebours', 'robotnik', 'sculptural', 'skinkons', 'stardom', 'syncer',
+ 'tools', 'unflagging', 'waaaay', 'yanks']
 ```
 
 ]
 
 ---
 
-#Once we have X, business as usual
+# Classification
 
 <br>
 
-.smaller[
+
 ```python
 from sklearn.linear_model import LogisticRegressionCV
-lr = LogisticRegressionCV().fit(X_train, y_train_sub)
+lr = LogisticRegressionCV().fit(X_train, y_train)
 ```
 ```python
 lr.C_
@@ -338,13 +370,12 @@ lr.score(X_val, y_val)
 0.882
 ```
 
-]
 
 ---
 class: middle
 
 .center[
-![:scale 100%](images/vectorization_plot.png)
+![:scale 100%](images/coefficients.png)
 ]
 
 
@@ -358,15 +389,18 @@ class:spacious
 - What to include in vocabulary?
 
 ---
+class: spacious
+
 # Tokenization
 - Scikit-learn (very simplistic):
-  * re.findall(r"\b\w\w+\b")
+  * `re.findall(r"\b\w\w+\b")`
   * Includes numbers
   * doesn't include single-letter words
-  * doesn't include - or '
-- Can change regular expression "token pattern":
+  * doesn't include `-` or `'`
 
-.tiny-code[
+---
+# Changing the token pattern regex
+
 ```python
 vect = CountVectorizer(token_pattern=r"\b\w+\b")
 vect.fit(malory)
@@ -375,18 +409,22 @@ print(vect.get_feature_names())
 ```
 ['ants', 'because', 'do', 'get', 'how', 's', 'that', 'want', 'you']
 ```
+
+--
+
 ```python
 vect = CountVectorizer(token_pattern=r"\b\w[\w’]+\b")
-# not actually an apostroph but some unicode pattern
-# because I copy & pasted the quote
+
 vect.fit(malory)
 print(vect.get_feature_names())
 ```
 ```
 ['ants', 'because', 'do', 'get', 'how', 'that’s', 'want', 'you']
 ```
-]
 
+???
+Was not actually an apostroph but some unicode pattern
+because I copy & pasted the quote.
 
 ---
 
