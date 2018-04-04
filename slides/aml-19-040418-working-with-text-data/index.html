@@ -125,6 +125,8 @@ class: center, middle
 
 Andreas C. Müller
 
+???
+FIXME make all bar-plots uniform style!
 ---
 
 # More kinds of data
@@ -429,13 +431,35 @@ because I copy & pasted the quote.
 ---
 
 #Normalization
+
+.smaller[
 - Correct spelling?
 - Stemming: reduce to word stem
-- Lemmatization: reduce words to stem using curated dictionary and context
+- Lemmatization: smartly reduce to word stem
+]
+--
+.smaller[
+"Our meeting today was worse than yesterday,<br/>
+I'm scared of meeting the clients tomorrow."
+
+Stemming:<br/>
+`
+['our', 'meet', 'today', 'wa', 'wors', 'than', 'yesterday', ',', 'i',
+ "'m", 'scare', 'of', 'meet', 'the', 'client', 'tomorrow', '.']
+`
+
+Lemmatization:<br/>
+`
+['our', 'meeting', 'today', 'be', 'bad', 'than', 'yesterday', ',', 'i',
+ 'be', 'scar', 'of', 'meet', 'the', 'client', 'tomorrow', '.']
+`
+]
+--
+.smaller[
 - scikit-learn:
   * Lower-case it
   * Configurable, use nltk or spacy
-
+]
 
 
 ---
@@ -448,7 +472,6 @@ class: center, middle
 
 # Stop Words
 
-.tiny-code[
 ```python
 vect = CountVectorizer(stop_words='english')
 vect.fit(malory)
@@ -461,6 +484,7 @@ print(vect.get_feature_names())
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 print(list(ENGLISH_STOP_WORDS))
 ```
+.tiny-code[
 ```
 ['former', 'above', 'inc', 'off', 'on', 'those', 'not', 'fifteen', 'sometimes', 'too', 'is', 'move', 'much', 'own', 'until', 'wherein', 
 'which', 'over', 'thru', 'whoever', 'this', 'indeed', 'same', 'three', 'whatever', 'us', 'somewhere', 'after', 'eleven', 'most', 'de', 'full', 
@@ -486,15 +510,13 @@ print(list(ENGLISH_STOP_WORDS))
 'whole', 'there']
 ```
 ]
-.smallest[
+???
+- not a very good stop-word list? Why is system in it? bill?
 - For supervised learning often little effect on large corpuses (on small corpuses and for unsupervised learning it can help)
-]
-
-
 ---
 # Infrequent Words
 
-- Words that appear only once or twice might not be helpful:
+- Remove words that appear <=2 times:
 
 .smaller[
 ```python
@@ -508,7 +530,7 @@ print(vect.get_feature_names())
 
 ]
 
-- Restrict vocabulary size to only most frequent words (for less features):
+- Restrict vocabulary size to max_features most frequent words:
 
 .smaller[
 ```python
@@ -525,36 +547,27 @@ print(vect.get_feature_names())
 
 ---
 
-.tiny-code[
+
+.smaller[
 ```python
 vect = CountVectorizer(min_df=2)
-X_train_df2 = vect.fit_transform(text_train_sub)
-X_val_df2 = vect.transform(text_val)
-print(X_train.shape)
-print(X_train_df2.shape)
-```
-```
-(18750, 66651)
-(18750, 39825)
-```
-]
+X_train_df2 = vect.fit_transform(text_train)
 
-.smallest[
-- Removed nearly 1/3 of features!
-]
-
-.tiny-code[
-
-```python
 vect = CountVectorizer(min_df=4)
-X_train_df4 = vect.fit_transform(text_train_sub)
+X_train_df4 = vect.fit_transform(text_train)
 X_val_df4 = vect.transform(text_val)
+
 print(X_train.shape)
 print(X_train_df2.shape)
 print(X_train_df4.shape)
 ```
 ```
-lr = LogisticRegressionCV().fit(X_train_df4, y_train_sub)
+(18750, 66651)
+(18750, 39825)
+(18750, 26928)
+```
+```python
+lr = LogisticRegressionCV().fit(X_train_df4, y_train)
 lr.C_
 ```
 ```
@@ -567,21 +580,22 @@ lr.score(X_val_df4, y_val)
 0.881
 ```
 ]
-
-.smallest[
+???
+- Removed nearly 1/3 of features!
 - As good as before
-]
-
 
 ---
-# Beyond single words
+# N-grams: Beyond single words
 - Bag of words completely removes word order.
 - "didn't love" and "love" are very different!
-- N-grams: tuples of consecutive words
+
+--
 
 .center[
 ![:scale 70%](images/single_words.png)
 ]
+???
+- N-grams: tuples of consecutive words
 
 
 ---
@@ -622,78 +636,101 @@ Vocabulary:
 'you', 'you get', 'you want']
 ```
 ]
+???
 
-.smallest[
 - Typically: higher n-grams lead to blow up of feature space!
-]
 
 ---
 # N-grams on IMDB data
 
-.smaller[
+
 ```
-Vocabulary size 1-gram (min_df=4): 26928
-Vocabulary size 2-gram (min_df=4): 128426
-Vocabulary size 1gram, 2gram (min_df=4): 155354
-Vocabulary size 1-3gram (min_df=4): 254274
-Vocabulary size 1-4gram, 2gram (min_df=4): 289443
+Vocabulary Sizes
+1-gram (min_df=4): 26928
+2-gram (min_df=4): 128426
+1-gram & 2-gram (min_df=4): 155354
+1-3gram (min_df=4): 254274
+1-4gram (min_df=4): 289443
 ```
 ```python
 cv = CountVectorizer(ngram_range=(1, 4)).fit(text_train_sub)
 print("Vocabulary size 1-4gram: {}".format(len(cv.vocabulary_)))
 ```
 ```
-Vocabulary size 1-4gram: 7815528
+Vocabulary size 1-4gram (min_df=1): 7815528
 ```
-]
 
-.smaller[
+
 - More than 20x more 4-grams!
-]
 
 ---
 #Stop-word impact on bi-grams
 
-.tiny-code[
 ```python
-cv = CountVectorizer(ngram_range=(1, 2), min_df=4).fit(text_train_sub)
-print("Vocabulary size (1, 2), min_df=4: {}".format(len(cv.vocabulary_)))
-cv = CountVectorizer(ngram_range=(1, 2), min_df=4, stop_words="english").fit(text_train_sub)
-print("Vocabulary size (1, 2), stopwords, min_df=4: {}".format(len(cv.vocabulary_)))
+cv = CountVectorizer(ngram_range=(1, 2), min_df=4)
+cv.fit(text_train)
+print("(1, 2), min_df=4: {}".format(len(cv.vocabulary_)))
+cv = CountVectorizer(ngram_range=(1, 2), min_df=4,
+                     stop_words="english")
+cv.fit(text_train)
+print("(1, 2), stopwords, min_df=4: {}".format(len(cv.vocabulary_)))
 ```
 ```
-Vocabulary size (1, 2), min_df=4: 155354
-Vocabulary size (1, 2), stopwords, min_df=4: 81085
+(1, 2), min_df=4: 155354
+(1, 2), stopwords, min_df=4: 81085
 ```
-]
 
 ---
 # Stop-word impact on 4-grams
 
 
 
-.tiny-code[
+
 ```python
-cv4 = CountVectorizer(ngram_range=(4, 4), min_df=4).fit(text_train_sub)
-cv4sw = CountVectorizer(ngram_range=(4, 4), min_df=4, stop_words="english").fit(text_train_sub)
+cv4 = CountVectorizer(ngram_range=(4, 4), min_df=4)
+cv4.fit(text_train)
+cv4sw = CountVectorizer(ngram_range=(4, 4), min_df=4,
+                       stop_words="english")
+cv4sw.fit(text_train)
 print(len(cv4.get_feature_names()))
 print(len(cv4sw.get_feature_names()))```
 ```
 31585
 369
 ```
-]
 ---
-- Stopwords included
+```
+['worst movie ve seen' '40 year old virgin' 've seen long time'
+'worst movies ve seen' 'don waste time money'
+'mystery science theater 3000' 'worst film ve seen'
+'lose friends alienate people' 'best movies ve seen'
+'don waste time watching' 'jean claude van damme'
+'really wanted like movie' 'best movie ve seen' 'rock roll high school'
+'don think ve seen' 'let face music dance' 'don say didn warn'
+'worst films ve seen' 'fred astaire ginger rogers' 'ha ha ha ha'
+'la maman et la' 'maman et la putain' 'left cutting room floor'
+'ve seen ve seen' 'just doesn make sense' 'robert blake scott wilson'
+'late 70 early 80' 'crouching tiger hidden dragon' 'low budget sci fi'
+'movie ve seen long' 'toronto international film festival'
+'night evelyn came grave' 'good guys bad guys' 'low budget horror movies'
+'waste time watching movie' 'vote seven title brazil' 'bad bad bad bad'
+'morning sunday night monday' '14 year old girl' 'film based true story'
+'don make em like' 'silent night deadly night'
+'rating saturday night friday' 'right place right time'
+'friday night friday morning' 'night friday night friday'
+'friday morning sunday night' 'don waste time movie'
+'saturday night friday night' 'really wanted like film']
+```
+---
 .center[
 ![:scale 75%](images/stopwords_1.png)
 ]
 
-- stopwords removed (slightly worse)
 .center[
 ![:scale 75%](images/stopwords_2.png)
 ]
-
+???
+Stopwords removed fares slightly worse
 ---
 
 .tiny-code[
@@ -705,7 +742,7 @@ my_stopwords.add("ve")
 ```
 ```python
 vect3msw = CountVectorizer(ngram_range=(1, 3), min_df=4, stop_words=my_stopwords)
-X_train3msw = vect3msw.fit_transform(text_train_sub)
+X_train3msw = vect3msw.fit_transform(text_train)
 lr3msw = LogisticRegressionCV().fit(X_train3msw, y_train_sub)
 X_val3msw = vect3msw.transform(text_val)
 lr3msw.score(X_val3msw, y_val)
@@ -731,11 +768,17 @@ $$ \text{tf-idf}(t,d) = \text{tf}(t,d)\cdot \text{idf}(t)$$
 
 $$ \text{idf}(t) = \log\frac{1+n_d}{1+\text{df}(d,t)} + 1$$
 
-Where, $n_d$ is the total number of documents and $df(d,t)$ is the number of documents containing term $t$
+$n_d$ = total number of documents <br/>
+$df(d,t)$ = number of documents containing term $t$
 
+--
+
+* In sklearn: by default also L2 normalisation!
+
+???
 * Emplasizes "rare" words - "soft stop word removal"
 * Slightly non-standard smoothing (many +1s)
-* By default also L2 normalisation!
+
 
 ---
 # TfidfVectorizer, TfidfTransformer
@@ -753,7 +796,8 @@ array([[ 0.41 ,  0.   ,  0.576,  0.   ,  0.   ,  0.   ,  0.576,  0.41 ],
        [ 0.318,  0.447,  0.   ,  0.447,  0.447,  0.447,  0.   ,  0.318]])
 ```
 ```python
-malory_tfidf = make_pipeline(CountVectorizer(), TfidfTransformer()).fit_transform(malory)
+malory_tfidf = make_pipeline(CountVectorizer(),
+                             TfidfTransformer()).fit_transform(malory)
 malory_tfidf.toarray()
 ```
 ```
@@ -774,7 +818,40 @@ class: middle
 <br>
 
 .center[
-![:scale 100%](images/do_you_want_ants.png)
+![:scale 100%](images/char_ngram_1.png)
+]
+
+---
+#Principle
+<br>
+<br>
+
+.center[
+![:scale 100%](images/char_ngram_2.png)
+]
+---
+#Principle
+<br>
+<br>
+
+.center[
+![:scale 100%](images/char_ngram_3.png)
+]
+---
+#Principle
+<br>
+<br>
+
+.center[
+![:scale 100%](images/char_ngram_4.png)
+]
+---
+#Principle
+<br>
+<br>
+
+.center[
+![:scale 100%](images/char_ngram_5.png)
 ]
 
 ---
@@ -897,9 +974,6 @@ array([ 0.452,  0.459,  0.341,  0.469,  0.418])
 ---
 
 # Grid-search parameters
-.smallest[
-- Small dataset, makes grid-search faster! (less reliable)
-]
 
 .tiny-code[
 ```python
@@ -913,7 +987,8 @@ param_grid = {"logisticregression__C": [100, 10, 1, 0.1, 0.001],
               "countvectorizer__min_df": [1, 2, 3],
               "normalizer": [None, Normalizer()]
              }
-grid = GridSearchCV(make_pipeline(CountVectorizer(analyzer="char"), Normalizer(), LogisticRegression()),
+grid = GridSearchCV(make_pipeline(CountVectorizer(analyzer="char"), Normalizer(), LogisticRegression(),
+                                  memory="cache_folder"),
                     param_grid=param_grid, cv=10, scoring="f1_macro"
                    )
 ```
@@ -935,6 +1010,8 @@ grid.best_params_
  'logisticregression__C': 10}
 ```
 ]
+???
+- Small dataset, makes grid-search faster! (less reliable)
 
 ---
 .center[
