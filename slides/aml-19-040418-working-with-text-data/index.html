@@ -127,6 +127,9 @@ Andreas C. Müller
 
 ???
 FIXME make all bar-plots uniform style!
+FIXME tfidf before n-grams
+FIXME explain L2 normalization and intuition.
+FIXME is logisticregressionCV efficient here? sag?
 ---
 
 # More kinds of data
@@ -268,7 +271,6 @@ length of text_trainval: 25000
 class balance: [12500 12500]
 ```
 ???
-FIXME: in notebook rename train -> trainval, train_sub -> train
 ---
 
 # Data loading
@@ -516,7 +518,7 @@ print(list(ENGLISH_STOP_WORDS))
 ---
 # Infrequent Words
 
-- Remove words that appear <=2 times:
+- Remove words that appear in less than 2 documents:
 
 .smaller[
 ```python
@@ -653,7 +655,7 @@ Vocabulary Sizes
 1-4gram (min_df=4): 289443
 ```
 ```python
-cv = CountVectorizer(ngram_range=(1, 4)).fit(text_train_sub)
+cv = CountVectorizer(ngram_range=(1, 4)).fit(text_train)
 print("Vocabulary size 1-4gram: {}".format(len(cv.vocabulary_)))
 ```
 ```
@@ -743,22 +745,17 @@ my_stopwords.add("ve")
 ```python
 vect3msw = CountVectorizer(ngram_range=(1, 3), min_df=4, stop_words=my_stopwords)
 X_train3msw = vect3msw.fit_transform(text_train)
-lr3msw = LogisticRegressionCV().fit(X_train3msw, y_train_sub)
+lr3msw = LogisticRegressionCV().fit(X_train3msw, y_train)
 X_val3msw = vect3msw.transform(text_val)
 lr3msw.score(X_val3msw, y_val)
 ```
 ```
 0.883
 ```
-```python
-plt.figure(figsize=(15, 4))
-plot_important_features(lr3msw.coef_.ravel(), np.array(vect3msw.get_feature_names()), top_n=40)
-```
-
 ]
 
 .center[
-![:scale 90%](images/stopwords_2.png)
+![:scale 90%](images/stopwords_3.png)
 ]
 ---
 
@@ -910,7 +907,7 @@ at’', 'au', 'aus', 'be', 'bec', 'ca', 'cau', 'do', 'do ', 'e ', 'ec', 'eca', '
 .smaller[
 ```python
 char_vect = CountVectorizer(ngram_range=(2, 5), min_df=4, analyzer="char_wb")
-X_train_char = char_vect.fit_transform(text_train_sub)
+X_train_char = char_vect.fit_transform(text_train)
 ```
 ```python
 len(char_vect.vocabulary_)
@@ -919,7 +916,7 @@ len(char_vect.vocabulary_)
 164632
 ```
 ```python
-lr_char = LogisticRegressionCV().fit(X_train_char, y_train_sub)
+lr_char = LogisticRegressionCV().fit(X_train_char, y_train)
 X_val_char = char_vect.transform(text_val)
 lr_char.score(X_val_char, y_val)
 ```
@@ -932,7 +929,7 @@ lr_char.score(X_val_char, y_val)
 ---
 class: middle
 .center[
-![:scale 100%](images/imdb_data_plot.png)
+![:scale 100%](images/imdb_char_ngrams.png.png)
 ]
 
 ---
@@ -1053,7 +1050,7 @@ class: middle
 ```python
 from sklearn.feature_extraction.text import HashingVectorizer
 hv = HashingVectorizer()
-X_train = hv.transform(text_train_sub)
+X_train = hv.transform(text_train)
 X_val = hv.transform(text_val)
 ```
 ```python
@@ -1062,7 +1059,7 @@ lr.score(X_val, y_val)
 ```python
 from sklearn.feature_extraction.text import HashingVectorizer
 hv = HashingVectorizer()
-X_train = hv.transform(text_train_sub)
+X_train = hv.transform(text_train)
 X_val = hv.transform(text_val)
 ```
 ```python
@@ -1072,7 +1069,7 @@ X_train.shape
 (18750, 1048576)
 ```
 ```python
-lr = LogisticRegressionCV().fit(X_train, y_train_sub)
+lr = LogisticRegressionCV().fit(X_train, y_train)
 lr.score(X_val, y_val)
 ```
 
