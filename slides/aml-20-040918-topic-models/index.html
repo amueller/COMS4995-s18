@@ -126,9 +126,14 @@ class: center, middle
 Andreas C. Müller
 
 ???
-FIXME NMF loss function?
 FIXME classification with LDA?
-FIXME do MCMC LDA?
+FIXME How to apply LDA (and NMF?) to test-data
+FIXME do MCMC LDA (code)?
+FIXME theory before practice?
+FIXME classification with logisticregressioncv  instead of fixed C?
+FIXME preprocessing for LDA: mention no tfidf.
+FIXME Edward is called bayes flow now?
+FIXME Classification with NMF.
 ---
 
 # Beyond Bags of Words
@@ -197,13 +202,12 @@ Points in direction of mean
 # Scale before LSA
 
 ```python
-from sklearn.preprocessing import MaxAbsScaler, Normalizer
+from sklearn.preprocessing import MaxAbsScaler
 scaler = MaxAbsScaler()
 X_scaled = scaler.fit_transform(X_train)
-X_normalized = Normalizer().fit_transform(X_train)
 
-lsa_normalized = TruncatedSVD(n_components=100)
-X_lsa_normalized = lsa_normalized.fit_transform(X_normalized)
+lsa_scaled = TruncatedSVD(n_components=100)
+X_lsa_scaled = lsa_scaled.fit_transform(X_nscaled)
 ```
 
 ???
@@ -254,8 +258,6 @@ lr_lsa.score(X_lsa_scaled[:, :10], y_train)
 - Not competitive but reasonable with just 10 components
 
 
-
-
 ---
 class: center, middle
 
@@ -286,6 +288,8 @@ class: spacious
 
 `$$\large d_{KL}(X, HW) = \sum_{i,j} \left(X_{ij} \log\left(\frac{X_{ij}}{(HW)_{ij}}\right) - X_{ij} + (HW)_{ij}\right)$$`
 
+???
+FIXME add non-negative constraints
 ---
 
 # NMF for topic models
