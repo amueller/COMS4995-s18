@@ -127,6 +127,8 @@ Andreas C. Müller
 
 ???
 FIXME NMF loss function?
+FIXME classification with LDA?
+FIXME do MCMC LDA?
 ---
 
 # Beyond Bags of Words
@@ -298,19 +300,23 @@ nmf_scale.fit(X_scaled)
 ]
 
 .center[
-![:scale 60%](images/nmf_scaled_plot.png)
+![:scale 65%](images/nmf_scaled_plot.png)
 ]
-
+???
+Sorted by "most active" components
 ---
+class: center
 # NMF components without scaling
 
-No plot available
+![:scale 70%](images/nmf_topics_no_scaling.png)
 
 
 ---
+class: center
+
 # NMF with tfidf
 
-No plot available
+![:scale 70%](images/nmf_topics_tfidf.png)
 
 ---
 
@@ -333,10 +339,11 @@ class: center, middle
 # The LDA Model
 
 .center[
-![:scale 70%](images/lda_model.png)
+![:scale 90%](images/lda_model.png)
 ]
-
+.smallest[
 (stolen from Dave and John)
+]
 
 ???
 - Generative probabilistic model (similar to mixture model)
@@ -398,41 +405,41 @@ Variational Inference
 - “Small data” (<= 10k? Documents):
 	* Gibbs sampling (lda package, MALLET in Java)
 - “Medium data” (<= 1M? Documents):
-	* Variational Inference (scikit-learn default)
+	* Variational Inference (scikit-learn future default)
 - “Large Data” (>1M? Documents):
-	* Stochastic Variational Inference (scikit-learn)
+	* Stochastic Variational Inference (scikit-learn current default)
 	* SVI allows online learning (partial_fit)
-- Remember SGD Lecture (and Leon Bottou):
-	* More data beats better inference (often)
+
 - Edward by Dustin Tran: http://edwardlib.org/
 	* Tensor-flow based framework for stochastic variational inference. 
 
+???
+- Remember SGD Lecture (and Leon Bottou):
+	* More data beats better inference (often)
+Variational might be more sensitive to hyper parameters? Or give different results?
 ---
 
 .smallest[
 ```python
 from sklearn.decomposition import LatentDirichletAllocation
-lda = LatentDirichletAllocation(n_topics=10, learning_method="batch")
+lda = LatentDirichletAllocation(n_components=10, learning_method="batch")
 X_lda = lda.fit_transform(X_train)
 ```
 ]
 
 .center[
-![:scale 60%](images/lda_plot_1.png)
+![:scale 70%](images/lda_plot_1.png)
 ]
-
-.smallest[
+???
 - Very generic, similar to NMF(n_components=10).
 TV Series, “family drama”, and “history / war” topics
-]
-
 
 ---
 
 
 .smallest[
 ```python
-lda100 = LatentDirichletAllocation(n_topics=100, learning_method="batch")
+lda100 = LatentDirichletAllocation(n_components=100, learning_method="batch")
 X_lda100 = lda100.fit_transform(X_train)
 ```
 ]
@@ -484,22 +491,22 @@ $\qquad E[X_i] = \frac{\alpha_i}{\sum_k{\alpha_k}}$
 
 - Prior is called "conjugate" of the posterior has the same form as prior
 $$ P(\theta | x) = \frac{p(x | \theta)p(\theta)}{\int_{}^{} p(x | \theta^\prime)p(\theta^\prime)d\theta^\prime} $$
-- if $p(x|\theta)$ is multimnomial (discrete distribution), then p(\theta) = Dirichlet(...) is a conjugate prior.
+
+--
+
+Multinomial
+$$ P(x_1, \dots, x_k |n, p_1, \dots, p_k) = \frac{n!}{x_1! \dots x_k!} p_1^{x_1} \dots p_k^{x^k}$$
 
 
-
-.right-column[
 Dirichlet
-$$ \frac{1}{B(\alpha)} \Pi_{i=1}^{K}{x_i^{\alpha_i - 1}}$$
-]
+`$$ P(x_1, \dots, x_k | \alpha_1, \dots \alpha_k)=\frac{1}{B(\alpha)} x_1^{\alpha_1 - 1} \dots x_k^{\alpha_k - 1} $$`
 
-.left-column[
-pmf
-$$ \frac{n!}{x_1! ... x_k!} p_1^{x_1} ... p_k^{x^k}$$
 
-]
+
 
 ???
+- if $p(x|\theta)$ is multimnomial (discrete distribution), <br>then $p(\theta) = \text{Dirichlet}(...)$ is a conjugate prior.
+
 FIXME formatting
 ---
 
