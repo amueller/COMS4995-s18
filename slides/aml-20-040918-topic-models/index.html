@@ -126,6 +126,7 @@ class: center, middle
 Andreas C. Müller
 
 ???
+FIXME NMF loss function?
 ---
 
 # Beyond Bags of Words
@@ -174,9 +175,6 @@ lsa.components_.shape
 ```python
 plt.semilogy(lsa.explained_variance_ratio_)
 ```
-```
-[<matplotlib.lines.Line2D at 0x7ffb8108fd68>]
-```
 ]
 
 .center[
@@ -206,6 +204,7 @@ lsa_normalized = TruncatedSVD(n_components=100)
 X_lsa_normalized = lsa_normalized.fit_transform(X_normalized)
 ```
 
+???
 - "Movie" and "Film" were dominating first couple of components. Try to get rid of that effect.
 
 ---
@@ -213,12 +212,12 @@ X_lsa_normalized = lsa_normalized.fit_transform(X_normalized)
 # Eigenvectors after scaling
 
 .center[
-![:scale 90%](images/lsa_six_eigvec_scaled.png)
+![:scale 100%](images/lsa_six_eigvec_scaled.png)
 ]
+???
 
-.smaller[
 - Movie and film still important, but not that dominant any more.
-]
+
 
 ---
 # Some Components Capture Sentiment
@@ -247,10 +246,11 @@ lr_lsa.score(X_lsa_scaled[:, :10], y_train)
 ```
 0.827
 ```
+]
+???
 
 - Not competitive but reasonable with just 10 components
 
-]
 
 
 
@@ -260,6 +260,7 @@ class: center, middle
 # Topic Models
 
 ---
+class: spacious
 
 # Motivation
 
@@ -273,7 +274,7 @@ class: center, middle
 # NMF for topic models
 
 .center[
-![:scale 70%](images/nmf.png)
+![:scale 80%](images/nmf.png)
 ]
 
 ---
@@ -281,9 +282,9 @@ class: center, middle
 # NMF for topic models
 
 .center[
-![:scale 70%](images/nmf_1.png)
+![:scale 95%](images/nmf_1.png)
 ]
-
+???
 - Each row of W corresponds to one "topic"
 
 ---
@@ -291,7 +292,6 @@ class: center, middle
 
 .smallest[
 ```python
-from sklearn.decomposition import NMF
 nmf_scale = NMF(n_components=100, verbose=10, tol=0.01)
 nmf_scale.fit(X_scaled)
 ```
@@ -325,15 +325,8 @@ No plot available
 ---
 class: center, middle
 
-#Latent Dirichlet Allocation (the other LDA)
-
----
-# LDA Motivation
-
-- Generative probabilistic model (similar to mixture model)
-- Bayesian graphical model
-- Learning is probabilistic inference
-- Non-convex optimization (even harder than mixture models)
+#Latent Dirichlet Allocation
+# (the other LDA)
 
 ---
 
@@ -343,7 +336,13 @@ class: center, middle
 ![:scale 70%](images/lda_model.png)
 ]
 
-- (stolen from Dave and John)
+(stolen from Dave and John)
+
+???
+- Generative probabilistic model (similar to mixture model)
+- Bayesian graphical model
+- Learning is probabilistic inference
+- Non-convex optimization (even harder than mixture models)
 
 ---
 
@@ -361,15 +360,13 @@ class: center, middle
 
 - (taken from Yang Ruan, Changsi An (http://salsahpc.indiana.edu/b649proj/proj3.html)
 ]
-
----
-
-# Estimated Parameters
+???
 
 - K topics = multinomial distributions over words
 - "mixture weights" for each document:
 	* How important is each topic for this document
-	* Each document contains multiple topics!
+    * Each document contains multiple topics!
+    
 
 ---
 
@@ -399,11 +396,11 @@ Variational Inference
 # Pick a solver
 
 - “Small data” (<= 10k? Documents):
-	* Gibbs sampling (lda package, MALLET in Java!)
+	* Gibbs sampling (lda package, MALLET in Java)
 - “Medium data” (<= 1M? Documents):
-	* Variational Inference (scikit-learn current default)
+	* Variational Inference (scikit-learn default)
 - “Large Data” (>1M? Documents):
-	* Stochastic Variational Inference (scikit-learn future default)
+	* Stochastic Variational Inference (scikit-learn)
 	* SVI allows online learning (partial_fit)
 - Remember SGD Lecture (and Leon Bottou):
 	* More data beats better inference (often)
@@ -501,6 +498,9 @@ pmf
 $$ \frac{n!}{x_1! ... x_k!} p_1^{x_1} ... p_k^{x^k}$$
 
 ]
+
+???
+FIXME formatting
 ---
 
 # Further Reading
