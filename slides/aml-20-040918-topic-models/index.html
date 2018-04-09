@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .remark-slide-content .smallest p, .remark-slide-content .smallest li,
+      .remark-slide-content .smallest .remark-code, .remark-slide-content .smallest a{
+          font-size: 15px;
+      }
+
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .column:first-of-type {float:left}
+      .column:last-of-type {float:right}
+      .tiny-code .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
+      .split-40 .column:first-of-type {width: 50%}
+      .split-40 .column:last-of-type {width: 50%}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# LSA & Topic Models
+
+04/09/18
+
+Andreas C. Müller
+
+???
+---
+
+# Beyond Bags of Words
+
+Limitations of bag of words:
+- Semantics of words not captured
+- Synonymous words not represented
+- Very distributed representation of documents
+
+---
+
+# Latent Semantic Analysis (LSA)
+
+- Reduce dimensionality of data.
+- Can't use PCA: can't subtract the mean (sparse data)
+- Instead of PCA: Just do SVD, truncate.
+- "Semantic" features, dense representation.
+- Easy to compute - convex optimization
+
+---
+
+# LSA with Truncated SVD
+
+.smaller[
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+vect = CountVectorizer(stop_words="english", min_df=4)
+X_train = vect.fit_transform(text_train)
+X_train.shape
+```
+```
+(25000, 30462)
+```
+```python
+from sklearn.decomposition import TruncatedSVD
+lsa = TruncatedSVD(n_components=100)
+X_lsa = lsa.fit_transform(X_train)
+lsa.components_.shape
+```
+```
+(100, 30462)
+```
+]
+---
+.smaller[
+```python
+plt.semilogy(lsa.explained_variance_ratio_)
+```
+```
+[<matplotlib.lines.Line2D at 0x7ffb8108fd68>]
+```
+]
+
+.center[
+![:scale 70%](images/lsa_truncated_svd_plot.png)
+]
+
+---
+# First Six eigenvectors
+
+.center[
+![:scale 100%](images/lsa_six_eigvec.png)
+]
+
+???
+Points in direction of mean
+---
+
+# Scale before LSA
+
+```python
+from sklearn.preprocessing import MaxAbsScaler, Normalizer
+scaler = MaxAbsScaler()
+X_scaled = scaler.fit_transform(X_train)
+X_normalized = Normalizer().fit_transform(X_train)
+
+lsa_normalized = TruncatedSVD(n_components=100)
+X_lsa_normalized = lsa_normalized.fit_transform(X_normalized)
+```
+
+- "Movie" and "Film" were dominating first couple of components. Try to get rid of that effect.
+
+---
+
+# Eigenvectors after scaling
+
+.center[
+![:scale 90%](images/lsa_six_eigvec_scaled.png)
+]
+
+.smaller[
+- Movie and film still important, but not that dominant any more.
+]
+
+---
+# Some Components Capture Sentiment
+
+.smallest[
+```python
+plt.scatter(X_lsa_scaled[:, 1], X_lsa_scaled[:, 3], alpha=.1, c=y_train)
+```
+]
+
+.center[
+![:scale 35%](images/capture_sentiment.png)
+]
+
+.smallest[
+
+```python
+lr_lsa = LogisticRegression(C=100).fit(X_lsa_scaled[:, :10], y_train)
+lr_lsa.score(X_test_lsa_scaled[:, :10], y_test)```
+```
+0.827
+```
+```python
+lr_lsa.score(X_lsa_scaled[:, :10], y_train)
+```
+```
+0.827
+```
+
+- Not competitive but reasonable with just 10 components
+
+]
+
+
+
+---
+class: center, middle
+
+# Topic Models
+
+---
+
+# Motivation
+
+- Each document is created as a mixture of topics
+- Topics are distributions over words
+- Learn topics and composition of documents simultaneously
+- Unsupervised (and possibly ill-defined)
+
+---
+
+# NMF for topic models
+
+.center[
+![:scale 70%](images/nmf.png)
+]
+
+---
+
+# NMF for topic models
+
+.center[
+![:scale 70%](images/nmf_1.png)
+]
+
+- Each row of W corresponds to one "topic"
+
+---
+# NMF on Scaled Data
+
+.smallest[
+```python
+from sklearn.decomposition import NMF
+nmf_scale = NMF(n_components=100, verbose=10, tol=0.01)
+nmf_scale.fit(X_scaled)
+```
+]
+
+.center[
+![:scale 60%](images/nmf_scaled_plot.png)
+]
+
+---
+# NMF components without scaling
+
+No plot available
+
+
+---
+# NMF with tfidf
+
+No plot available
+
+---
+
+
+# NMF with tfidf and 10 components
+
+.center[
+![:scale 70%](images/tfidf_10comp_plot.png)
+]
+
+
+---
+class: center, middle
+
+#Latent Dirichlet Allocation (the other LDA)
+
+---
+# LDA Motivation
+
+- Generative probabilistic model (similar to mixture model)
+- Bayesian graphical model
+- Learning is probabilistic inference
+- Non-convex optimization (even harder than mixture models)
+
+---
+
+# The LDA Model
+
+.center[
+![:scale 70%](images/lda_model.png)
+]
+
+- (stolen from Dave and John)
+
+---
+
+.center[
+![:scale 70%](images/lda_params.png)
+]
+
+.smallest[
+- For each topic $k$, draw $\beta_k \sim Dirichlet(\eta), k = 1 ... K$
+- For each document $d$ draw $\theta_d \sim Dirichlet(\alpha), d = 1 ... D$
+- For each word $i$ in document $d$:
+	* Draw a topic index $z_{di} \sim Multinomial(\theta_d)$
+	* Draw the observed word $w_{ij} \sim Multinomial(\beta_z)$
+
+
+- (taken from Yang Ruan, Changsi An (http://salsahpc.indiana.edu/b649proj/proj3.html)
+]
+
+---
+
+# Estimated Parameters
+
+- K topics = multinomial distributions over words
+- "mixture weights" for each document:
+	* How important is each topic for this document
+	* Each document contains multiple topics!
+
+---
+
+# Two Schools (of solvers)
+
+.left-column[
+Gibbs Sampling
+- Implements MCMC
+- Standard procedure for any probabilistic model
+- Very accuracte
+- Very slow
+
+]
+
+.right-column[
+
+Variational Inference
+- Extension of expectation-maximization algorithm
+- Deterministic
+- fast(er)
+- Less accurate solutions
+- Championed by Dave Blei
+
+]
+
+---
+# Pick a solver
+
+- “Small data” (<= 10k? Documents):
+	* Gibbs sampling (lda package, MALLET in Java!)
+- “Medium data” (<= 1M? Documents):
+	* Variational Inference (scikit-learn current default)
+- “Large Data” (>1M? Documents):
+	* Stochastic Variational Inference (scikit-learn future default)
+	* SVI allows online learning (partial_fit)
+- Remember SGD Lecture (and Leon Bottou):
+	* More data beats better inference (often)
+- Edward by Dustin Tran: http://edwardlib.org/
+	* Tensor-flow based framework for stochastic variational inference. 
+
+---
+
+.smallest[
+```python
+from sklearn.decomposition import LatentDirichletAllocation
+lda = LatentDirichletAllocation(n_topics=10, learning_method="batch")
+X_lda = lda.fit_transform(X_train)
+```
+]
+
+.center[
+![:scale 60%](images/lda_plot_1.png)
+]
+
+.smallest[
+- Very generic, similar to NMF(n_components=10).
+TV Series, “family drama”, and “history / war” topics
+]
+
+
+---
+
+
+.smallest[
+```python
+lda100 = LatentDirichletAllocation(n_topics=100, learning_method="batch")
+X_lda100 = lda100.fit_transform(X_train)
+```
+]
+
+.center[
+![:scale 60%](images/lda_plot_2.png)
+]
+
+---
+.center[
+![:scale 80%](images/lda_topics.png)
+]
+
+---
+
+# Hyper-Parameters
+
+- $\alpha$ (or $\theta$) = doc_topic_prior
+- $\beta$ (or $\eta$) = topic_word_prior
+- Both dirichlet distributions
+- Large value $\xrightarrow[]{}$ more dispersed
+- Small value $\xrightarrow[]{}$ more concentrated
+
+.center[
+![:scale 50%](images/lda_params.png)
+]
+
+---
+
+# Dirichlet Distributions
+
+.left-column[
+PDF: 
+$\qquad \frac{1}{B(\alpha)} \Pi_{i=1}^{K}{x_i^{\alpha_i - 1}}$
+]
+
+.right-column[
+Mean: 
+$\qquad E[X_i] = \frac{\alpha_i}{\sum_k{\alpha_k}}$
+]
+
+.center[
+![:scale 60%](images/dirichlet_dist.png)
+]
+
+---
+
+# Conjugate Prior
+
+- Prior is called "conjugate" of the posterior has the same form as prior
+$$ P(\theta | x) = \frac{p(x | \theta)p(\theta)}{\int_{}^{} p(x | \theta^\prime)p(\theta^\prime)d\theta^\prime} $$
+- if $p(x|\theta)$ is multimnomial (discrete distribution), then p(\theta) = Dirichlet(...) is a conjugate prior.
+
+
+
+.right-column[
+Dirichlet
+$$ \frac{1}{B(\alpha)} \Pi_{i=1}^{K}{x_i^{\alpha_i - 1}}$$
+]
+
+.left-column[
+pmf
+$$ \frac{n!}{x_1! ... x_k!} p_1^{x_1} ... p_k^{x^k}$$
+
+]
+---
+
+# Further Reading
+
+- Rethinking LDA: Why Priors Matter - Hanna Wallach
+- LDA Revisited: Entropy, Prior and Convergence –
+Zhang et. al.
+
+
+
+---
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
