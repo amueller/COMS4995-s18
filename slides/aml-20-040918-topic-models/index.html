@@ -280,6 +280,13 @@ class: spacious
 ]
 
 ---
+# NMF objectives
+
+`$$\large d_{Fro} = \frac{1}{2} ||X - HW||_{\mathrm{Fro}}^2 = \frac{1}{2} \sum_{i,j} (X_{ij} - (HW)_{ij})^2$$`
+
+`$$\large d_{KL}(X, HW) = \sum_{i,j} \left(X_{ij} \log\left(\frac{X_{ij}}{(HW)_{ij}}\right) - X_{ij} + (HW)_{ij}\right)$$`
+
+---
 
 # NMF for topic models
 
@@ -507,9 +514,35 @@ Dirichlet
 ???
 - if $p(x|\theta)$ is multimnomial (discrete distribution), <br>then $p(\theta) = \text{Dirichlet}(...)$ is a conjugate prior.
 
-FIXME formatting
 ---
 
+# (Block) Gibbs Sampling for LDA
+.center[
+![:scale 50%](images/lda_params.png)
+]
+
+--
+
+`$p(z_{iv} = k \, \vert \, \mathbf{\theta}_i, \phi_k) \propto \exp(\log \theta_{ik} + \log \phi_{k, y_{iv}})$`
+
+`$p(\theta_i \, \vert \, z_{iv} = k, \phi_k) = \text{Dir}(\alpha + \sum_l \mathbb{I}(z_{il} = k))$`
+
+`$p(\phi_k \, \vert \, z_{iv} = k, \mathbf{\theta}_i) = \text{Dir}(\gamma + \sum_i \sum_l \mathbb{I}(y_{il} = v, z_{il} = k))$`
+
+
+---
+
+# Collapsed Gibbs Sampling for LDA
+.center[
+![:scale 50%](images/lda_params.png)
+]
+
+Sample only `$p(z_i=k|\mathbf{z}_{-i})$`
+
+Compute $\theta$, $\phi$ from $\mathbf{z}$
+???
+Now sequential problem!
+---
 # Further Reading
 
 - Rethinking LDA: Why Priors Matter - Hanna Wallach
