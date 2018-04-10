@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .remark-slide-content .smallest p, .remark-slide-content .smallest li,
+      .remark-slide-content .smallest .remark-code, .remark-slide-content .smallest a{
+          font-size: 15px;
+      }
+
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      
+      .left-column30 {
+      width: 30%;
+      float: left;
+		}
+
+	  .right-column70 {
+      width: 70%;
+      float: right;
+      }
+
+
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .column:first-of-type {float:left}
+      .column:last-of-type {float:right}
+      .tiny-code .remark-code, .remark-inline-code .tiny-code{
+        font-size: 15px;
+      }
+      .split-40 .column:first-of-type {width: 50%}
+      .split-40 .column:last-of-type {width: 50%}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Word Embeddings
+
+04/11/18
+
+Andreas C. Müller
+
+???
+---
+
+# Beyond Bags of Words
+
+Limitations of bag of words:
+- Semantics of words not captured
+- Synonymous words not represented
+- Very distributed representation of documents
+
+---
+
+# Last Time
+
+- Latent Semantic Analysis
+- Non-negative Matrix Factorization
+- Latent Dirichlet Allocation
+- All embed documents into a continuous, corpusspecific
+space.
+- Today: Embed words in a “general” space.
+
+---
+# Idea
+
+- Unsupervised extraction of semantics using large
+corpus (wikipedia etc)
+- Input: one-hot representation of word (as in BoW).
+- Use auxiliary task to learn continuous
+representation.
+
+---
+# Skip-Gram models
+
+- Given a word, predict surrounding word
+- Supervised task, each document yields many
+examples
+- Not interested in performance for this task, just
+want to learn representations.
+
+
+---
+class: left
+
+# [“What is my purpose?”, “You pass the butter.”]
+
+.smallest[
+Using context windows of size 1 (in practice 5 or 10):
+]
+
+.center[
+![:scale 50%](images/context_window.png)
+]
+
+---
+# CBOW vs Skip-gram
+
+.center[
+![:scale 70%](images/cbow_skipgram.png)
+]
+
+.smallest[
+Efficient Estimation of Word Representations in Vector Space https://arxiv.org/pdf/1301.3781.pdf
+]
+
+
+---
+.center[
+![:scale 50%](images/cbow_skipgram_1.png)
+]
+
+
+---
+
+#Softmax Training
+.center[
+![:scale 70%](images/softmax.png)
+]
+
+
+.smallest[
+http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.
+pdf
+]
+
+---
+# Implementations
+
+- Gensim
+- Word2vec
+- Tensorflow
+- For small applications don’t train yourself
+---
+
+
+# Gensim - topic models for humans
+
+- Multiple LDA implementations
+- Wrappers for Mallet and vopal wabbit
+- Tools for analyzing topic models
+- No supervised learning
+- Uses list-of-tuples instead of sparse matrices to
+store documents.
+---
+# Introduction to gensim
+
+.smallest[
+```python
+docs = ["What is my purpose", "You bring butter"]
+texts = [[token for token in doc.lower().split()] for doc in docs]
+print(texts)
+```
+```
+[['what', 'is', 'my', 'purpose'], ['you', 'bring', 'butter']]
+```
+```python
+from gensim import corpora
+dictionary = corpora.Dictionary(texts)
+print(dictionary)
+```
+```
+Dictionary(7 unique tokens: ['butter', 'you', 'is', 'purpose', 'my']...)
+```
+```python
+new_doc = "what butter"
+dictionary.doc2bow(new_doc.lower().split())
+```
+```
+[(3, 1), (5, 1)]
+```
+```python
+corpus = [dictionary.doc2bow(text) for text in texts]
+corpus
+```
+```
+[[(0, 1), (1, 1), (2, 1), (3, 1)], [(4, 1), (5, 1), (6, 1)]]
+```
+
+
+Use NLTK or spacy or a regexp for tokenization in real
+applications. This method here doesn’t even handle
+punctuation.
+In gensim, a document is represented as list of tuples
+(index, frequency), corpus is a list of these.
+
+]
+
+---
+
+# Latent Semantic Analysis (LSA)
+
+- Reduce dimensionality of data.
+- Can't use PCA: can't subtract the mean (sparse data)
+- Instead of PCA: Just do SVD, truncate.
+- "Semantic" features, dense representation.
+- Easy to compute - convex optimization
+
+---
+# Converting to/from sparse matrix
+
+.smallest[
+```python
+import gensim
+corpus
+```
+```
+[[(0, 1), (1, 1), (2, 1), (3, 1)], [(4, 1), (5, 1), (6, 1)]]
+```
+```python
+gensim.matutils.corpus2csc(corpus)
+```
+```
+<7x2 sparse matrix of type '<class 'numpy.float64'>'
+  with 7 stored elements in Compressed Sparse Column format>
+```
+```python
+X = CountVectorizer().fit_transform(docs)
+X
+```
+```python
+sparse_corpus = gensim.matutils.Sparse2Corpus(X.T)
+print(sparse_corpus)
+print(list(sparse_corpus))
+```
+```
+<gensim.matutils.Sparse2Corpus object at 0x7fd6d776b438>
+[[(4, 1), (3, 1), (2, 1), (5, 1)], [(1, 1), (0, 1), (6, 1)]]
+```
+
+
+most transformations is gensim are lazy:
+They yield a generator (like Sparse2Corpus) which can
+be converted to a list.
+]
+
+---
+# Corpus Transformations
+
+.smaller[
+```python
+tfidf = gensim.models.TfidfModel(corpus)
+tfidf[corpus[0]]
+```
+```
+[(0, 0.5), (1, 0.5), (2, 0.5), (3, 0.5)]
+```
+```python
+print(tfidf[corpus])
+print(list(tfidf[corpus]))
+```
+```
+<gensim.interfaces.TransformedCorpus object at 0x7fd6d776b2b0>
+[[(0, 0.5), (1, 0.5), (2, 0.5), (3, 0.5)], [(4, 0.577), (5, 0.577), (6, 0.577)]]
+```
+
+]
+
+
+---
+
+# Word2Vecc in Gensim
+
+```python
+from gensim import models
+w = models.KeyedVectors.load_word2vec_format(
+    '../GoogleNews-vectors-negative300.bin', binary=True)
+w['queen'].shape
+```
+```
+(300,)
+```
+```python
+w.syn0.shape
+```
+```
+(3000000, 300)
+```
+
+---
+
+class: spacious
+# Prepare document
+
+.smallest[
+```python
+vect_w2v = CountVectorizer(vocabulary=w.index2word)
+vect_w2v.fit(text_train_sub)
+docs = vect_w2v.inverse_transform(vect_w2v.transform(text_train_sub))
+docs[0]
+```
+```
+array(['in', 'for', 'that', 'is', 'the', 'at', 'not', 'as', 'it', 'by',
+       'are', 'have', 'an', 'this', 'they', 'but', 'one', 'which', 'do',
+       'than', 'over', 'just', 'some', 'like', 'only', 'did', 'because',
+       'off', 'being', 'my', 'very', 'much', 'go', 'under', 'does', 'got',
+       'top', 'come', 'really', 'lot', 'find', 'thing', 'once', 'offer',
+       'feel', 'film', 'medical', 'terms', 'rather', 'certain', 'felt',
+       'consider', 'watch', 'parts', 'heavy', 'towards', 'enjoy',
+       'feeling', 'maybe', 'piece', 'fear', 'myself', 'stuff', 'handed',
+       'brings', 'movies', 'hospitals', 'rare', 'lots', 'skin', 'eating',
+       'intense', 'somewhat', 'liked', 'afraid', 'tribute', 'horror',
+       'revenge', 'brave', 'whilst', 'sympathy', 'assaulted', 'satisfying',
+       'hatred', 'viewer', 'awhile', 'pardon', 'delightful', 'disgust',
+       'imitation', 'pudding', 'cringe', 'jaded', 'pun', 'pangs', 'doesn',
+       'junctures', 'hellraiser', 'appologize'], 
+      dtype='<U98')
+```
+
+This is a silly way to tokenize the input and using only
+words that appear in the vocabulary used in the pretrained
+model.
+
+]
+
+---
+# Represent doc by average
+
+.smaller[
+```python
+X_train = np.vstack([np.mean(w[doc], axis=0) for doc in docs])
+X_train.shape
+```
+```
+(18750, 300)
+```
+```python
+docs_val = vect_w2v.inverse_transform(vect_w2v.transform(text_val))
+X_val = np.vstack([np.mean(w[doc], axis=0) for doc in docs_val])
+```
+```python
+lr_w2v = LogisticRegression(C=100).fit(X_train, y_train_sub)
+lr_w2v.score(X_train, y_train_sub)
+```
+```
+0.867
+```
+```python
+lr_w2v.score(X_val, y_val)
+```
+```
+0.857
+```
+
+]
+
+---
+# Analogues and Relationships
+
+.center[
+![:scale 60%](images/analogues.png)
+]
+
+
+.smallest[
+http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.pdf]
+
+---
+
+.center[
+![:scale 100%](images/king_queen.png)
+]
+
+
+.smaller[
+Answer “King is to Kings as Queen is to ?”: Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
+]
+
+.smallest[
+http://www.aclweb.org/anthology/N13-1090]
+---
+# Examples with Gensim
+
+.smaller[
+```python
+w.most_similar(positive=['woman', 'king'], negative=['man'], topn=3)
+```
+```
+[('queen', 0.7118192911148071),
+ ('monarch', 0.6189674139022827),
+ ('princess', 0.5902431607246399)]
+```
+```python
+w.most_similar(positive=['woman', 'he'], negative=['man'], topn=3)
+```
+```
+[('she', 0.8492251634597778),
+ ('She', 0.6329933404922485),
+ ('her', 0.6029669046401978)]
+```
+```python
+w.most_similar(positive=['Germany', 'pizza'], negative=['Italy'], topn=3)
+```
+```
+[('bratwurst', 0.5436394810676575),
+ ('Domino_pizza', 0.5133179426193237),
+ ('donuts', 0.5121968984603882)]
+```
+
+]
+
+---
+class: middle
+
+.center[
+![:scale 70%](images/table_gensim.png)
+]
+
+
+
+---
+class: center
+
+<br>
+.center[
+![:scale 70%](images/paper_title.png)
+]
+
+<br>
+
+<br>
+
+.smaller[
+$\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{king} - \overrightarrow{queen}$
+
+<br>
+<br>
+
+$\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{computer programmer} - \overrightarrow{homemaker}$
+
+
+]
+
+
+---
+# Going along he-she direction:
+
+<br>
+.center[
+![:scale 90%](images/he_she.png)
+]
+
+
+
+---
+
+# Paragraph Vectors - Doc2Vec
+
+<br>
+.center[
+![:scale 70%](images/doc2vec.png)
+]
+
+
+.smallest[
+Add a vector for each paragraph / document, also
+randomly initialized.
+To infer for new paragraph: keep weights fixed, do
+stochastic gradient descent on the representation D,
+sampling context examples from this paragraph.
+
+]
+
+
+---
+#Doc2Vec with gensim
+
+.smaller[
+```python
+def read_corpus(text, tokens_only=False):
+    for i, line in enumerate(text):
+        if tokens_only:
+            yield gensim.utils.simple_preprocess(line)
+        else:
+            # For training data, add tags
+            yield gensim.models.doc2vec.TaggedDocument(gensim.utils.simple_preprocess(line), [i])
+```
+```python
+train_corpus = list(read_corpus(text_train_sub))
+test_corpus = list(read_corpus(text_val, tokens_only=True))
+```
+```python
+model = gensim.models.doc2vec.Doc2Vec(size=300, min_count=2, iter=55)
+model.build_vocab(train_corpus)
+```
+```python
+model.train(train_corpus, total_examples=model.corpus_count)
+```
+]
+
+
+.smallest[
+https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-lee.ipynb
+]
+
+---
+#Encoding using doc2vec
+
+.smaller[
+```python
+vectors = [model.infer_vector(train_corpus[doc_id].words)
+          for doc_id in range(len(train_corpus))]    
+```
+```python
+X_train = np.vstack(vectors)
+```
+```python
+X_train.shape
+```
+```
+(18759, 50)
+```
+```python
+test_vectors = [model.infer_vector(test_corpus[doc_id])
+                for doc_id in range(len(test_corpus))]   
+```
+```python
+X_test = np.vstack(test_vectors)
+```
+
+]
+
+---
+
+```python
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression(C=100).fit(X_train, y_train_sub)
+```
+```python
+lr.score(X_train, y_train_sub)
+```
+```
+0.81738666666666671
+```
+```python
+lr.score(X_val, y_val)
+```
+```
+0.80320000000000003
+```
+
+.smaller[
+
+Not working well here. Either not enough training data,
+sgd didn’t converge yet, or too low dimension.
+]
+
+---
+
+
+# GloVe: Global Vecotrs for Word Representation
+
+.smaller[
+- https://nlp.stanford.edu/projects/glove/
+- Co-occurence not prediction
+
+]
+
+$$ J = \sum\limits_{i,j=1}^{V} f(X_k) (w_i^T \tilde{w_j} + b_i + \tilde{b_j} - \log X_k)  \qquad \text{ k is i,j}  $$
+
+
+$$ 
+f(x) = 
+\begin{cases}
+  (x/x_m)^\alpha & \text{if  } x < x_m   \\
+  1 & \text{otherwise} \\
+\end{cases} 
+$$
+
+.smallest[
+X_m is the maximim value.
+Here X_ij is the coocurrance count matrix, counting
+how often word I and j appear in the same context –
+say a 5 word window.
+We are learning a factorization of log(X_ij) into w_i and
+~w_j, where w_i are the word-vectors we want to
+extract.
+Very infrequent word-pairs are less important to get
+right, and are down-weighted using f(X_ij).
+]
+
+
+
+---
+# Word analogies
+
+.center[
+![:scale 35%](images/word_analogies.png)
+]
+
+
+.smallest[
+Comparison of CBOW, SGD, skip-gram and Glove on
+the semantic (ie. state→capital) and syntactic (ie
+singular→ plural) word analogy tasks
+]
+
+---
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
