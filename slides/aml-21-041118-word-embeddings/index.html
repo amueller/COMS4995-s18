@@ -670,11 +670,15 @@ $\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{computer 
 ![:scale 90%](images/he_she.png)
 ]
 
+---
+class: middle
 
-
+# Paragaph Vectors
+???
+Fixme rerun experiments from doc2vec paper to show it works?
 ---
 
-# Paragraph Vectors - Doc2Vec
+# Doc2Vec
 
 <br>
 .center[
@@ -727,6 +731,7 @@ https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-
 ]
 ???
 fixme example of nearest neighbors to see if this learned something useful!
+Should use the unlabeled reviews!
 
 ---
 #Encoding using doc2vec
@@ -773,11 +778,12 @@ lr.score(X_val, y_val)
 Not working well here. Either not enough training data,
 sgd didn’t converge yet, or too low dimension.
 FIXME combine with word vectors?
+In the paper: they actually get 0.926%
 
 ---
 
 
-# GloVe: Global Vecotrs for Word Representation
+# GloVe: Global Vectors for Word Representation
 
 
 $X_{ij}$ = How often does work j appear in context of word i
@@ -812,17 +818,17 @@ right, and are down-weighted using f(X_ij).
 alpha is 3/4 empirically. x_max is 100.
 
 ---
-class: center
-# Glove  Weighting function f
+class: center, spacious
+# GloVe  Weighting function f
 
-![:scale 80%](images/glove_weighting.png)
+![:scale 90%](images/glove_weighting.png)
 ???
 
 ---
 # Word analogies
 
 .center[
-![:scale 35%](images/word_analogies.png)
+![:scale 45%](images/word_analogies.png)
 ]
 
 ???
