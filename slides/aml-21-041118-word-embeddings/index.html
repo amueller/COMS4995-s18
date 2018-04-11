@@ -139,7 +139,8 @@ Andreas C. Müller
 
 ???
 today we'll talk about word embeddings
-word embeddings are the logical next step in doing text analysis after working with topic models on Monday.
+word embeddings are the logical next step in doing text analysis after working
+with topic models on Monday.
 ---
 
 # Beyond Bags of Words
@@ -152,11 +153,11 @@ Limitations of bag of words:
 ???
 
 Last time we started talking about limitations of bag of words, such as
-semantics of words are not captured
-synonymous words are not represented - if I use two synonymous words, for example film and movie,
-they are represented in completely different ways and there is no connection between them.
-and we also have a very distributed representation of documents, which might be hard to understand or hard
-to learn from.
+semantics of words are not captured synonymous words are not represented - if I
+use two synonymous words, for example film and movie, they are represented in
+completely different ways and there is no connection between them. and we also
+have a very distributed representation of documents, which might be hard to
+understand or hard to learn from.
 ---
 
 # Last Time
@@ -170,13 +171,15 @@ space.
 
 ???
 
-Last time we looked at latent semanic analysis, non-negative matrix factorization and latent dirichlet
-allocation.
-Each of them embedds the documents into a continuous, corpus specific space of a dimension of our choosing,
-using an unsupervised objective. The first two are matrix factorization, the third is a probabilistic generative model.
+Last time we looked at latent semanic analysis, non-negative matrix
+factorization and latent dirichlet allocation.
+Each of them embedds the documents into a continuous, corpus specific space of a
+dimension of our choosing, using an unsupervised objective. The first two are
+matrix factorization, the third is a probabilistic generative model.
 
-Today we'll be talking about a more general embedding, which tries to embedd individual words, not documents.
-The goal is to learn an embedding that's generally useful, and not necessarily tied to a particular corpus.
+Today we'll be talking about a more general embedding, which tries to embedd
+individual words, not documents. The goal is to learn an embedding that's
+generally useful, and not necessarily tied to a particular corpus.
 
 ---
 # Idea
@@ -189,12 +192,13 @@ representation.
 
 ???
 
-We'll talk about several methods, but they'll all use a very large corpus to create a relatively generic embedding.
-So we might use something like wikipedia or google news or a big corpus of books.
-It's an unsupervised task, but the way it is phrased is using an auxiliary supervised task to learn the embedding.
-And what I mean by that will be more clear shortly.
-The starting principle is a one-hot representation of each word, as in Bag of words, which basically just means
-each word is identified by some index.
+We'll talk about several methods, but they'll all use a very large corpus to
+create a relatively generic embedding. So we might use something like wikipedia
+or google news or a big corpus of books. It's an unsupervised task, but the way
+it is phrased is using an auxiliary supervised task to learn the embedding. And
+what I mean by that will be more clear shortly. The starting principle is a
+one-hot representation of each word, as in Bag of words, which basically just
+means each word is identified by some index.
 
 ---
 # Skip-Gram models
@@ -208,10 +212,12 @@ want to learn representations.
 ???
 
 A very commonly used auxiliary task is the skip-gram model.
-Here the task is, given a word, predict the surrounding words. This is a supervised task, with each
-document providing many examples, basically as many as there are words in the document.
-I'm saying this is an auxiliary task, because we're not really interested in actually solving this
-problem of predicting surrounding words, we just want to use this task to learn useful representations.
+Here the task is, given a word, predict the surrounding words. This is a
+supervised task, with each document providing many examples, basically as many
+as there are words in the document. I'm saying this is an auxiliary task,
+because we're not really interested in actually solving this problem of
+predicting surrounding words, we just want to use this task to learn useful
+representations.
 
 ---
 class: left
@@ -228,15 +234,17 @@ Using context windows of size 1 (in practice 5 or 10):
 
 ???
 Here's an example of what this task looks like.
-Let's say we have a corpus of two documents, "what is my purpose" and "you pass the butter".
-We specify a context window size, let's say one. Then, for each word that has enough context,
-we generate a training example.
-So for "is", we have a context of "what" and "my", for "my" we have "is" and "purpose", and so on.
-So the input would be "is" and the goal would be to predict that the word before is "what" and the word after is "my".
-that assigns a high probability to the outputs "what" and "my".
-In practice larger context windows are used, often 5-10 words in either direction.
-Cearly it's impossible to actually solve this task, because each word can appear in many different contexts.
-The goal is to learn which contexts are likely, and which are not.
+Let's say we have a corpus of two documents, "what is my purpose" and "you pass
+the butter". We specify a context window size, let's say one. Then, for each
+word that has enough context, we generate a training example.
+So for "is", we have a context of "what" and "my", for "my" we have "is" and
+"purpose", and so on. So the input would be "is" and the goal would be to
+predict that the word before is "what" and the word after is "my". that assigns
+a high probability to the outputs "what" and "my".
+In practice larger context windows are used, often 5-10 words in either
+direction. Cearly it's impossible to actually solve this task, because each word
+can appear in many different contexts. The goal is to learn which contexts are
+likely, and which are not.
 
 
 ---
@@ -252,14 +260,19 @@ Efficient Estimation of Word Representations in Vector Space https://arxiv.org/p
 ???
 
 This is the skip-gram model, here you can see it on the left (FIXME?!)
-So we start with the one-hot-encoding of the word, and we have a matrix multiplication into a latent space.
-A matrix multiplication with a one-hot vector just means that each row in that embedding matrix
-represents one word. From this latent space, we run logistic regression, trying to predict what the word is for each particular offset, so here in this picture we're trying to predict the word two to the left, one to the left, one
-to the right, and two to the right. So these are basically four classifiers running on the same input.
+So we start with the one-hot-encoding of the word, and we have a matrix
+multiplication into a latent space. A matrix multiplication with a one-hot
+vector just means that each row in that embedding matrix represents one word.
+From this latent space, we run logistic regression, trying to predict what the
+word is for each particular offset, so here in this picture we're trying to
+predict the word two to the left, one to the left, one to the right, and two to
+the right. So these are basically four classifiers running on the same input.
 
-Another approach is shown on the left, the continuous bag of words model, or CBOW.
-This is something that seems a bit more natural to me, where given the context, we are trying to predict the word in the center.
-So here we would be given four context words and try to figure out what's the most likely word to be in between those.
+Another approach is shown on the left, the continuous bag of words model, or
+CBOW. This is something that seems a bit more natural to me, where given the
+context, we are trying to predict the word in the center. So here we would be
+given four context words and try to figure out what's the most likely word to be
+in between those.
 
 
 ---
