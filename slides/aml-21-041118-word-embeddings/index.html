@@ -145,6 +145,10 @@ Andreas C. Müller
 today we'll talk about word embeddings
 word embeddings are the logical next step in doing text analysis after working
 with topic models on Monday.
+
+FIXME: redo paragraph vector experiments
+FIXME: state of the art?
+FIXME: too short?
 ---
 
 # Beyond Bags of Words
@@ -249,9 +253,6 @@ In practice larger context windows are used, often 5-10 words in either
 direction. Cearly it's impossible to actually solve this task, because each word
 can appear in many different contexts. The goal is to learn which contexts are
 likely, and which are not.
-
-
-
 
 ---
 .center[
@@ -732,7 +733,23 @@ https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-
 ???
 fixme example of nearest neighbors to see if this learned something useful!
 Should use the unlabeled reviews!
-
+---
+# Validation of Word Vectors
+```python
+model.wv.most_similar("movie")
+```
+```
+[('film', 0.9482318758964539),
+ ('flick', 0.822228193283081),
+ ('series', 0.715380072593689),
+ ('programme', 0.7032747268676758),
+ ('sequel', 0.6939107179641724),
+ ('story', 0.6771408319473267),
+ ('show', 0.6559576392173767),
+ ('documentary', 0.6537493467330933),
+ ('picture', 0.6427854299545288),
+ ('thriller', 0.6300673484802246)]
+ ```
 ---
 #Encoding using doc2vec
 
@@ -779,6 +796,7 @@ Not working well here. Either not enough training data,
 sgd didn’t converge yet, or too low dimension.
 FIXME combine with word vectors?
 In the paper: they actually get 0.926%
+400 dimensions (And using unsupervised data)
 
 ---
 
