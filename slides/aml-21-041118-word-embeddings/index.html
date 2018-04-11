@@ -180,15 +180,15 @@ want to learn representations.
 ---
 class: left
 
-# [“What is my purpose?”, “You pass the butter.”]
-
-.smallest[
-Using context windows of size 1 (in practice 5 or 10):
-]
-
+# Example
+```
+[“What is my purpose?”, “You pass the butter.”]
+```
 .center[
 ![:scale 50%](images/context_window.png)
 ]
+
+Using context windows of size 1 (in practice 5 or 10):
 
 ---
 # CBOW vs Skip-gram
@@ -273,7 +273,9 @@ corpus
 ```
 [[(0, 1), (1, 1), (2, 1), (3, 1)], [(4, 1), (5, 1), (6, 1)]]
 ```
+]
 
+???
 
 Use NLTK or spacy or a regexp for tokenization in real
 applications. This method here doesn’t even handle
@@ -281,19 +283,8 @@ punctuation.
 In gensim, a document is represented as list of tuples
 (index, frequency), corpus is a list of these.
 
-]
-
 ---
 
-# Latent Semantic Analysis (LSA)
-
-- Reduce dimensionality of data.
-- Can't use PCA: can't subtract the mean (sparse data)
-- Instead of PCA: Just do SVD, truncate.
-- "Semantic" features, dense representation.
-- Easy to compute - convex optimization
-
----
 # Converting to/from sparse matrix
 
 .smallest[
@@ -324,12 +315,14 @@ print(list(sparse_corpus))
 <gensim.matutils.Sparse2Corpus object at 0x7fd6d776b438>
 [[(4, 1), (3, 1), (2, 1), (5, 1)], [(1, 1), (0, 1), (6, 1)]]
 ```
+]
 
+???
 
 most transformations is gensim are lazy:
 They yield a generator (like Sparse2Corpus) which can
 be converted to a list.
-]
+
 
 ---
 # Corpus Transformations
@@ -403,12 +396,12 @@ array(['in', 'for', 'that', 'is', 'the', 'at', 'not', 'as', 'it', 'by',
        'junctures', 'hellraiser', 'appologize'], 
       dtype='<U98')
 ```
+]
 
+???
 This is a silly way to tokenize the input and using only
 words that appear in the vocabulary used in the pretrained
 model.
-
-]
 
 ---
 # Represent doc by average
@@ -548,15 +541,12 @@ $\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{computer 
 ![:scale 70%](images/doc2vec.png)
 ]
 
-
-.smallest[
+???
 Add a vector for each paragraph / document, also
 randomly initialized.
 To infer for new paragraph: keep weights fixed, do
 stochastic gradient descent on the representation D,
 sampling context examples from this paragraph.
-
-]
 
 
 ---
@@ -627,20 +617,18 @@ lr = LogisticRegression(C=100).fit(X_train, y_train_sub)
 lr.score(X_train, y_train_sub)
 ```
 ```
-0.81738666666666671
+0.817
 ```
 ```python
 lr.score(X_val, y_val)
 ```
 ```
-0.80320000000000003
+0.803
 ```
 
-.smaller[
-
+???
 Not working well here. Either not enough training data,
 sgd didn’t converge yet, or too low dimension.
-]
 
 ---
 
@@ -664,8 +652,10 @@ f(x) =
 \end{cases} 
 $$`
 
-.smallest[
+???
+
 X_m is the maximim value.
+
 Here X_ij is the coocurrance count matrix, counting
 how often word I and j appear in the same context –
 say a 5 word window.
@@ -674,7 +664,7 @@ We are learning a factorization of log(X_ij) into w_i and
 extract.
 Very infrequent word-pairs are less important to get
 right, and are down-weighted using f(X_ij).
-]
+
 
 
 
@@ -685,12 +675,11 @@ right, and are down-weighted using f(X_ij).
 ![:scale 35%](images/word_analogies.png)
 ]
 
+???
 
-.smallest[
 Comparison of CBOW, SGD, skip-gram and Glove on
 the semantic (ie. state→capital) and syntactic (ie
 singular→ plural) word analogy tasks
-]
 
 ---
 class: middle
