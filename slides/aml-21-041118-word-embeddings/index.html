@@ -576,7 +576,7 @@ lr_w2v.score(X_val, y_val)
 
 .smaller[
 Answer “King is to Kings as Queen is to ?”:<br/>
-Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
+Find closest vector to vec(“Queen”) + (vec(“Kings”) - vec(“King”))
 ]
 
 .smallest[
@@ -589,6 +589,20 @@ Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
 
 .smallest[
 <a href="http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et. al. - Distributed Representations of Words and Phrases and their Compositionality (2013)</a>]
+---
+# Finding Relations
+<br />
+$$\large a : b : : c : ?$$
+<br />
+$$\large d = \text{arg}\max_i\frac{\left(\text{vec}(b) - \text{vec}(a) + \text{vec}(v)\right)^T vec_i}{\lVert\text{vec}(b) - \text{vec}(a) + \text{vec}(v)\rVert\lVert \text{vec}_i\rVert}$$
+---
+class: middle
+
+.center[
+![:scale 70%](images/table_cities_states.png)
+]
+
+.smallest[<a href="https://cs224d.stanford.edu/lecture_notes/notes2.pdf">Stanford CS 224D: Deep Learning for NLP</a>]
 
 ---
 
@@ -620,13 +634,6 @@ w.most_similar(positive=['Germany', 'pizza'], negative=['Italy'], topn=3)
  ('donuts', 0.5121968984603882)]
 ```
 
-]
-
----
-class: middle
-
-.center[
-![:scale 70%](images/table_gensim.png)
 ]
 
 
@@ -677,11 +684,17 @@ $\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{computer 
 <a href="https://cs.stanford.edu/~quocle/paragraph_vector.pdf">Le, Mikolov: Distributed Representations of Sentences and Documents (2014)</a>
 ]
 ???
+based on cbow, not skip-grams
+
 Add a vector for each paragraph / document, also
 randomly initialized.
 To infer for new paragraph: keep weights fixed, do
 stochastic gradient descent on the representation D,
 sampling context examples from this paragraph.
+
+FIXME better explanation.
+
+There is no gradient descent at encoding time for word2vec!
 
 
 ---
@@ -701,10 +714,10 @@ def read_corpus(text, tokens_only=False):
 train_corpus = list(read_corpus(text_train_sub))
 test_corpus = list(read_corpus(text_val, tokens_only=True))
 
-model = gensim.models.doc2vec.Doc2Vec(size=50, min_count=2, iter=55)
+model = gensim.models.doc2vec.Doc2Vec(vector_size=50, min_count=2)
 model.build_vocab(train_corpus)
 
-model.train(train_corpus, total_examples=model.corpus_count)
+model.train(train_corpus, total_examples=model.corpus_count, epochs=55)
 ```
 ]
 
@@ -712,6 +725,8 @@ model.train(train_corpus, total_examples=model.corpus_count)
 .smallest[
 https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-lee.ipynb
 ]
+???
+fixme example of nearest neighbors to see if this learned something useful!
 
 ---
 #Encoding using doc2vec
@@ -764,26 +779,26 @@ FIXME combine with word vectors?
 
 # GloVe: Global Vecotrs for Word Representation
 
-.smaller[
-- https://nlp.stanford.edu/projects/glove/
-- Co-occurence not prediction
 
-]
+$X_{ij}$ = How often does work j appear in context of word i
 
-$$ J = \sum\limits_{i,j=1}^{V} f(X_k) (w_i^T \tilde{w_j} + b_i + \tilde{b_j} - \log X_k)  \qquad \text{ k is i,j}  $$
+`$$ J = \sum\limits_{i,j=1}^{V} f(X_{ij}) (w_i^T \tilde{w_j} + b_i + \tilde{b_j} - \log X_{ij})^2$$`
 
 
 `$$ 
 f(x) = 
 \begin{cases}
-  (x/x_m)^\alpha & \text{if  } x < x_m   \\
+  (x/x_\text{max})^\alpha & \text{if  } x < x_\text{max}  \\
   1 & \text{otherwise} \\
 \end{cases} 
 $$`
 
-???
+.smaller[
+https://nlp.stanford.edu/projects/glove/
+]
 
-X_m is the maximim value.
+
+???
 
 Here X_ij is the coocurrance count matrix, counting
 how often word I and j appear in the same context –
@@ -794,8 +809,14 @@ extract.
 Very infrequent word-pairs are less important to get
 right, and are down-weighted using f(X_ij).
 
+alpha is 3/4 empirically. x_max is 100.
 
+---
+class: center
+# Glove  Weighting function f
 
+![:scale 80%](images/glove_weighting.png)
+???
 
 ---
 # Word analogies
