@@ -247,6 +247,26 @@ can appear in many different contexts. The goal is to learn which contexts are
 likely, and which are not.
 
 
+
+
+---
+.center[
+![:scale 50%](images/cbow_skipgram_1.png)
+]
+
+
+---
+
+#Softmax Training
+.center[
+![:scale 70%](images/softmax.png)
+]
+
+
+.smallest[
+http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.
+pdf
+]
 ---
 # CBOW vs Skip-gram
 
@@ -274,39 +294,19 @@ context, we are trying to predict the word in the center. So here we would be
 given four context words and try to figure out what's the most likely word to be
 in between those.
 
-
----
-.center[
-![:scale 50%](images/cbow_skipgram_1.png)
-]
-
-
----
-
-#Softmax Training
-.center[
-![:scale 70%](images/softmax.png)
-]
-
-
-.smallest[
-http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.
-pdf
-]
-
 ---
 # Implementations
 
 - Gensim
 - Word2vec
 - Tensorflow
-- For small applications don’t train yourself
+- Don't train yourself
 ---
 
 
 # Gensim - topic models for humans
 
-- Multiple LDA implementations
+- Multiple Latent Dirichlet Allocation implementations
 - Wrappers for Mallet and vopal wabbit
 - Tools for analyzing topic models
 - No supervised learning
@@ -391,11 +391,10 @@ print(list(sparse_corpus))
 ]
 
 ???
-
 most transformations is gensim are lazy:
 They yield a generator (like Sparse2Corpus) which can
 be converted to a list.
-
+Note that the CSC is transposed to what we would expect in sklearn.
 
 ---
 # Corpus Transformations
@@ -422,7 +421,7 @@ print(list(tfidf[corpus]))
 
 ---
 
-# Word2Vecc in Gensim
+# Word2Vec in Gensim
 
 ```python
 from gensim import models
@@ -511,7 +510,20 @@ lr_w2v.score(X_val, y_val)
 # Analogues and Relationships
 
 .center[
-![:scale 60%](images/analogues.png)
+![:scale 100%](images/king_queen.png)
+]
+
+
+.smaller[
+Answer “King is to Kings as Queen is to ?”:<br/>
+Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
+]
+
+.smallest[
+http://www.aclweb.org/anthology/N13-1090]
+---
+.center[
+![:scale 80%](images/analogues.png)
 ]
 
 
@@ -520,18 +532,6 @@ http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrase
 
 ---
 
-.center[
-![:scale 100%](images/king_queen.png)
-]
-
-
-.smaller[
-Answer “King is to Kings as Queen is to ?”: Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
-]
-
-.smallest[
-http://www.aclweb.org/anthology/N13-1090]
----
 # Examples with Gensim
 
 .smaller[
@@ -633,17 +633,15 @@ def read_corpus(text, tokens_only=False):
             yield gensim.utils.simple_preprocess(line)
         else:
             # For training data, add tags
-            yield gensim.models.doc2vec.TaggedDocument(gensim.utils.simple_preprocess(line), [i])
-```
-```python
+            yield gensim.models.doc2vec.TaggedDocument(
+                gensim.utils.simple_preprocess(line), [i])
+
 train_corpus = list(read_corpus(text_train_sub))
 test_corpus = list(read_corpus(text_val, tokens_only=True))
-```
-```python
+
 model = gensim.models.doc2vec.Doc2Vec(size=300, min_count=2, iter=55)
 model.build_vocab(train_corpus)
-```
-```python
+
 model.train(train_corpus, total_examples=model.corpus_count)
 ```
 ]
@@ -660,11 +658,9 @@ https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-
 ```python
 vectors = [model.infer_vector(train_corpus[doc_id].words)
           for doc_id in range(len(train_corpus))]    
-```
-```python
+
 X_train = np.vstack(vectors)
-```
-```python
+
 X_train.shape
 ```
 ```
@@ -673,8 +669,6 @@ X_train.shape
 ```python
 test_vectors = [model.infer_vector(test_corpus[doc_id])
                 for doc_id in range(len(test_corpus))]   
-```
-```python
 X_test = np.vstack(test_vectors)
 ```
 
@@ -685,8 +679,7 @@ X_test = np.vstack(test_vectors)
 ```python
 from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(C=100).fit(X_train, y_train_sub)
-```
-```python
+
 lr.score(X_train, y_train_sub)
 ```
 ```
