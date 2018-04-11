@@ -57,15 +57,19 @@
       .padding-top {
           padding-top: 100px;
       }
-      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
-      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+      .remark-slide-container .smaller p, .remark-slide-container .smaller li,
+      .remark-slide-container .smaller .remark-code, .remark-slide-container .smaller a{
           font-size: 25px;
       }
       .normal {
           font-size: 30px;
       }
-      .remark-slide-content .smallest p, .remark-slide-content .smallest li,
-      .remark-slide-content .smallest .remark-code, .remark-slide-content .smallest a{
+      .remark-slide-container .smallerr p, .remark-slide-container .smallerr li,
+      .remark-slide-container .smallerr .remark-code, .remark-slide-container .smallerr a{
+          font-size: 20px;
+      }
+      .remark-slide-container .smallest p, .remark-slide-container .smallest li,
+      .remark-slide-container .smallest .remark-code, .remark-slide-container .smallest a{
           font-size: 15px;
       }
 
@@ -264,8 +268,7 @@ likely, and which are not.
 
 
 .smallest[
-http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.
-pdf
+<a href="http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et. al. - Distributed Representations of Words and Phrases and their Compositionality (2013)</a>]
 ]
 ---
 # CBOW vs Skip-gram
@@ -433,18 +436,75 @@ w['queen'].shape
 (300,)
 ```
 ```python
-w.syn0.shape
+w.vectors.shape
 ```
 ```
 (3000000, 300)
 ```
+---
+# Cosine Similarity
+.padding-top[
+
+`$$\Large \text{similarity}(v, w)=\cos(\theta) = \frac{v^Tw}{\lVert v\rVert \lVert w \rVert}$$`
+]
+---
+class: smallerr
+# Inspecting Semantics
+```python
+w.most_similar(positive=['movie'], topn=5)
+```
+
+```
+[('film', 0.8676770925521851),
+ ('movies', 0.8013108968734741),
+ ('films', 0.7363011837005615),
+ ('moive', 0.6830361485481262),
+ ('Movie', 0.6693680286407471)]
+```
+--
+```python
+w.most_similar(positive=['good'], topn=5)
+```
+--
+```
+[('great', 0.7291510105133057),
+ ('bad', 0.7190051078796387),
+ ('terrific', 0.6889115571975708),
+ ('decent', 0.6837348341941833),
+ ('nice', 0.6836092472076416)]
+ ```
+--
+```python
+w.most_similar(positive=['cute', 'dog'], topn=5)
+```
+```
+[('puppy', 0.7645270228385925),
+ ('chihuahua', 0.7209305763244629),
+ ('adorable_puppy', 0.7108923196792603),
+ ('yorkie', 0.7013816833496094),
+ ('Shitzu', 0.7004074454307556)]
+ ```
 
 ---
 
-class: spacious
-# Prepare document
+# Prepare document (IMDB)
 
 .smallest[
+```python
+print(text_train_sub[0].decode())
+```
+```
+Maybe it's just because I have an intense fear of hospitals and medical stuff, but this one got under my skin
+(pardon the pun). This piece is brave, not afraid to go over the top and as satisfying as they come in terms
+of revenge movies. Not only did I find myself feeling lots of hatred for the screwer and lots of sympathy 
+towards the "screwee", I felt myself cringe and feel pangs of disgust at certain junctures which is really a
+rare and delightful thing for a somewhat jaded horror viewer like myself. Some parts are very reminiscant of
+"Hellraiser", but come off as tribute rather than imitation. It's a heavy handed piece that does not offer 
+the viewer much to consider, but I enjoy being assaulted by a film once and awhile. This piece brings it and 
+doesn't appologize.
+I liked this one a lot. Do NOT watch whilst eating pudding.
+```
+
 ```python
 vect_w2v = CountVectorizer(vocabulary=w.index2word)
 vect_w2v.fit(text_train_sub)
@@ -520,7 +580,7 @@ Find closest vector to vec(“Queen”) + (vect(“Kings”) - vec(“King”))
 ]
 
 .smallest[
-http://www.aclweb.org/anthology/N13-1090]
+<a href="http://www.aclweb.org/anthology/N13-1090">Mikolov et. al. Linguistic Regularities in Continuous Space Word Representations (2013)</a>]
 ---
 .center[
 ![:scale 80%](images/analogues.png)
@@ -528,7 +588,7 @@ http://www.aclweb.org/anthology/N13-1090]
 
 
 .smallest[
-http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-theircompositionality.pdf]
+<a href="http://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf">Mikolov et. al. - Distributed Representations of Words and Phrases and their Compositionality (2013)</a>]
 
 ---
 
@@ -613,7 +673,9 @@ $\overrightarrow{man} - \overrightarrow{woman} \approx \overrightarrow{computer 
 .center[
 ![:scale 70%](images/doc2vec.png)
 ]
-
+.smallest[
+<a href="https://cs.stanford.edu/~quocle/paragraph_vector.pdf">Le, Mikolov: Distributed Representations of Sentences and Documents (2014)</a>
+]
 ???
 Add a vector for each paragraph / document, also
 randomly initialized.
@@ -639,7 +701,7 @@ def read_corpus(text, tokens_only=False):
 train_corpus = list(read_corpus(text_train_sub))
 test_corpus = list(read_corpus(text_val, tokens_only=True))
 
-model = gensim.models.doc2vec.Doc2Vec(size=300, min_count=2, iter=55)
+model = gensim.models.doc2vec.Doc2Vec(size=50, min_count=2, iter=55)
 model.build_vocab(train_corpus)
 
 model.train(train_corpus, total_examples=model.corpus_count)
@@ -695,6 +757,7 @@ lr.score(X_val, y_val)
 ???
 Not working well here. Either not enough training data,
 sgd didn’t converge yet, or too low dimension.
+FIXME combine with word vectors?
 
 ---
 
