@@ -227,5 +227,48 @@ So we look at k samples, compute the gradients, average them, and update the wei
 That allows us to update much more often than looking at the whole dataset, while still having a more stable
 gradient, and better being able to use the parallel computing capabilities of modern CPUs and GPUs.
 This is what's used in practice basically always.
-The reason why this is faster is basically that doing a matrix-vector multiplication is faster than
-doing a bunch of vector-vector operations.
+The reason why this is faster is basically that doing a matrix-matrix multiplication is faster than
+doing a bunch of matrix-vector operations.
+
+In principle we could also be using smarter optimization methods, like second order methods or LBFGS,
+but these are often not very effective on these large non-convex problems.
+One, called levenberg-marquardt is actually a possibility, but it's not really used these days.
+
+???
+As with linear models, tuning the learning rate is a major issue here, so finding a good value of eta.
+
+Actually, having a constant learning rate during the whole learning process is not good.
+Instead, we want to make bigger steps in the beginning and smaller steps in the end, so that's what
+people used for many years.
+Even better is to have a different learning rate for each parameter that we're tuning, based on
+past gradient steps.
+There's many heuristics for that, and it's somewhat related to diagonal approximations of second
+order methods. There's adagrad, adadelta, rmsprop and may more.
+When I first started doing neural nets, I actually used something similar, Rprop, from the 90s.
+Arguably the state of the art for these per-parameter adaptive learning rates is adam. It has
+some magic numbers in it but it seems to work well in practice. Rmsprop is also used by some.
+
+In addition to the speed of convergence, there's the addition issue that you will get different
+solutions depending on how you pick the learning rates, as it's a non-convex problem.
+
+While there is a whole lot of literature on this topic, it's really hard to do actual theory
+about this, as it's fundamentally impossible to actually find a global optimum. So nearly
+all of these strategies are heuristics, that have just proven well to work in practice.
+???
+
+So for large datasets, something like adam or rmsprop is probably a good idea.
+However, if you have a very small datasets, you might just try an off-the-shelf solver like lbfgs.
+Lbfgs basically uses an estimate of the hessian and is originally meant for convex problems, but it
+also works reasonably well for non-convex problems.
+And if you have time and nerve, you can try tuning a learning rate or learning rate schedule
+yourself, and that can give better results than using one of the heurstics, but only after
+putting in some effort. One other commonly used strategy is using a constant learning rate
+for all weights, and half it once learning slows down.
+These are basically the options that scikit-learn gives you, with the default being adam.
+For some of the toy datasets we'll use lbfgs instead, which is more likely to give good results
+if it's feasible to run a large number of iterations.
+So let's start using these models now, for now with scikit-learn.
+
+FIXME add transition slide.
+???
+So lets start with some toy data. Here's my favorite two moons dataset.
