@@ -369,11 +369,11 @@ class: center, middle
 ]
 
 .smallest[
-- For each topic $k$, draw $\beta_k \sim Dirichlet(\eta), k = 1 ... K$
-- For each document $d$ draw $\theta_d \sim Dirichlet(\alpha), d = 1 ... D$
+- For each topic $k$, draw $\phi_k \sim \text{Dirichlet}(\beta), k = 1 ... K$
+- For each document $d$ draw $\theta_d \sim \text{Dirichlet}(\alpha), d = 1 ... D$
 - For each word $i$ in document $d$:
-	* Draw a topic index $z_{di} \sim Multinomial(\theta_d)$
-	* Draw the observed word $w_{ij} \sim Multinomial(\beta_z)$
+	* Draw a topic index $z_{di} \sim \text{Multinomial}(\theta_d)$
+	* Draw the observed word $w_{ij} \sim \text{Multinomial}(\beta_z)$
 
 
 - (taken from Yang Ruan, Changsi An (http://salsahpc.indiana.edu/b649proj/proj3.html)
