@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Neural Networks
+
+04/16/18
+
+Andreas C. Müller
+???
+---
+# History
+
+- Nearly everything we talk about today existed ~1990
+
+- What changed?
+
+  – More data
+
+  – Faster computers (GPUs)
+
+  – Some improvements:
+    - relu
+    - Drop-out
+    - adam
+    - batch-normalization
+
+???
+---
+#Supervised Neural Networks
+
+- Non-linear models for classification and regression
+
+- Work well for very large datasets
+
+- Non-convex optimization
+
+- Notoriously slow to train – need for GPUs
+
+- Use dot products etc require preprocessing, → similar to
+SVM or linear models, unlike trees
+
+- MANY variants (Convolutional nets, Gated Recurrent neural
+networks, Long-Short-Term Memory, recursive neural
+networks, variational autoencoders, general adverserial
+networks, neural turing machines...)
+
+???
+---
+#Logistic regression drawn as neural net
+
+.center[
+![:scale 40%](images/log_reg_nn.png)
+]
+
+???
+---
+
+#Basic Architecture (for making predictions)
+
+.center[
+![:scale 30%](images/nn_basic_arch.png)
+]
+
+`$ h(x) = f(Wx+b) $`
+
+`$ o(x) = g(W'h(x) + b') $`
+???
+ First let’s describe how to make a prediction given a
+  model.
+
+ Input denotes single sample, here three input features.
+ Hidden layer here 4 units is matrix multiply with W, b
+  added (size of b is 4 here), followed by the univariate
+  non-linear function f – sigmoid, tanh, rectifying linear
+  function.
+
+ Output is a matrix multiplication with different weight
+matrix W’, b’ added (size 2 here), followed by
+another non-linear function g. The function g for the
+output layer is often different: identity for regression,
+soft-max for classification.
+
+ We want to learn W (3x4) W’ (4x2), b (4,), b’ (2,).
+
+ Can think of it as logistic regression with learning a
+non-linear basis transformation.
+---
+#Can have arbitrarily many layers
+
+.center[
+![:scale 60%](images/nn_manylayers.png)
+]
+???
+- Hidden layers usually all have the same non-linear
+  function, weights are different for each layer.
+
+- Many layers → “deep learning”.
+- This is called a multilayer perceptron, feed-forward neural network, vanilla feed-forward neural network.
+
+- For regression usually single output neuron with linear activation.
+- For classification one-hot-encoding of classes, n_classes many output variables with softmax.
+---
+#Nonlinear activation function
+
+.center[
+![:scale 65%](images/nonlin_fn.png)
+]
+???
+
+- Choices for activation function f of hidden layers.
+
+- Traditional tanh (or logistic sigmoid, not shown, but similar).
+
+- Tanh squashes to open interval (-1, 1).
+
+- Relu – recent trend, linear function x=y for positive,
+constant for negative values. Bias allows shifting the
+cut-off (~ linear splines)
+
+---
+# Training Objective
+
+`$$ h(x) = f(W_1x+b_1) $$`
+`$$ o(x) = g(W_2h(x)+b_2) = g(W_2f(W_1x + b_1) + b_2)$$`
+`$$ \min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,o(x_i)) $$` 
+
+- Could add regularization
+.center[
+`$ \min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,g(W_2h(x)+b_2) = g(W_2f(W_1x + b_1) + b_2)) $`
+]
+- `$l$` Squared loss for regression. Cross-entropy loss (multi-class log-loss) for classification
+
+???
+---
+
+#Backpropogation
+
+- For gradient based-method need `$ \frac{\partial o(x)}{\partial W_i} $` and `$\frac{\partial o(x)}{\partial b_i}$`
+
+`$$ net(x) := W_1x + b_1 $$`
+
+.center[![:scale 60%](images/backprop_eqn.png)]
+
+Backpropogation = Chain Rule + Dynamic Programming
+
+???
+- Easy to write down for last layer
+
+- Example for squared loss (g is identity for
+regression)
+
+- Can use the chain rule to compute other gradients
+
+- Bottom layers require partial derivatives of upper
+layers → reuse results
+
+- Backpropagation: dynamic programming + chain rule
+
+- “backward pass” compute partial derivatives starting at the last layer.
+
+- You should try to go through that yourself once
+
+
+---
+#But wait!
+
+.center[
+![:scale 75%](images/relu_differentiability.png)
+]
+
+???
+- relu is not differentiable.
+
+- But it’s differentiable almost anywhere.
+
+- “subgradient descent” - little issues in practice
+
+---
+#Optimizing W, b
+
+- Batch
+`$ W_i \leftarrow W_i - \eta\sum\limits_{j=1}^N \frac{l(x_j,y_j)}{W_i} $`
+
+- Minibatch
+`$ W_i \leftarrow W_i - \eta\sum\limits_{j=k}^{k+m} \frac{l(x_j,y_j)}{W_i}$`
+
+- Online/Stochastic
+`$ W_i \leftarrow W_i - \eta\frac{l(x_j,y_j)}{W_i}$`
+
+???
+- Standard solvers: l-bfgs, newton, cg
+
+- Problem: Hessian too expensive, can to l-bfgs
+
+- Computing gradients over whole dataset expensive
+
+- Stochastic Gradient Descent to rescue
+
+- Actually use mini-batches
+---
+class:spacious
+# Learning Heuristics
+
+- Constant `$\eta$` not good
+
+- Can decrease `$\eta$`
+
+- Better: adaptive `$\eta$` for each entry if W_i
+
+- State-of-the-art: adam (with magic numbers)
+
+- https://arxiv.org/pdf/1412.6980.pdf
+
+- http://sebastianruder.com/optimizing-gradient-descent/
+???
+---
+class:spacious
+# Picking Optimization Algorithms
+
+- Small dataset: off the shelf like l-bfgs
+
+- Big dataset: adam
+
+- Have time &amp; nerve: tune the schedule
+
+???
+---
+#Neural Nets with sklearn
+
+.center[
+![:scale 45%](images/nn_sklearn.png)
+]
+
+.smaller[
+```python
+mlp = MLPClassifier(solver='lbfgs', random_state=0).fit(X_train, y_train)
+print(mlp.score(X_train, y_train))
+print(mlp.score(X_test, y_test))
+```
+```
+1.0
+0.88
+```
+]
+
+???
+- Don’t user sklearn for anything but toy problems in
+neural nets.
+---
+#Random State
+
+.center[
+![:scale 75%](images/random_state.png)
+]
+
+???
+This net is also way over capacity and can overfit in many ways.
+Regularization might make it less dependent on initialization.
+---
+# Hidden Layer Size
+
+.smaller[
+```python
+mlp = MLPClassifier(solver='lbfgs', hidden_layer_size=(5,),random_state=10).
+                    fit(X_train, y_train)
+print(mlp.score(X_train, y_train))
+print(mlp.score(X_test, y_test))
+```
+```
+0.9333333333333
+0.82
+```
+]
+.center[
+![:scale 50%](images/hidden_layer_size.png)
+]
+
+
+???
+---
+
+# Hidden Layer Size
+
+.smaller[
+```python
+mlp = MLPClassifier(solver='lbfgs', hidden_layer_sizes=(10, 10, 10), random_state=0
+                   )
+mlp.fit(X_train, y_train)
+print(mlp.score(X_train, y_train))
+print(mlp.score(X_test, y_test))
+```
+```
+0.973333333333
+0.84
+```
+]
+.center[
+![:scale 48%](images/hidden_layer_size_2.png)
+]
+
+???
+---
+#Activation Functions
+.smaller[
+```python
+mlp = MLPClassifier(solver='lbfgs', hidden_layer_sizes=(10, 10, 10),
+                    activation='tanh', random_state=0)
+mlp.fit(X_train, y_train)
+print(mlp.score(X_train, y_train))
+print(mlp.score(X_test, y_test))
+```
+```
+1.0
+0.92
+```
+]
+
+.center[
+![:scale 45%](images/activation_functions_plot.png)
+]
+
+???
+- Using tanh we get smoother boundaries
+
+- Here actually it fits the data better.
+
+- It might be that relu doesn’t work that well with l-bfgs or
+with using these very small hidden layer sizes.
+
+- For large networks, relu is definitely preferred.
+---
+# Regression
+
+.center[
+![:scale 55%](images/regression_plot.png)
+]
+
+.smaller[
+```python
+from sklearn.neural_network import MLPRegressor
+mlp_relu = MLPRegressor(solver="lbfgs").fit(X, y)
+mlp_tanh = MLPRegressor(solver="lbfgs", activation='tanh').fit(X, y)
+```]
+
+???
+---
+class:spacious
+# Complexity Control
+
+- Number of parameters
+
+- Regularization
+
+- Early Stopping
+
+- (drop-out)
+
+???
+---
+#Grid-Searching Neural Nets
+
+.smaller[
+```python
+from sklearn.datasets import load_breast_cancer
+data = load_breast_cancer()
+X_train, X_test, y_train, y_test = train_test_split(
+    data.data, data.target, stratify=data.target, random_state=0)
+scaler = StandardScaler().fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```]
+
+.smaller[
+```python
+from sklearn.model_selection import GridSearchCV
+pipe = make_pipeline(StandardScaler(), MLPClassifier(solver="lbfgs", 
+                     random_state=1))
+param_grid = {'mlpclassifier__alpha': np.logspace(-3, 3, 7)}
+grid = GridSearchCV(pipe, param_grid, cv=5)
+```]
+
+.smaller[
+```python
+results = pd.DataFrame(grid.cv_results_)
+res = results.pivot_table(index="param_mlpclassifier__alpha",
+                          values=["mean_test_score", "mean_train_score"])
+res
+```]
+???
+---
+.center[![:scale 50%](images/gridsearch_table.png)]
+
+.center[![:scale 45%](images/gridsearch_plot.png)]
+
+???
+---
+#Searching hidden layer sizes
+.smaller[
+```python
+from sklearn.model_selection import GridSearchCV
+pipe = make_pipeline(StandardScaler(), MLPClassifier(solver="lbfgs"
+                     ,random_state=1))
+param_grid = {'mlpclassifier__hidden_layer_sizes':
+              [(10,), (50,), (100,), (500,), (10, 10), (50, 50), (100, 100), (500, 
+              500)]
+             }
+grid = GridSearchCV(pipe, param_grid, cv=5)
+grid.fit(X_train, y_train)
+```]
+.center[![:scale 40%](images/search_hidden_layers_plot.png)]
+
+???
+---
+class:center,middle
+#Getting Flexible and Scaling Up
+
+???
+---
+class:spacious
+# Write your own neural networks
+.smaller[
+```python
+class NeuralNetwork(object):
+    def __init__(self):
+        # initialize coefficients and biases
+        pass
+    def forward(self, x):
+        activation = x
+        for coef, bias in zip(self.coef_, self.bias_):
+            activation = self.nonlinearity(np.dot(activation, coef) + bias)
+        return activation
+    def backward(self, x):
+        # compute gradient of stuff in forward pass
+        pass
+```]
+???
+---
+#Autodiff
+
+.smaller[
+```python
+# http://mxnet.io/architecture/program_model.html
+class array(object) :
+    """Simple Array object that support autodiff."""
+    def __init__(self, value, name=None):
+        self.value = value
+        if name:
+            self.grad = lambda g : {name : g}
+    def __add__(self, other):
+        assert isinstance(other, int)
+        ret = array(self.value + other)
+        ret.grad = lambda g : self.grad(g)
+        return ret
+    def __mul__(self, other):
+        assert isinstance(other, array)
+        ret = array(self.value * other.value)
+        def grad(g):
+            x = self.grad(g * other.value)
+            x.update(other.grad(g * self.value))
+            return x
+        ret.grad = grad
+        return ret
+```]
+
+???
+---
+.smaller[
+```python
+a = array(np.array([1, 2]), 'a')
+b = array(np.array([3, 4]), 'b')
+c = b * a
+d = c + 1
+print(d.value)
+print(d.grad(1))
+```]
+```
+[4 9]
+{'b': array([1, 2]), 'a': array([3, 4])}
+```
+
+???
+---
+# GPU Support
+
+.center[
+![:scale 45%](images/gpu_support.png)
+]
+
+- From http://www.nvidia.com/object/gpu-accelerated-applic
+ations-tensorflow-benchmarks.html
+
+- Take with a grain of salt.
+
+???
+---
+#Computation Graph
+
+.center[
+![:scale 100%](images/computation_graph.png)
+]
+
+???
+---
+# All I want from a deep learning framework
+
+- Autodiff
+
+- GPU support
+
+- Optimization and inspection of computation graph
+
+- on-the-fly generation of the graph?
+
+- distribution over cluster?
+
+- Choices:
+  
+  – TensorFlow
+  
+  – Theano
+  
+  – Torch (lua)
+
+???
+---
+#Deep Learning Libraries
+
+- tf.learn (Tensorflow)
+
+- Keras (Tensorflow, Theano)
+
+- Lasagna (Theano)
+
+- Torch.nn / PyTorch (torch)
+
+- Chainer (chainer)
+
+- MXNet (MXNet)
+
+- Also see:
+http://mxnet.io/architecture/program_model.html
+
+???
+---
+class:center,middle
+
+#Introduction to tf.learn
+
+
+
+???
+Not sure what to fill here (and the following slides. Is this part of lecture 23? 
+---
+
+
+???
+---
+#Dropout
+
+???
+---
+
+#Implementing Dropout
+
+???
+---
+
+#Experiments
+
+???
+---
+
+#Batch Normalization
+
+???
+
+---
+
+
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
