@@ -48,7 +48,7 @@
           overflow: auto;
           width: 100%;
       }
-      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+      .remark-slide-container .compact p, .remark-slide-container .compact li, .remark-slide-container .compact pre, .remark-slide-container .compact .MathJax_Display{
           font-size: 30px;
           line-height: 1.1;
           display: block;
@@ -121,6 +121,8 @@ to get into.
 In particular we will only talk about supervised feed-forward neural networks, both the standard fully
 connected variants and convolutional neural networks. We'll not discuss recurrent neural networks
 or LSTMs or anything more complex.
+
+FIXME nees wayyy more polish!
 ---
 # History
 
@@ -130,13 +132,18 @@ or LSTMs or anything more complex.
 
   – More data
 
+--
+
   – Faster computers (GPUs)
+  
+--
 
   – Some improvements:
     - relu
     - Drop-out
     - adam
     - batch-normalization
+    - residual networks
 
 ???
 For some reason, whenever anyone talks about neural networks, they also talk about history,
@@ -158,7 +165,7 @@ data available for neural nets to work, and so people were very skeptical of the
 
 Because neural networks were so successful recently, there has been a giant amount of research
 around them, and that resulted in many important improvements like the use or relu units,
-drop out, adam, batch normalization and FIXME residual networks. We'll talk about these improvements
+drop out, adam, batch normalization and residual networks. We'll talk about these improvements
 today and next time as well.
 
 The dramatic shift that we've seen is mostly due to the availability of data and processing power, though.
@@ -193,15 +200,15 @@ arrows into circles mean sums, and they often imply some non-linear function
 like the logistic sigmoid.
 ---
 
-#Basic Architecture (for making predictions)
+#Basic Architecture
 
 .center[
-![:scale 30%](images/nn_basic_arch.png)
+![:scale 50%](images/nn_basic_arch.png)
 ]
 
-`$ h(x) = f(Wx+b) $`
+`$ h(x) = f(W_1x+b_1) $`
 
-`$ o(x) = g(W'h(x) + b') $`
+`$ o(x) = g(W_2h(x) + b_2) $`
 ???
 So now let's look at what a neural network is. It's very similar to the logistic
 regression, only applied several times.
@@ -218,7 +225,6 @@ sums of the hidden units, to arrive at the outputs. Here this would correspond
 to multiplying by a 4 by 2 matrix, and adding a vector of dimension 2. Then we
 could apply for example a logistic sigmoid or softmax to get a classification
 output.
-FIXME why two outputs?!
 So we basically do two matrix multiplications. If that was all, we could
 simplify this by just multiplying the matrices together into a single matrix,
 and we would just have a linear model. But the interesting part is that in the
@@ -353,13 +359,13 @@ reinforcement learning that can play better go than any human.
 
 `$$ h(x) = f(W_1x+b_1) $$`
 `$$ o(x) = g(W_2h(x)+b_2) = g(W_2f(W_1x + b_1) + b_2)$$`
-`$$ \min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,o(x_i)) $$` 
+--
 
-- Could add regularization
-.center[
-`$ \min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,g(W_2h(x)+b_2) = g(W_2f(W_1x + b_1) + b_2)) $`
-]
-- `$l$` Squared loss for regression. Cross-entropy loss (multi-class log-loss) for classification
+`$$ \min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,o(x_i)) $$`
+-- 
+`$$ =\min_{W_1,W_2,b_1,b_2} \sum\limits_{i=1}^N l(y_i,g(W_2f(W_1x+b_1)+b_2)$$`
+--
+- `$l$` Squared loss for regression. Cross-entropy loss for classification
 
 ???
 So how are we going to learn these parameters, these weights and biases for all
@@ -395,15 +401,14 @@ Because you have to care about this optimization more than for many other models
 about how this works. Let me know if anything is unclear.
 ---
 
-#Backpropogation
+#Backpropagation
 
-- For gradient based-method need `$ \frac{\partial o(x)}{\partial W_i} $` and `$\frac{\partial o(x)}{\partial b_i}$`
+- Need `$ \frac{\partial o(x)}{\partial W_i} $` and `$\frac{\partial o(x)}{\partial b_i}$`
 
-`$$ net(x) := W_1x + b_1 $$`
+`$$ \text{net}(x) := W_1x + b_1 $$`
 
-.center[![:scale 60%](images/backprop_eqn.png)]
+.center[![:scale 70%](images/backprop_eqn.png)]
 
-Backpropogation = Chain Rule + Dynamic Programming
 
 ???
 To run an optimizer, we do need to compute the gradients for all our parameters
@@ -462,19 +467,25 @@ how could we do that? Gradient descent for example(FIXME gave answer earlier)
 
 
 ---
+class: compact
 #Optimizing W, b
 
-- Batch
-`$ W_i \leftarrow W_i - \eta\sum\limits_{j=1}^N \frac{l(x_j,y_j)}{W_i} $`
+Batch
+`$$ W_i \leftarrow W_i - \eta\sum\limits_{j=1}^N \frac{\partial l(x_j,y_j)}{\partial W_i} $$`
+<br />
+--
 
-- Minibatch
-`$ W_i \leftarrow W_i - \eta\sum\limits_{j=k}^{k+m} \frac{l(x_j,y_j)}{W_i}$`
+Online/Stochastic
+`$$ W_i \leftarrow W_i - \eta\frac{\partial l(x_j,y_j)}{\partial W_i}$$`
+<br />
 
-- Online/Stochastic
-`$ W_i \leftarrow W_i - \eta\frac{l(x_j,y_j)}{W_i}$`
+--
+
+Minibatch
+`$$ W_i \leftarrow W_i - \eta\sum\limits_{j=k}^{k+m} \frac{\partial l(x_j,y_j)}{\partial W_i}$$`
+
 
 ???
-FIXME partial derivative signs!!!
 So doing standard gradient descent, we would update a weight matrix W_i but
 using the old W_i and taking a gradient step, so subtracting the gradient of the
 loss wrt the paramters, summed over the whole training set, times some learning
@@ -491,8 +502,6 @@ So you update the weights much more often, but you have a much less stable
 estimate of the gradient. In practice, we often just iterate through the data
 instead of picking a sample at random. And as with linear models, this is much
 faster than doing full batches for large datasets.
-
-FIXME first online then mini-batch?
 
 However, it's less stable, and also it doesn't necessarily use the hardware in
 the best way. So we can do a compromise in where we look at mini-batches of size
@@ -576,8 +585,10 @@ being adam. For some of the toy datasets we'll use lbfgs instead, which is more
 likely to give good results if it's feasible to run a large number of
 iterations.
 So let's start using these models now, for now with scikit-learn.
+---
+class: middle
 
-FIXME add transition slide.
+# Neural Nets in Practice
 ---
 #Neural Nets with sklearn
 
@@ -617,13 +628,13 @@ Regularization might make it less dependent on initialization.
 
 .smaller[
 ```python
-mlp = MLPClassifier(solver='lbfgs', hidden_layer_size=(5,),random_state=10).
-                    fit(X_train, y_train)
+mlp = MLPClassifier(solver='lbfgs', hidden_layer_size=(5,), random_state=10)
+mlp.fit(X_train, y_train)
 print(mlp.score(X_train, y_train))
 print(mlp.score(X_test, y_test))
 ```
 ```
-0.9333333333333
+0.93
 0.82
 ```
 ]
@@ -639,14 +650,14 @@ print(mlp.score(X_test, y_test))
 
 .smaller[
 ```python
-mlp = MLPClassifier(solver='lbfgs', hidden_layer_sizes=(10, 10, 10), random_state=0
-                   )
+mlp = MLPClassifier(solver='lbfgs', hidden_layer_sizes=(10, 10, 10),
+                    random_state=0)
 mlp.fit(X_train, y_train)
 print(mlp.score(X_train, y_train))
 print(mlp.score(X_test, y_test))
 ```
 ```
-0.973333333333
+0.97
 0.84
 ```
 ]
@@ -712,6 +723,7 @@ class:spacious
 - (drop-out)
 
 ???
+FIXME number of parameters calculation graph!
 ---
 #Grid-Searching Neural Nets
 
