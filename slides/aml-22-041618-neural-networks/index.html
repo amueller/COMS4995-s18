@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>Neural Networks</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Garamond);
@@ -521,6 +521,15 @@ class:center,middle
 #Getting Flexible and Scaling Up
 
 ???
+Now we'll look at neural nets beyond
+scikit-learn.
+There are two main motivations for this: scaling to
+larger datasets and larger networks using GPUs, and
+having more flexible ways to create the neural
+network architectures.
+If you want to get serious about neural nets, you are
+likely to include some modifications to the standard
+network. So how could you go about doing that?
 ---
 class:spacious
 # Write your own neural networks
@@ -540,6 +549,18 @@ class NeuralNetwork(object):
         pass
 ```]
 ???
+It’s actually pretty straight-forward to write the
+prediction functions, or forward pass of a neural
+network. There is matrix multiplications and
+nonlinearities. It quickly becomes more complicated
+when you use some of the tricks we’ll discuss today,
+but even for this writing down the gradient can be a
+bit tricky and something people used to get wrong all
+the time.
+So they came up with a trick that avoided having to
+write down the gradients yourself, also known as the
+backward pass.
+That trick is autodiff.
 ---
 #Autodiff
 
@@ -569,6 +590,22 @@ class array(object) :
 ```]
 
 ???
+Here is a toy implementation of the idea behind
+autodiff. It’s a class called array with some
+operations such as addition of integer and
+multiplication with other arrays.
+It also has a method that returns the gradient called
+grad. The gradient of the array is just the identity
+function.
+The trick is what happens with the addition and
+multiplication. If you add something to an array or
+you multiply two arrays, the result again is an array,
+and has again a gradient. The product actually has
+two gradients, one for each array involved.
+The magic here is that while we are doing some
+computation, we are keep track of that computation
+and building up a graph of how to compute the
+gradient of it.
 ---
 .smaller[
 ```python
@@ -583,8 +620,22 @@ print(d.grad(1))
 [4 9]
 {'b': array([1, 2]), 'a': array([3, 4])}
 ```
-
 ???
+On the right you can see the result of adding two
+arrays and then computing the gradient at a
+particular location.
+FIXME the gradient of multiplication?
+Any computation in the neural network is a simple
+operation like a matrix multiplication, addition or nonlinearity.
+If we write down the derivative of each of
+these, we can keep track of our computation and
+automatically get the derivative.
+It’s really easy to implement but really helpful.
+Keep in mind that we actually hard-code the derivative
+for each operation, there is no symbolic
+differentiation involved.
+---
+
 ---
 # GPU Support
 
@@ -596,9 +647,13 @@ print(d.grad(1))
 ations-tensorflow-benchmarks.html
 
 - Take with a grain of salt.
-
 ???
+An important limitation of GPUs is that they usually
+have much less memory than the RAM, and memory
+copies between RAM and GPU are somewhat
+expensive.
 ---
+
 #Computation Graph
 
 .center[
@@ -606,6 +661,23 @@ ations-tensorflow-benchmarks.html
 ]
 
 ???
+Autodiff doesn’t solve all of the problems, though.
+Depending on which derivations you need to
+compute, you need to store different intermediate
+results (the net activation in backprob for example).
+Given the limited amount of memory available, it’s
+important to know what to store and what can be
+discarded. That requires an end-to-end view of the
+computation, which can be summarized as a graph.
+Then you can use knowledge about the computation
+graph to decide what results to cache, what results to
+throw away and when to communicate between CPU
+and GPU.
+Having a representation of the graph also helps with
+visual debugging and understanding your network
+structure. The computation graph is more complex
+than the network graph because it includes
+intermediate results and gradient computations.
 ---
 # All I want from a deep learning framework
 
@@ -626,8 +698,24 @@ ations-tensorflow-benchmarks.html
   – Theano
   
   – Torch (lua)
-
 ???
+So create deep learning model efficiently, I need
+support for auto diff, computation on a GPGPU, and
+optimization and inspection of the computation
+graph.
+There is some more advanced features that can come
+in handy for research, like on-the-fly generation of
+computation graphs, and distributing the network
+over multiple GPUs or over a cluster.
+At least the first three are all provided by the
+TensorFlow, Theano and Torch frameworks, which
+are the most established deep learning frameworks.
+These don’t provide deep learning models, they are
+infrastructure, more like numpy on steroids than
+sklearn.
+Theano was an early deep learning library for python,
+but I think it has become less relevant since
+tensorflow got released.
 ---
 #Deep Learning Libraries
 
@@ -646,40 +734,331 @@ ations-tensorflow-benchmarks.html
 - Also see:
 http://mxnet.io/architecture/program_model.html
 
+
+???
+Then there are actual deep learning libraries that
+provide higher level interfaces built on top of this
+infrastructure.
+There are a lot of these right now given the deep
+learning hype, I want to point out a couple.
+There is tf.learn, a high-level interface to tensorflow,
+including a scikit-learn compatible API.
+There’s keras, which supports both Tensorflow and
+theano, there’s lasagna, which I think has seen less
+activity recently, and torch.nn (lua) and pytorch
+building on top of the torch framework.
+Then there are two projects that are deep learning
+libraries but that also come with their own framework
+underneath, chainer and mxnet.
+I think right now Keras with tensorflow is the most
+commonly used one, and I want to go into those two
+a bit more. But these all have their pros and cons.
+---
+
+#Quick look at TensorFlow
+
+- “down to the metal” - don’t use for everyday tasks
+
+- Three steps for learning:
+  
+  – Build the computation graph (using array operations
+  and functions etc)
+  
+  – Create an Optimizer (gradient descent, adam, …)
+  attached to the graph.
+  
+  – Run the actual computation.
+
+???
+---
+.center[
+![:scale 75%](images/tensor_flow_basics.png)
+]
+
+???
+---
+#A little more tf
+
+- Everything passed to the graph is a “tensor”
+
+- Either “variable”, “constant”, “placeholder”
+
+- Learned parameters: variables
+
+- Data: placeholders (data is assigned using “feed”)
+
+???
+---
+# Great Resources!
+
+- https://www.tensorflow.org/versions/r0.10/tutorials/
+
+- http://playground.tensorflow.org
+
+- https://www.tensorflow.org/versions/r0.10/get_star
+ted/basic_usage
+
+- https://www.tensorflow.org/versions/r0.10/tutorials
+/mnist/beginners/
+
+- Note: tf.learn is now officially tf.contrib.learn
+
+- Tensorboard web interface
+
 ???
 ---
 class:center,middle
-
-#Introduction to tf.learn
-
-
-
-???
-Not sure what to fill here (and the following slides. Is this part of lecture 23? 
----
-
-
+#Introduction to Keras
 ???
 ---
-#Dropout
+#Keras Sequential
+
+.smaller[
+```python
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+
+model = Sequential([
+    Dense(32, input_shape=(784,)),
+    Activation('relu'),
+    Dense(10),
+    Activation('softmax'),
+])
+```
+```
+Using TensorFlow backend.
+```
+]
+
+.smaller[
+```python
+model = Sequential()
+model.add(Dense(32, input_dim=784))
+model.add(Activation('relu'))
+```
+]
+.smaller[
+```python
+model = Sequential([
+    Dense(32, input_shape=(784,), activation='relu'),
+    Dense(10, activation='softmax'),
+])
+```
+]
+
+
+???
+There are two interfaces to keras, sequential and the
+functional, but we’ll only discuss sequential.
+Sequential is for feed-forward neural networks where
+one layer follows the other. You specify the layers as
+a list, similar to a sklearn pipeline.
+Dense layers are just matrix multiplications. Here we
+have a neural net with 32 hidden units for the mnist
+dataset with 10 outputs. The hidden layer nonlinearity
+is relu, the output if softmax for multi-class
+classification.
+You can also instantiate an empty sequential model
+and then add steps to it.
+For the first layer we need to specify the input shape
+so the model knows the sizes of all the matrices. The
+following layers can infer the sizes from the previous
+layers.
+---
+
+.smaller[
+```python
+model.summary()
+```
+]
+
+.center[
+![:scale 70%](images/model_summary.png)
+]
+
+???
+---
+# Setting Optimizer
+
+.center[
+![:scale 80%](images/optimizer.png)
+]
+
+.smaller[
+```python
+model.compile("adam", "categorical_crossentropy", metrics=['accuracy'])
+```
+]
+
+???
+Compile method picks optimization procedure and
+loss
+---
+
+# Training the model
+
+.center[
+![:scale 80%](images/training_model.png)
+]
+
+???
+---
+#Preparing MNIST data
+.smaller[
+```python
+from keras.datasets import mnist
+import keras
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+X_train = X_train.reshape(60000, 784)
+X_test = X_test.reshape(10000, 784)
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+X_train /= 255
+X_test /= 255
+print(X_train.shape[0], 'train samples')
+print(X_test.shape[0], 'test samples')
+
+num_classes = 10
+# convert class vectors to binary class matrices
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+```
+```
+60000 train samples
+10000 test samples
+```
+]
+
+
+???
+---
+# Fit Model
+.smaller[
+```python
+model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1)
+```
+]
+
+.center[
+![:scale 80%](images/model_fit.png)
+]
+
+???
+---
+#Fit with Validation
+
+.smaller[
+```python
+model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1, 
+          validation_split=.1)
+```
+]
+
+.center[
+![:scale 90%](images/validation_fit.png)
+]
+
+
+???
+---
+#Evaluating on Test Set
+
+.smaller[
+```python
+score = model.evaluate(X_test, y_test, verbose=0)
+print("Test loss: {:.3f}".format(score[0]))
+print("Test Accuracy: {:.3f}".format(score[1]))
+```
+
+```
+Test loss: 0.120
+Test Accuracy: 0.966
+```
+]
 
 ???
 ---
 
-#Implementing Dropout
+# Loggers and Callbacks
+
+.smaller[
+```python
+model = Sequential([
+    Dense(32, input_shape=(784,), activation='relu'),
+    Dense(10, activation='softmax'),
+])
+model.compile("adam", "categorical_crossentropy", metrics=['accuracy'])
+history_callback = model.fit(X_train, y_train, batch_size=128,
+                             epochs=100, verbose=1, validation_split=.1)
+```
+]
+
+.smaller[
+```python
+pd.DataFrame(history_callback.history).plot()
+```
+]
+
+.center[
+![:scale 40%](images/logger_callback_plot.png)
+]
 
 ???
 ---
+#Wrappers for sklearn
 
-#Experiments
+See https://keras.io/scikit-learn-api/
+
+.smaller[
+```python
+from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
+from sklearn.model_selection import GridSearchCV
+def make_model(optimizer="adam", hidden_size=32):
+    model = Sequential([
+        Dense(hidden_size, input_shape=(784,)),
+        Activation('relu'),
+        Dense(10),
+        Activation('softmax'),
+    ])
+    model.compile(optimizer=optimizer,loss="categorical_crossentropy",   
+                  metrics=['accuracy'])
+    return model
+clf = KerasClassifier(make_model)
+param_grid = {'epochs': [1, 5, 10],  # epochs is fit parameter, not in make_model!
+              'hidden_size': [32, 64, 256]}
+grid = GridSearchCV(clf, param_grid=param_grid, cv=5)
+grid.fit(X_train, y_train)
+```
+]
 
 ???
+Useful for grid-search.
+You need to define a callable that returns a compiled
+model.
+You can search parameters that in Keras would be
+passed to “fit” like the number of epochs.
 ---
+.smaller[
+```python
+res = pd.DataFrame(grid.cv_results_)
+res.pivot_table(index=["param_epochs", "param_hidden_size"],
+                values=['mean_train_score', "mean_test_score"])
+```
+]
 
-#Batch Normalization
+.center[
+![:scale 70%](images/keras_api_results.png)
+]
+
+
 
 ???
-
+Training longer overfits more and more units overfit
+more, but both also lead to better results.
+We should probably train much longer actually.
+Setting the number of epochs via cross-validation is a
+bit silly since it means starting from scratch again
+each time. Using early stopping would be better.
 ---
 
 

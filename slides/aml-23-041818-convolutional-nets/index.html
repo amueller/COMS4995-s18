@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>More Neural Networks</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Garamond);
@@ -114,125 +114,8 @@ class: center, middle
 Andreas C. Müller
 ???
 ---
-class:center,middle
-#Getting Flexible and Scaling Up
 
-???
-So today we’ll talk about using neural nets beyond
-scikit-learn.
-There are two main motivations for this: scaling to
-larger datasets and larger networks using GPUs, and
-having more flexible ways to create the neural
-network architectures.
-If you want to get serious about neural nets, you are
-likely to include some modifications to the standard
-network. So how could you go about doing that?
----
 
-class:spacious
-# Write your own neural networks
-.smaller[
-```python
-class NeuralNetwork(object):
-    def __init__(self):
-        # initialize coefficients and biases
-        pass
-    def forward(self, x):
-        activation = x
-        for coef, bias in zip(self.coef_, self.bias_):
-            activation = self.nonlinearity(np.dot(activation, coef) + bias)
-        return activation
-    def backward(self, x):
-        # compute gradient of stuff in forward pass
-        pass
-```]
-
-???
-It’s actually pretty straight-forward to write the
-prediction functions, or forward pass of a neural
-network. There is matrix multiplications and
-nonlinearities. It quickly becomes more complicated
-when you use some of the tricks we’ll discuss today,
-but even for this writing down the gradient can be a
-bit tricky and something people used to get wrong all
-the time.
-So they came up with a trick that avoided having to
-write down the gradients yourself, also known as the
-backward pass.
-That trick is autodiff.
----
-#Autodiff
-
-.smaller[
-```python
-# http://mxnet.io/architecture/program_model.html
-class array(object) :
-    """Simple Array object that support autodiff."""
-    def __init__(self, value, name=None):
-        self.value = value
-        if name:
-            self.grad = lambda g : {name : g}
-    def __add__(self, other):
-        assert isinstance(other, int)
-        ret = array(self.value + other)
-        ret.grad = lambda g : self.grad(g)
-        return ret
-    def __mul__(self, other):
-        assert isinstance(other, array)
-        ret = array(self.value * other.value)
-        def grad(g):
-            x = self.grad(g * other.value)
-            x.update(other.grad(g * self.value))
-            return x
-        ret.grad = grad
-        return ret
-```]
-
-???
-Here is a toy implementation of the idea behind
-autodiff. It’s a class called array with some
-operations such as addition of integer and
-multiplication with other arrays.
-It also has a method that returns the gradient called
-grad. The gradient of the array is just the identity
-function.
-The trick is what happens with the addition and
-multiplication. If you add something to an array or
-you multiply two arrays, the result again is an array,
-and has again a gradient. The product actually has
-two gradients, one for each array involved.
-The magic here is that while we are doing some
-computation, we are keep track of that computation
-and building up a graph of how to compute the
-gradient of it.
----
-.smaller[
-```python
-a = array(np.array([1, 2]), 'a')
-b = array(np.array([3, 4]), 'b')
-c = b * a
-d = c + 1
-print(d.value)
-print(d.grad(1))
-```]
-```
-[4 9]
-{'b': array([1, 2]), 'a': array([3, 4])}
-```
-???
-On the right you can see the result of adding two
-arrays and then computing the gradient at a
-particular location.
-FIXME the gradient of multiplication?
-Any computation in the neural network is a simple
-operation like a matrix multiplication, addition or nonlinearity.
-If we write down the derivative of each of
-these, we can keep track of our computation and
-automatically get the derivative.
-It’s really easy to implement but really helpful.
-Keep in mind that we actually hard-code the derivative
-for each operation, there is no symbolic
-differentiation involved.
 ---
 # GPU Support
 
