@@ -4,6 +4,11 @@
 *.~lock*
 *.pyc
 
+# data stuff
+*.pickle
+*.bin
+*.data
+
 *.DS_Store
 homeworks/cache_files/
 slides/aml-19-040418-working-with-text-data/aclImdb/
