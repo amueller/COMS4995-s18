@@ -122,6 +122,8 @@ HW: don't commit cache! Don't commit data!
 Most <1mb, some 7gb.
 Say something about GPUs.
 
+FIXME update with state-of-the-art instead of VGG16
+FIXME slide full vs valid vs same convolutions
 FIXME update syntax conv2d!
 FIXME doc screenshots resolution
 FIXME densenet
@@ -129,7 +131,9 @@ FIXME resnet
 FIXME new convnet architectures
 FIXME move batch-norm before conv-nets
 FIXME add slide on imagenet?
-FIXME add distil article on feature visualization.
+FIXME y_i in batch normalization confusing.
+FIXME add something about data augmentation
+FIXME move deconvolutions back (or remove and just do distil paper)
 ---
 class:center,middle
 #Introduction to Keras
@@ -467,6 +471,7 @@ class:spacious
 - Weight sharing
 
 ???
+FIXME figure with illustration
 ---
 #Definition of Convolution
 
@@ -1038,6 +1043,8 @@ create the samples.
 Given how high-dimensional the input space is, this is
 not very surprising from a mathematical perspective,
 but it might be somewhat unexpected.
+
+requires the weights, done by gradient descent.
 ---
 class: middle
 # Questions ?
