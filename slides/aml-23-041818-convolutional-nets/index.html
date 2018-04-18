@@ -533,6 +533,29 @@ lower and lower resolution.
 At the end, you have some fully connected layers to do
 the classificattion.
 ---
+.center[
+![:scale 60%](images/cnn_digits.png)
+]
+???
+---
+# Deconvolution
+.center[
+![:scale 70%](images/deconvolution_1.png)
+]
+https://www.cs.nyu.edu/~fergus/papers/zeilerECCV2014.pdf
+???
+---
+.center[
+![:scale 70%](images/deconvolution_2.png)
+]
+???
+---
+.center[
+![:scale 70%](images/deconvolution_3.png)
+]
+???
+
+---
 
 #Max Pooling
 
@@ -598,7 +621,7 @@ The position of the channels is configurable, using the
 “channels_first” and “channels_last” options – but
 you shouldn’t have to worry about that.
 ---
-
+# Create Tiny Network
 .smaller[
 ```python
 from keras.layers import Conv2D, MaxPooling2D, Flatten
@@ -658,6 +681,29 @@ cnn.evaluate(X_test_images, y_test)
 ]
 ???
 ---
+#Visualize Filters
+.smaller[
+```python
+weights, biases = cnn_small.layers[0].get_weights()
+weights2, biases2 = cnn_small.layers[2].get_weights()
+print(weights.shape)
+print(weights2.shape)
+```
+```
+(3,3,1,8)
+(3,3,8,8)
+```
+]
+.center[![:scale 40%](images/visualize_filters.png)]
+???
+---
+.center[![:scale 80%](images/digits.png)]
+???
+---
+class:center,middle
+# Batch Normalization
+???
+---
 #Batch Normalization
 
 .center[
@@ -683,6 +729,37 @@ To keep the expressive power of the model, additional
 scale and shift parameters are learned that are
 applied after the per-batch normalization.
 ---
+# Tiny convnet with Batch Normalization
+.smaller[```python
+from keras.layers import BatchNormalization
+
+num_class = 10
+cnn_small_bn = Sequential()
+cnn_small_bn.add(Conv2D(8, kernel_size=(3, 3),
+                 input_shape=input_shape))
+cnn_small_bn.add(Activation("relu"))
+cnn_small_bn.add(BatchNormalization())
+cnn_small_bn.add(MaxPooling2D(pool_size=(2, 2)))
+cnn_small_bn.add(Conv2D(8, (3, 3)))
+cnn_small_bn.add(Activation("relu"))
+cnn_small_bn.add(BatchNormalization())
+cnn_small_bn.add(MaxPooling2D(pool_size=(2, 2)))
+cnn_small_bn.add(Flatten())
+cnn_small_bn.add(Dense(64, activation='relu'))
+cnn_small_bn.add(Dense(num_classes, activation='softmax'))
+```]
+???
+---
+# Learning speed (and accuracy)
+.center[![:scale 70%](images/learning_speed.png)
+]
+???
+---
+# For larger (64 filters) net
+.center[![:scale 70%](images/learning_speed_larger.png)
+]
+???
+---
 #Inspecting Conv-Nets
 
 
@@ -698,33 +775,62 @@ applied after the per-batch normalization.
 #Deconvolution?
 
 
-
 ???
 ---
-#Adverserial Samples
-
-.center[
-![:scale 70%](images/adverserial.png)
-]
-- Intriguing properties of neural networks https://arxiv.org/abs/1312.6199
+class:center,middle
+# VGG and Imagenet Filters
 ???
-Since convolutional neural nets are so good at image
-recognition, some people think they are pretty
-infallible. But they are not. There is this interesting
-paper about intriguing properties of neural networks,
-that introduces adverserial samples.
-Adverserial samples are samples that were created by
-an adversary or attacker to fool your model. Here,
-they changed images to be classified as Ostrich by
-AlexNet trained on imagenet.
-The picture on the left is change just slightly, and went
-from correctly classified to classified as Ostrich.
-This technique uses gradient descent on the input and
-requires access to all the weights in the network to
-create the samples.
-Given how high-dimensional the input space is, this is
-not very surprising from a mathematical perspective,
-but it might be somewhat unexpected.
+---
+# Inspecting VGG
+.left-column[.smaller[
+```python
+from keras import applications 
+
+# build the VGG16 network
+model = applications.VGG16(include_top=False,
+                           weights='imagenet')
+model.summary()
+```]]
+.right-column[
+![:scale 80%](images/vgg_model_summary.png)
+]
+???
+---
+#VGG filters
+.smaller[
+```python
+vgg_weights, vgg_biases = model.layers[1].get_weights()
+vgg_weights.shape
+```
+```
+(3, 3, 3, 64)
+```]
+.center[![:scale 40%](images/vgg_filters.png)]
+???
+---
+.left-column[![:scale 80%](images/bkny_image.png)]
+.right-column[.smaller[
+```python
+get_3rd_layer_output = K.function([model.layers[0].input],
+                                  [model.layers[3].output])
+get_6rd_layer_output = K.function([model.layers[0].input],
+                                  [model.layers[6].output])
+
+layer3_output = get_3rd_layer_output([[image]])[0]
+layer6_output = get_6rd_layer_output([[image]])[0]
+print(layer3_output.shape)
+print(layer6_output.shape)
+```
+```
+(1, 300, 192, 64)
+(1, 150, 96, 128)
+```
+]]
+???
+---
+.center[![:scale 50%](images/after_first_pooling.png)]
+.center[![:scale 50%](images/after_second_pooling.png)]
+???
 ---
 #Using pre trained  networks
 
@@ -786,6 +892,86 @@ as transfer learning.
 This potentially doesn’t work with images from a very
 different domain, like medical images.
 ---
+# Ball snake vs Carpet Python
+.center[
+![:scale 70%](images/ball_snake_vs_python.png)
+]
+???
+---
+.smaller[
+```python
+import flickrapi
+import json
+flickr = flickrapi.FlickrAPI(api_key, api_secret, format='json')
+json.loads(flickr.photos.licenses.getInfo().decode("utf-8"))
+def get_url(photo_id="33510015330"):
+    response = flickr.photos.getsizes(photo_id=photo_id)
+    sizes = json.loads(response.decode('utf-8'))['sizes']['size']
+    for size in sizes:
+        if size['label'] == "Small":
+            return size['source']
+            
+get_url()
+ids = search_ids("ball snake", per_page=100)
+urls_ball = [get_url(photo_id=i) for i in ids]
+
+from urllib.request import urlretrieve
+import os
+for url in urls_carpet:
+    urlretrieve(url, os.path.join("snakes", "carpet", os.path.basename(url)))
+```]
+???
+---
+.center[
+![:scale 70%](images/carpet_python_snake.png)
+]
+
+???
+---
+# Extracting Features using VGG
+.smaller[
+```python
+from keras.preprocessing import image
+
+images_carpet = [image.load_img(os.path.join("snakes", "carpet", os.path.basename(url)), target_size=(224, 224))
+                 for url in urls_carpet]
+images_ball = [image.load_img(os.path.join("snakes", "ball", os.path.basename(url)), target_size=(224, 224))
+                 for url in urls_ball]
+X = np.array([image.img_to_array(img) for img in images_carpet + images_ball])
+print(X.shape)
+# build the VGG16 network
+model = applications.VGG16(include_top=False,
+                           weights='imagenet')
+from keras.applications.vgg16 import preprocess_input
+X_pre = preprocess_input(X)
+features = model.predict(X_pre)
+print(features.shape)
+features_ = features.reshape(200, -1)
+```
+```
+(200, 224, 224, 3)
+(200, 7, 7, 512)
+```]
+???
+---
+# Classification with LogReg
+.smaller[
+```python
+from sklearn.linear_model import LogisticRegressionCV
+lr = LogisticRegressionCV().fit(X_train, y_train)
+print(lr.score(X_train, y_train))
+print(lr.score(X_test, y_test))
+from sklearn.metrics import confusion_matrix
+confusion_matrix(y_test, lr.predict(X_test))
+```
+```
+1.0
+0.82
+array([[24,  1],
+       [ 8, 17]])
+```]
+???
+---
 #Finetuning
 
 - Start with pre-trained net
@@ -814,6 +1000,32 @@ little bit before we backpropagate through the
 network. Otherwise the random initialization of the
 last layer might destroy the filters that we used for
 initialization.
+
+---
+#Adverserial Samples
+
+.center[
+![:scale 70%](images/adverserial.png)
+]
+- Intriguing properties of neural networks https://arxiv.org/abs/1312.6199
+???
+Since convolutional neural nets are so good at image
+recognition, some people think they are pretty
+infallible. But they are not. There is this interesting
+paper about intriguing properties of neural networks,
+that introduces adverserial samples.
+Adverserial samples are samples that were created by
+an adversary or attacker to fool your model. Here,
+they changed images to be classified as Ostrich by
+AlexNet trained on imagenet.
+The picture on the left is change just slightly, and went
+from correctly classified to classified as Ostrich.
+This technique uses gradient descent on the input and
+requires access to all the weights in the network to
+create the samples.
+Given how high-dimensional the input space is, this is
+not very surprising from a mathematical perspective,
+but it might be somewhat unexpected.
 ---
 class: middle
 # Questions ?
