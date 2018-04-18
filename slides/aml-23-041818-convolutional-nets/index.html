@@ -107,14 +107,22 @@ class: center, middle
 
 ### W4995 Applied Machine Learning
 
-# More Neural Networks
+# Neural Networks in Practice
 
 04/18/18
 
 Andreas C. Müller
 
 ???
-FIXME update syntax!
+HW: don't commit cache! Don't commit data!
+Most <1mb, some 7gb.
+Say something about GPUs.
+
+FIXME update syntax conv2d!
+FIXME doc screenshots resolution
+FIXME densenet
+FIXME resnet
+FIXME new convnet architectures
 ---
 class:center,middle
 #Introduction to Keras
@@ -126,32 +134,26 @@ class:center,middle
 ```python
 from keras.models import Sequential
 from keras.layers import Dense, Activation
-
-model = Sequential([
-    Dense(32, input_shape=(784,)),
-    Activation('relu'),
-    Dense(10),
-    Activation('softmax'),
-])
 ```
 ```
 Using TensorFlow backend.
 ```
-]
-
-.smaller[
 ```python
+model = Sequential([
+    Dense(32, input_shape=(784,)),
+    Activation('relu'),
+    Dense(10),
+    Activation('softmax')])
+
+# or
 model = Sequential()
 model.add(Dense(32, input_dim=784))
 model.add(Activation('relu'))
-```
-]
-.smaller[
-```python
+
+# or
 model = Sequential([
     Dense(32, input_shape=(784,), activation='relu'),
-    Dense(10, activation='softmax'),
-])
+    Dense(10, activation='softmax')])
 ```
 ]
 
@@ -182,15 +184,17 @@ model.summary()
 ]
 
 .center[
-![:scale 70%](images/model_summary.png)
+![:scale 100%](images/model_summary.png)
 ]
 
 ???
+FIXME parameter calculation!
+
 ---
 # Setting Optimizer
 
 .center[
-![:scale 80%](images/optimizer.png)
+![:scale 90%](images/optimizer.png)
 ]
 
 .smaller[
@@ -207,10 +211,12 @@ loss
 # Training the model
 
 .center[
-![:scale 80%](images/training_model.png)
+![:scale 100%](images/training_model.png)
 ]
 
 ???
+Fit gets many parameters, not as in sklearn.
+
 ---
 #Preparing MNIST data
 .smaller[
@@ -242,11 +248,10 @@ y_test = keras.utils.to_categorical(y_test, num_classes)
 ???
 ---
 # Fit Model
-.smaller[
 ```python
 model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1)
 ```
-]
+
 
 .center[
 ![:scale 80%](images/model_fit.png)
@@ -256,15 +261,14 @@ model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1)
 ---
 #Fit with Validation
 
-.smaller[
 ```python
 model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1, 
           validation_split=.1)
 ```
-]
+
 
 .center[
-![:scale 90%](images/validation_fit.png)
+![:scale 100%](images/validation_fit.png)
 ]
 
 
@@ -272,7 +276,6 @@ model.fit(X_train, y_train, batch_size=128, epochs=10, verbose=1,
 ---
 #Evaluating on Test Set
 
-.smaller[
 ```python
 score = model.evaluate(X_test, y_test, verbose=0)
 print("Test loss: {:.3f}".format(score[0]))
@@ -283,7 +286,7 @@ print("Test Accuracy: {:.3f}".format(score[1]))
 Test loss: 0.120
 Test Accuracy: 0.966
 ```
-]
+
 
 ???
 ---
@@ -292,36 +295,25 @@ Test Accuracy: 0.966
 
 .smaller[
 ```python
-model = Sequential([
-    Dense(32, input_shape=(784,), activation='relu'),
-    Dense(10, activation='softmax'),
-])
-model.compile("adam", "categorical_crossentropy", metrics=['accuracy'])
 history_callback = model.fit(X_train, y_train, batch_size=128,
                              epochs=100, verbose=1, validation_split=.1)
-```
-]
-
-.smaller[
-```python
 pd.DataFrame(history_callback.history).plot()
 ```
 ]
 
 .center[
-![:scale 40%](images/logger_callback_plot.png)
+![:scale 70%](images/logger_callback_plot.png)
 ]
 
 ???
 ---
 #Wrappers for sklearn
 
-See https://keras.io/scikit-learn-api/
-
 .smaller[
 ```python
 from keras.wrappers.scikit_learn import KerasClassifier, KerasRegressor
 from sklearn.model_selection import GridSearchCV
+
 def make_model(optimizer="adam", hidden_size=32):
     model = Sequential([
         Dense(hidden_size, input_shape=(784,)),
@@ -332,6 +324,7 @@ def make_model(optimizer="adam", hidden_size=32):
     model.compile(optimizer=optimizer,loss="categorical_crossentropy",   
                   metrics=['accuracy'])
     return model
+
 clf = KerasClassifier(make_model)
 param_grid = {'epochs': [1, 5, 10],  # epochs is fit parameter, not in make_model!
               'hidden_size': [32, 64, 256]}
@@ -341,11 +334,14 @@ grid.fit(X_train, y_train)
 ]
 
 ???
+See https://keras.io/scikit-learn-api/
+
 Useful for grid-search.
 You need to define a callable that returns a compiled
 model.
 You can search parameters that in Keras would be
 passed to “fit” like the number of epochs.
+Searching over epochs in this way is not necessarily a good idea, though.
 ---
 .smaller[
 ```python
@@ -368,14 +364,18 @@ We should probably train much longer actually.
 Setting the number of epochs via cross-validation is a
 bit silly since it means starting from scratch again
 each time. Using early stopping would be better.
+
+---
+class: middle
+# Drop-out
 ---
 # Drop-out Regularization
 
-- Randomly set activations to zero.
-
 .center[
-![:scale 55%](images/dropout_reg.png)
+![:scale 65%](images/dropout_reg.png)
 ]
+
+--
 
 - https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf
 
@@ -384,6 +384,9 @@ each time. Using early stopping would be better.
 - Predictions: use all weights, down-weight by rate
 
 ???
+
+- Randomly set activations to zero.
+
 Drop out is a very successful regularization technique
 developed in 2014. It is an extreme case of adding
 noise to the input, a previously established method to
@@ -542,19 +545,22 @@ the classificattion.
 ---
 # Deconvolution
 .center[
-![:scale 70%](images/deconvolution_1.png)
+![:scale 100%](images/deconvolution_1.png)
 ]
 https://www.cs.nyu.edu/~fergus/papers/zeilerECCV2014.pdf
 ???
 ---
-.center[
-![:scale 70%](images/deconvolution_2.png)
-]
+class: center, middle
+
+![:scale 100%](images/deconvolution_2.png)
+
 ???
 ---
-.center[
-![:scale 70%](images/deconvolution_3.png)
-]
+class: center, middle
+
+
+![:scale 100%](images/deconvolution_3.png)
+
 ???
 
 ---
@@ -562,13 +568,13 @@ https://www.cs.nyu.edu/~fergus/papers/zeilerECCV2014.pdf
 #Max Pooling
 
 .center[
-![:scale 80%](images/maxpool.png)
+![:scale 100%](images/maxpool.png)
 ]
 
+???
 - Need to remember position of maximum for back-propagation.
 
-- Again not differentiable subgradient → descent
-???
+- Again not differentiable → subgradient descent
 ---
 
 .center[
