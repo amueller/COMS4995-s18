@@ -61,6 +61,10 @@
       .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
           font-size: 25px;
       }
+      .remark-slide-container .smallest p, .remark-slide-container .smallest li,
+      .remark-slide-container .smallest .remark-code, .remark-slide-container .smallest a{
+          font-size: 15px;
+      }
       .normal {
           font-size: 30px;
       }
@@ -123,6 +127,9 @@ FIXME doc screenshots resolution
 FIXME densenet
 FIXME resnet
 FIXME new convnet architectures
+FIXME move batch-norm before conv-nets
+FIXME add slide on imagenet?
+FIXME add distil article on feature visualization.
 ---
 class:center,middle
 #Introduction to Keras
@@ -630,7 +637,7 @@ The position of the channels is configurable, using the
 you shouldn’t have to worry about that.
 ---
 # Create Tiny Network
-.smaller[
+
 ```python
 from keras.layers import Conv2D, MaxPooling2D, Flatten
 
@@ -646,7 +653,7 @@ cnn.add(Flatten())
 cnn.add(Dense(64, activation='relu'))
 cnn.add(Dense(num_classes, activation='softmax'))
 ```
-]
+
 
 
 ???
@@ -715,10 +722,12 @@ class:center,middle
 #Batch Normalization
 
 .center[
-![:scale 70%](images/batch_norm.png)
+![:scale 80%](images/batch_norm.png)
 ]
 
-- https://arxiv.org/abs/1502.03167
+.smallest[
+[Ioffe, Szegedy: Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift](https://arxiv.org/abs/1502.03167)
+]
 
 ???
 Another relatively recent advance in neural networks is
@@ -737,7 +746,7 @@ To keep the expressive power of the model, additional
 scale and shift parameters are learned that are
 applied after the per-batch normalization.
 ---
-# Tiny convnet with Batch Normalization
+# Convnet with Batch Normalization
 .smaller[```python
 from keras.layers import BatchNormalization
 
@@ -757,52 +766,40 @@ cnn_small_bn.add(Dense(64, activation='relu'))
 cnn_small_bn.add(Dense(num_classes, activation='softmax'))
 ```]
 ???
+very small to make it fit on a slide
 ---
-# Learning speed (and accuracy)
-.center[![:scale 70%](images/learning_speed.png)
+# Learning speed and accuracy
+.center[![:scale 80%](images/learning_speed.png)
 ]
 ???
+FIXME label axes!
 ---
-# For larger (64 filters) net
-.center[![:scale 70%](images/learning_speed_larger.png)
+# For larger net (64 filters)
+.center[![:scale 80%](images/learning_speed_larger.png)
 ]
 ???
----
-#Inspecting Conv-Nets
-
-
-
-???
----
-#Tensorboard?
-
-
-
-???
----
-#Deconvolution?
-
-
-???
+FIXME label axes
 ---
 class:center,middle
 # VGG and Imagenet Filters
 ???
 ---
-# Inspecting VGG
+# Inspecting VGG16
 .left-column[.smaller[
 ```python
 from keras import applications 
 
-# build the VGG16 network
-model = applications.VGG16(include_top=False,
-                           weights='imagenet')
+# load the VGG16 network
+model = applications.VGG16(
+    include_top=False,
+    weights='imagenet')
 model.summary()
 ```]]
 .right-column[
-![:scale 80%](images/vgg_model_summary.png)
+![:scale 90%](images/vgg_model_summary.png)
 ]
 ???
+This is not really state of the art any more.
 ---
 #VGG filters
 .smaller[
@@ -813,11 +810,11 @@ vgg_weights.shape
 ```
 (3, 3, 3, 64)
 ```]
-.center[![:scale 40%](images/vgg_filters.png)]
+.center[![:scale 45%](images/vgg_filters.png)]
 ???
 ---
-.left-column[![:scale 80%](images/bkny_image.png)]
-.right-column[.smaller[
+.left-column[![:scale 90%](images/bkny_image.png)]
+.right-column[.smallest[
 ```python
 get_3rd_layer_output = K.function([model.layers[0].input],
                                   [model.layers[3].output])
@@ -836,11 +833,28 @@ print(layer6_output.shape)
 ]]
 ???
 ---
-.center[![:scale 50%](images/after_first_pooling.png)]
-.center[![:scale 50%](images/after_second_pooling.png)]
+.center[![:scale 75%](images/after_first_pooling.png)]
+.center[![:scale 75%](images/after_second_pooling.png)]
 ???
+
 ---
-#Using pre trained  networks
+class: middle
+![:scale 100%](images/distill-feature-vis.png)
+
+.smaller[https://distill.pub/2017/feature-visualization/]
+---
+class: middle
+# Transfer learning
+---
+class: center
+# Transfer Learning
+
+.center[
+![:scale 80%](images/pretrained_network.png)
+]
+
+.smaller[See http://cs231n.github.io/transfer-learning/]
+???
 
 - Train on “large enough” data.
 
@@ -849,11 +863,7 @@ print(layer6_output.shape)
 - Take activations of last or second to last fully
 connected layer.
 
-.center[
-![:scale 70%](images/pretrained_network.png)
-]
 
-???
 Often we have a small but specific image dataset for a
 particular application. Training a neural net is not
 feasible unless we have tens of thousands or
@@ -871,21 +881,7 @@ contain a lot of information about the image.
 We can then use these activations as features for
 another classifier like a linear model or smaller dense
 neural network.
----
-#Using pre trained  networks
 
-- Train on “large enough” data.
-
-- Apply to new “small” dataset.
-
-- Take activations of last or second to last fully
-connected layer.
-
-.center[
-![:scale 70%](images/pretrained_network.png)
-]
-
-???
 The main point is that we don’t need to retrain all the
 weights in the network. You can think of it as
 retraining only the last layer – the classification layer
@@ -900,9 +896,10 @@ as transfer learning.
 This potentially doesn’t work with images from a very
 different domain, like medical images.
 ---
+class: spacious
 # Ball snake vs Carpet Python
 .center[
-![:scale 70%](images/ball_snake_vs_python.png)
+![:scale 100%](images/ball_snake_vs_python.png)
 ]
 ???
 ---
@@ -931,7 +928,7 @@ for url in urls_carpet:
 ???
 ---
 .center[
-![:scale 70%](images/carpet_python_snake.png)
+![:scale 80%](images/carpet_python_snake.png)
 ]
 
 ???
@@ -941,18 +938,18 @@ for url in urls_carpet:
 ```python
 from keras.preprocessing import image
 
-images_carpet = [image.load_img(os.path.join("snakes", "carpet", os.path.basename(url)), target_size=(224, 224))
-                 for url in urls_carpet]
-images_ball = [image.load_img(os.path.join("snakes", "ball", os.path.basename(url)), target_size=(224, 224))
-                 for url in urls_ball]
+
 X = np.array([image.img_to_array(img) for img in images_carpet + images_ball])
-print(X.shape)
-# build the VGG16 network
-model = applications.VGG16(include_top=False,
-                           weights='imagenet')
+
+# load VGG16
+model = applications.VGG16(include_top=False, weights='imagenet')
+
+# preprocessing for VGG16
 from keras.applications.vgg16 import preprocess_input
+
 X_pre = preprocess_input(X)
 features = model.predict(X_pre)
+print(X.shape)
 print(features.shape)
 features_ = features.reshape(200, -1)
 ```
@@ -961,6 +958,7 @@ features_ = features.reshape(200, -1)
 (200, 7, 7, 512)
 ```]
 ???
+VGG16 like each convnet has particular input requirements, for example 224x224 images.
 ---
 # Classification with LogReg
 .smaller[
@@ -982,18 +980,20 @@ array([[24,  1],
 ---
 #Finetuning
 
+
+.center[
+![:scale 90%](images/finetuning.png)
+]
+
+
+???
+
 - Start with pre-trained net
 
 - Back-propagate error through all layers
 
 - “tune” filters to new data.
 
-.center[
-![:scale 70%](images/finetuning.png)
-]
-
-
-???
 A more complicated variant of this is to load a network
 trained on some other dataset, and replace the last
 layer with your classification task.
@@ -1013,9 +1013,13 @@ initialization.
 #Adverserial Samples
 
 .center[
-![:scale 70%](images/adverserial.png)
+![:scale 80%](images/adverserial.png)
 ]
-- Intriguing properties of neural networks https://arxiv.org/abs/1312.6199
+
+.smallest[
+<br />
+[Szegedy et. al.: Intriguing properties of neural networks](https://arxiv.org/abs/1312.6199)
+]
 ???
 Since convolutional neural nets are so good at image
 recognition, some people think they are pretty
