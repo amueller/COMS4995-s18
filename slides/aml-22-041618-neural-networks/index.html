@@ -309,7 +309,7 @@ SVM or linear models, unlike trees
 
 - MANY variants (Convolutional nets, Gated Recurrent neural
 networks, Long-Short-Term Memory, recursive neural
-networks, variational autoencoders, general adverserial
+networks, variational autoencoders, generative adverserial
 networks, neural turing machines...)
 
 ???
@@ -734,13 +734,7 @@ from sklearn.datasets import load_breast_cancer
 data = load_breast_cancer()
 X_train, X_test, y_train, y_test = train_test_split(
     data.data, data.target, stratify=data.target, random_state=0)
-scaler = StandardScaler().fit(X_train)
-X_train_scaled = scaler.transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-```]
 
-.smaller[
-```python
 from sklearn.model_selection import GridSearchCV
 pipe = make_pipeline(StandardScaler(), MLPClassifier(solver="lbfgs", 
                      random_state=1))
