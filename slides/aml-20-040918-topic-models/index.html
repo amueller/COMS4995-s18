@@ -134,6 +134,7 @@ FIXME classification with logisticregressioncv  instead of fixed C?
 FIXME preprocessing for LDA: mention no tfidf.
 FIXME Edward is called bayes flow now?
 FIXME Classification with NMF.
+FIXME dirichlet distribution better explanation
 ---
 
 # Beyond Bags of Words
@@ -533,6 +534,18 @@ Dirichlet
 
 `$p(\phi_k \, \vert \, z_{iv} = k, \mathbf{\theta}_i) = \text{Dir}(\gamma + \sum_i \sum_l \mathbb{I}(y_{il} = v, z_{il} = k))$`
 
+???
+i is index for documents, v is index for words in document, k index for topics.
+z is word-topic assignments.
+
+$z_{iv}=k$ means word v in document i is assigned topic k.
+
+$\theta$ is document topic distribution, $\theta_{ik}$ is the probability of a word in document i to come from topic k.
+
+$y_{iv}$ is the actual word (word-index) of word v in document i.
+
+$\phi_{k, y}$ is the probability of a drawing word y from document k.
+$\phi_{k, y_{iv}}$ is the probability 
 
 ---
 
@@ -545,6 +558,8 @@ Sample only `$p(z_i=k|\mathbf{z}_{-i})$`
 
 Compute $\theta$, $\phi$ from $\mathbf{z}$
 ???
+Now looking at all documents together (i goes over words and documents).
+$z_{-i}$ is word-topic assignments for all other words for all documents.
 Now sequential problem!
 ---
 # Further Reading
