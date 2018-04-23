@@ -118,9 +118,7 @@ class: center, middle
 Andreas C. Müller
 
 ???
-HW: don't commit cache! Don't commit data!
-Most <1mb, some 7gb.
-Say something about GPUs.
+drive home point about permuting pixels in imaged doesn't affect dense networks (or RF, or SVM)
 
 FIXME update with state-of-the-art instead of VGG16
 FIXME show how permuting pixels doesn't affect fully connected network,
@@ -389,29 +387,124 @@ but it might be somewhat unexpected.
 requires the weights, done by gradient descent.
 ---
 class: middle
-# Convolutional neural networks for text
+# Convolutional Neural Networks
+# for Text Classification
 ---
-# Character Level Neural Networks for Text Classification
-[:scale 100%](images/character-level-cnn.png)
+# Word Level CNNs for Text Classification
+.smallest[[Kim - Convolutional Neural Networks for Sentence Classification (2014)](https://arxiv.org/pdf/1408.5882.pdf)]
+![:scale 100%](images/word-level-cnn.png)
+---
+class: center
+# Datasets
+![:scale 60%](images/word-level-datasets.png)
+---
+class: center
+![:scale 100%](images/word-level-cnn-results.png)
+???
+rand: random initialized
+static: used word2vec embedding (and random for out-of-vocabulary)
+non-static: fine-tuning
+multi-channel: one fixed and one fine-tuned word2vec channel
+
+rand doesn't seem so good. Rest pretty much the same. Pretty competative (at the time) against
+highly specialized networks.
+---
+class: center
+# Learned Representations
+![:scale 30%](images/word-level-embeddings.png)
+???
+removes sentiment ambiguity in word2vec
+---
+class: middle
+# Character Level
+# Convolutional Neural Networks
+# for Text Classification
+---
+class: center
+# Character Level CNNs for Text Classification
+.smallest[[Zhang et. al. - Character-level Convolutional Networks for Text
+Classification (2015)](http://papers.nips.cc/paper/5782-character-level-convolutional-networks-for-text-classification.pdf)]
+![:scale 100%](images/character-level-cnn.png)
+--
+![:scale 50%](images/character-nn-characters.png)
 ???
 Need to cut to fixed-length input.
 70 characters
 temporal max-pooling.
 ---
+class: center
+# Datasets
+.padding-top[
+![:scale 100%](images/character-cnn-datasets.png)
+]
+???
+Much bigger than for word-level!
+epoch size: dataset size / minibatch size.
+---
+class: center, middle
+![:scale 75%](images/character-cnn-results.png)
 
+.smallest[
+Later improved in [Conneau et. al - Very Deep Convolutional Networks
+for Text Classification - 2016](http://www.aclweb.org/anthology/E17-1104)]
+???
+Might be good for very short texts, not necessarily the go-to solution (yet).
 ---
 class: center, middle
 
 # Advanced Architectures
 ---
+class: center, middle
 # Deep Residual Networks (ResNet)
+[He et. al. - Deep Residual Learning for Image Recognition (2015)](https://arxiv.org/pdf/1512.03385.pdf)
 ---
-# Densely Connected Convolutional Networks (DenseNet)
+# Problem
+![:scale 90%](images/resnet-no-deep-nets.png)
+???
+We can't fit deep networks well - not even on training set!
+"vanishing gradient problem" - was motivation for relu, but not solved yet.
+---
+class: center
+# Solution
+![:scale 60%](images/residual-layer.png)
 
+`$$y = F(x, \{W_i\}) + x$$`
+
+--
+
+`$$y = F(x, \{W_i\}) + W_sx$$`
+
+???
+instead of learning a function. learn the difference to identity.
+if sizes different, add linear projection.
 ---
-# Recurrent Neural Networks
+class: center, middle
+![:scale 25%](images/resnet-architecture.png)
+???
+dotted lines are linear projection, others are identity.
 ---
-# Long-Short-Term-Memory (LSTM)
+class: center, middle
+![:scale 100%](images/resnet-success.png)
+---
+class: center, middle
+![:scale 80%](images/resnet-results.png)
+???
+uses batch normalization and dropout.
+---
+class: middle, center
+# Densely Connected Convolutional Networks (DenseNet)
+[Huang et. al - Densely Connected Convolutional Networks (2016)](https://arxiv.org/pdf/1608.06993)
+---
+class: center
+![:scale 60%](images/densenet-architecture.png)
+--
+![:scale 80%](images/densenet-architecture2.png)
+---
+class: center, middle
+![:scale 70%](images/densenet-vs-resnet.png)
+
+???
+uses batch normalization and dropout.
 ---
 class: middle
 # Questions ?
