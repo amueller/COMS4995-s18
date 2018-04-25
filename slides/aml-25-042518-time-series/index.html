@@ -266,6 +266,7 @@ maunaloa.head()
 
 ???
 
+Multiple columns combined to a single date !
 ---
 
 # Time Series Index
@@ -281,6 +282,7 @@ maunaloa.head()
 
 .center[![:scale 80%](images/time series index.png)]
 
+- Can also use set_index if we already read the data it.
 
 ???
 
@@ -301,9 +303,6 @@ year_month_day
 1974-06-09    332.18
 1974-06-16    332.37
 Name: co2, dtype: float64
-```
-```python
-maunaloa.head()                       
 ```
 ]
 ]
@@ -365,6 +364,8 @@ year_month_day
 1974-08-01    329.0725
 1974-09-01    327.3240
 Freq: MS, Name: co2, dtype: float64
+
+http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
 ```
 ]
 ]
@@ -372,9 +373,11 @@ Freq: MS, Name: co2, dtype: float64
 .right-column[
 
 .center[![:scale 80%](images/resampling 1.png)]
-.center[![:scale 80%](images/resampling 2.png)]
+.center[![:scale 70%](images/resampling 2.png)]
 
 ]
+
+
 
 ???
 
@@ -425,6 +428,10 @@ class: spacious
 - Model trend
 - Or differencing (compute new series)....  $\quad x_{t + 1} - x_t$
 
+.smaller[
+```python
+ppm.diff.plot()
+```]
 .center[![:scale 55%](images/detrending.png)]
 
 ???
@@ -639,6 +646,7 @@ plt.legend(loc="best")
 - More complicated process model
 - Internally uses differencing
 - Also checkout SARIMAX (state space model)
+- Note: ```typ = "levels"``` !!
 
 ]
 
@@ -772,16 +780,18 @@ FIXME - Note: Couldn't decrease size further
 
 .smaller[
 ```python
-X_month = pd.concat([X, pd.DataFrame({'month': X.index.month}, index=X.index)], axis=1)
+X_month = pd.concat([X, pd.DataFrame({'month': X.index.month},index=X.index)],
+		         		axis=1)
 X_month.head()
 ```
 ]
-.center[![:scale 30%](images/linear regression.png)]
+.center[![:scale 25%](images/linear regression.png)]
 .smaller[
 ```python
 X_train_month = X_month[:500]
 X_test_month = X_month[500:]
-lr_poly_month = make_pipeline(PolynomialFeatures(include_bias=False), LinearRegression())
+lr_poly_month = make_pipeline(PolynomialFeatures(include_bias=False), 
+								LinearRegression())
 lr_poly_month.fit(X_train_month, train)
 X_test_month.shape # (209,2)
 ```
@@ -801,11 +811,13 @@ X_test_month.shape # (209,2)
 .smaller[
 ```python
 from sklearn.preprocessing import OneHotEncoder
-lr_poly_month_ohe = make_pipeline(OneHotEncoder(categorical_features=[1], sparse=False),
-                                  PolynomialFeatures(include_bias=False), LinearRegression())
+lr_poly_month_ohe = make_pipeline(OneHotEncoder(categorical_features=[1], 
+												 sparse=False),
+                                  PolynomialFeatures(include_bias=False), 
+                                  LinearRegression())
 lr_poly_month_ohe.fit(X_train_month, train)
 ```
-.center[![:scale 55%](images/arma res.png)]
+.center[![:scale 45%](images/arma res.png)]
 ```python
 from sklearn.metrics import mean_squared_error
 mean_squared_error(ppm[500:], lr_poly_month_ohe.predict(X_test_month)) #0.505
@@ -863,13 +875,14 @@ energy.Appliances.plot()
 
 .smaller[
 ```python
-week = energy.Appliances.groupby([energy.index.dayofweek, energy.index.hour]).mean()
+week = energy.Appliances.groupby([energy.index.dayofweek, 
+									energy.index.hour]).mean()
 week.head(30)
 ```
 ]
 
 .wide-left-column[
-.center[![:scale 100%](images/weekly trends.png)]
+.center[![:scale 90%](images/weekly trends.png)]
 ]
 
 .narrow-right-column[
