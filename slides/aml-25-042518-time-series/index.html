@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Time Series</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Garamond);
+      @import url(https://fonts.googleapis.com/css?family=Muli:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      body {
+        font-family: 'Muli';
+        font-size: 140%;
+      }
+      h1, h2 {
+        font-family: 'Garamond';
+        font-weight: normal;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .remark-slide-content h1 {
+        font-size: 70px;
+        text-align: center;
+      }
+      .remark-slide-content p, .remark-slide-content li {
+        font-size:30px;
+        line-height: 1.4;
+      }
+      .remark-code {
+        font-size:30px;
+      }
+      .remark-slide-content p {
+          margin: 5px;
+      }
+      .remark-slide-container .spacious p,
+      .remark-slide-container .spacious li{
+          margin-bottom: 50px;
+          margin-top: 50px;
+      }
+      .remark-slide-container .spacious h1{
+          margin-bottom: 50px;
+      }
+      .remark-slide-container .some-space p,
+      .remark-slide-container .some-space li,
+      .remark-slide-container .some-space h1{
+          margin-bottom: 30px;
+      }
+      .reset-column {
+          overflow: auto;
+          width: 100%;
+      }
+      .remark-slide-content .compact p, .remark-slide-content .compact li, .remark-slide-content .compact pre, .remark-slide-content .compact .MathJax_Display{
+          font-size: 30px;
+          line-height: 1.1;
+          display: block;
+          margin: 2px 0;
+      }
+      .padding-top {
+          padding-top: 100px;
+      }
+      .remark-slide-content .smaller p, .remark-slide-content .smaller li,
+      .remark-slide-content .smaller .remark-code, .remark-slide-content .smaller a{
+          font-size: 25px;
+      }
+      .remark-slide-container .smallest p, .remark-slide-container .smallest li,
+      .remark-slide-container .smallest .remark-code, .remark-slide-container .smallest a{
+          font-size: 15px;
+      }
+      .normal {
+          font-size: 30px;
+      }
+      .quote_author {
+          display: block;
+          text-align: right;
+          margin-top: 20px;
+          font-size: 30px;
+          font-family: 'Garamond';
+      }
+      .larger, .larger .remark-code {
+          font-size: 40px;
+      }
+      .largest, .largest .remark-code {
+          font-size: 50px;
+      }
+      .left-column, .right-column {
+          width: 48%;
+      }
+      .right-column{
+          float: right;
+      }
+      .left-column{
+          float: left;
+      }
+      .narrow-right-column {
+          float: right;
+          width: 32%
+      }
+      .wide-left-column {
+          float: left;
+          width: 65%
+      }
+      .invisible {
+          visibility: hidden
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+### W4995 Applied Machine Learning
+
+# Time Series and Forecasting
+
+04/25/18
+
+Andreas C. Müller
+
+???
+
+---
+class: spacious
+
+#What's different ?
+
+- Not iid
+
+
+???
+
+---
+
+
+# Equally spaced & not equally spaced
+
+`$$ (x_{t_1}, y_{t_1}), ... (x_{t_m}, y_{t_m})  \quad t_1 < t_2 < ... < t_m $$`
+
+Equally spaced:
+
+$$ t_{i+1} - t_i = const$$ 
+- 1 second, 1 day, 1 year
+
+Unevenly spaced:
+
+$$ t_{i+1} - t_i  \quad varies $$ 
+- Event time series (earthquake, trade, ...)
+
+
+???
+
+---
+
+
+.left-column[
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Evenly spaced
+![:scale 95%](images/evenly spaced data.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CO2 Measurements
+- Today only evenly spaced
+
+]
+.right-column[
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unevenly spaced
+![:scale 100%](images/unevenly spaced data.png)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Volcanic Eruption Deaths
+- For uneven: sometimes aggregates over fixed periods make sense
+]
+
+???
+
+---
+class: center, middle
+
+# Tasks 
+
+???
+
+---
+
+# 1d Forecasting
+
+.center[![:scale 80%](images/1d forecasting.png)]
+
+???
+
+---
+
+# Nd Forecasting
+
+.center[![:scale 80%](images/nd forecasting.png)]
+
+???
+
+---
+class: spacious
+
+# Feature-based forecasting &nbsp; (expanatory variables)
+
+.center[![:scale 80%](images/feature based forecasting.png)]
+
+???
+
+---
+
+# Time Series Classification
+
+.center[![:scale 70%](images/time series classification.png)]
+
+???
+
+---
+
+
+# Tasks
+
+- 1d time-series forecasting
+  - Number of customers (naive)
+- Multivariate time-series -- forecast all
+  - Stock market
+- Multivariate time-series -- forecast one
+  - Number of customers (with features)
+- Time-series classification (1d or Nd)
+  - Activity from smart phone sensors
+
+???
+
+---
+class: center, middle
+
+# Data reading / munging with Pandas
+
+???
+
+---
+
+# Parse Dates
+
+.smaller[
+```python
+url = "ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_weekly_mlo.txt"
+names = ["year", "month", "day", "year_decimal", "co2", "days", "1 yr ago", 
+          "10 yr ago", "since 1800"]
+maunaloa = pd.read_csv(url, skiprows=49, header=None, delim_whitespace=True,
+                       names=names, na_values=[-999.99])
+maunaloa.head()
+```
+]
+
+.center[![:scale 80%](images/parse dates.png)]
+
+???
+
+---
+
+# Parse Dates
+
+.smaller[
+```python
+maunaloa = pd.read_csv(url, skiprows=49, header=None, delim_whitespace=True,
+                       names=names, parse_dates=[[0, 1, 2]], na_values=[-999.99])
+maunaloa.head()                       
+```
+]
+
+.center[![:scale 80%](images/parse dates 2.png)]
+
+???
+
+Multiple columns combined to a single date !
+---
+
+# Time Series Index
+
+.smaller[
+```python
+maunaloa = pd.read_csv(url, skiprows=49, header=None, delim_whitespace=True,
+                       names=names, parse_dates=[[0, 1, 2]], na_values=[-999.99],
+                       index_col="year_month_day")
+maunaloa.head()                       
+```
+]
+
+.center[![:scale 80%](images/time series index.png)]
+
+- Can also use set_index if we already read the data it.
+
+???
+
+---
+class: spacious
+
+.left-column[
+
+.smaller[
+```python
+maunaloa.co2.head()
+```
+```python
+year_month_day
+1974-05-19    333.34
+1974-05-26    332.95
+1974-06-02    332.32
+1974-06-09    332.18
+1974-06-16    332.37
+Name: co2, dtype: float64
+```
+]
+]
+
+.right-column[
+
+.center[![:scale 120%](images/maunaloa plot.png)]
+
+]
+
+???
+
+---
+
+# Backfill and Forward Fill
+
+- Simple "imputation" method
+
+.smaller[
+```python
+maunaloa.co2.isnull().sum()
+```
+20
+```python
+maunaloa.fillna(method="ffill", inplace=True)  # or bfill
+maunaloa.co2.isnull().sum()                      
+```
+0
+]
+
+- If we resample later, we could also just drop
+
+???
+
+---
+class: compact
+
+# Resampling
+
+.left-column[
+.smaller[
+```python
+# resampling is lazy
+resampled_co2 = 
+maunaloa.co2.resample("MS")
+print(resampled_co2)
+resampled_co2.mean().head()
+```
+```
+DatetimeIndexResampler 
+[freq=<MonthBegin>, axis=0, 
+  closed=left, label=left, 
+  convention=start, base=0]
+Out[209]:
+year_month_day
+1974-05-01    333.1450
+1974-06-01    332.0280
+1974-07-01    330.7125
+1974-08-01    329.0725
+1974-09-01    327.3240
+Freq: MS, Name: co2, dtype: float64
+
+http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
+```
+]
+]
+
+.right-column[
+
+.center[![:scale 80%](images/resampling 1.png)]
+.center[![:scale 70%](images/resampling 2.png)]
+
+]
+
+
+
+???
+
+---
+
+.smaller[
+```python
+maunaloa.co2.resample("W").mean().plot(marker="o", markersize=1)
+maunaloa.co2.resample("AS").mean().plot(marker="o")
+maunaloa.co2.resample("3AS").mean().plot(marker="o")
+```]
+
+.center[![:scale 75%](images/maunaloa resample.png)]
+
+???
+
+---
+class: center, middle
+
+# Basic Analysis
+
+???
+
+---
+class: spacious
+
+# Stationarity
+
+- Required for some classical statistics methods
+- Mean independent of time
+- Variance independent of time
+- Covariance of two observations k steps apart independent of time
+
+???
+
+---
+
+.center[![:scale 75%](images/stationarity.png)]
+
+- Mean changes --> not stationary, there is a trend
+
+???
+
+---
+
+# De-trending
+
+- Model trend
+- Or differencing (compute new series)....  $\quad x_{t + 1} - x_t$
+
+.smaller[
+```python
+ppm.diff.plot()
+```]
+.center[![:scale 55%](images/detrending.png)]
+
+???
+
+---
+class: spacious
+
+# Autocorrelation
+
+$$ R(s,t) = \frac{\operatorname{E}[(X_t - \mu_t)(X_s - \mu_s)]}{\sigma_t\sigma_s} $$
+
+???
+
+---
+
+.smaller[
+```python
+ppm.autocorr()
+#0.9989
+ppm.autocorr(lag=12)
+#0.99973
+from pandas.tools.plotting import autocorrelation_plot
+autocorrelation_plot(ppm)
+```
+]
+
+.center[![:scale 65%](images/autocorr.png)]
+
+
+???
+
+---
+
+.smaller[
+```python
+from statsmodels.tsa.stattools import acf
+autocorrelation = acf(ppm)
+plt.plot(autocorrelation)
+```
+]
+
+.center[![:scale 65%](images/autocorr 2.png)]
+
+???
+Note - 1 slide split into 3 slides (1)
+
+---
+
+.smaller[
+```python
+autocorrelation_plot(ppm.diff()[1:])
+```
+]
+
+.center[![:scale 65%](images/autocorr 3.png)]
+
+???
+Note - 1 slide split into 3 slides (2)
+
+---
+
+.smaller[
+```python
+from statsmodels.tsa.stattools import acf
+autocorrelation = acf(ppm.diff()[1:])
+plt.plot(autocorrelation)
+```
+]
+
+.center[![:scale 65%](images/autocorr 4.png)]
+
+???
+Note - 1 slide split into 3 slides (3)
+
+---
+class: compact
+
+.smaller[
+- Seasonal model for CO2
+```python
+from statsmodels.tsa.seasonal import seasonal_decompose
+decomposition = seasonal_decompose(ppm, model='additive')
+fig = decomposition.plot()
+#fig.set_figheight(6)
+fig.tight_layout()
+```
+]
+
+.center[![:scale 55%](images/seasonal model.png)]
+
+
+???
+
+---
+class: spacious
+
+# Autoregressive (linear) model
+
+- Order k AR model (can include trend and offset):
+
+`$$ x_{t+k} = c_0  x_t + c_1 x_{t + 1} + ... + c_{k - 1} x_t $$`
+
+- learn $c_i$ (i.e. using least squares)
+
+???
+
+---
+
+# AR model with statsmodels
+
+.left-column[
+.smaller[
+```python
+from statsmodels.tsa import ar_model
+ar = ar_model.AR(ppm[:500])
+res = ar.fit(maxlag=12)
+res.params
+```
+```
+const              -2.018779
+L1.interpolated     0.931758
+L2.interpolated    -0.240629
+L3.interpolated    -0.099048
+L4.interpolated    -0.076488
+L5.interpolated     0.164472
+L6.interpolated    -0.000531
+L7.interpolated    -0.023481
+L8.interpolated    -0.125134
+L9.interpolated     0.100288
+L10.interpolated   -0.021266
+L11.interpolated    0.414740
+L12.interpolated   -0.017268
+dtype: float64
+```
+]
+]
+
+.right-column[
+.smaller[
+```python
+ppm[300:].plot(label="true")
+res.predict(ppm.index[500], 
+  ppm.index[-1]).plot(label="predict")
+plt.legend(loc="best")
+```
+]
+.center[![:scale 100%](images/ar model with statsmodel.png)]
+]
+
+???
+
+---
+
+# Impact of order
+
+.left-column[
+.smaller[
+```python
+ar6 = ar_model.AR(ppm[:500])
+res = ar6.fit(maxlag=6)
+ar_pred = res.predict(ppm.index[500], 
+                      ppm.index[-1])
+ppm[300:].plot(label="true")
+ar_pred.plot(label="AR predict")
+plt.legend(loc="best")
+```
+]
+.center[![:scale 90%](images/impact of order 1.png)]
+]
+
+.right-column[
+.smaller[
+```python
+ar25 = ar_model.AR(ppm[:500])
+res = ar25.fit(maxlag=25)
+ar_pred = res.predict(ppm.index[500], 
+                      ppm.index[-1])
+ppm[300:].plot(label="true")
+ar_pred.plot(label="AR predict")
+plt.legend(loc="best")
+```
+]
+.center[![:scale 90%](images/impact of order 2.png)]
+]
+
+???
+
+---
+
+# ARIMA
+
+.smaller[
+```python
+from statsmodels import tsa
+arima_model = tsa.arima_model.ARIMA (ppm[:500], order=(12, 1, 0))
+res = arima_model.fit()
+arima_pred = res.predict(ppm.index[500], ppm.index[-1], typ="levels")
+ppm[300:].plot(label="true")
+arima_pred.plot(label="ARIMA predict")
+plt.legend(loc="best")
+```
+]
+
+.left-column[
+
+.center[![:scale 90%](images/arima.png)]
+
+]
+
+.right-column[
+
+- More complicated process model
+- Internally uses differencing
+- Also checkout SARIMAX (state space model)
+- Note: ```typ = "levels"``` !!
+
+]
+
+???
+
+---
+
+# 1d with sklearn
+
+.smaller[
+```python
+ppm.shape 
+```
+```
+(709,)
+```
+```python
+train = ppm[:500]
+test = ppm[500:]
+X = ppm.index.to_series().apply(lambda x: x.toordinal())
+X = pd.DataFrame(X)
+X_train, X_test = X.iloc[:500, :], X.iloc[500:, :]
+X_train.shape
+```
+```
+(500,1)
+```
+```python
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression().fit(X_train, train)
+lr_pred = lr.predict(X_test)
+plt.plot(ppm.index, lr.predict(X))
+ppm.plot()
+```
+]
+
+
+???
+
+---
+
+# Linear model for trend
+
+.center[![:scale 85%](images/linear model for trend.png)]
+
+???
+
+---
+
+# Quadratic Model
+
+.smaller[
+```python
+from sklearn.preprocessing import PolynomialFeatures
+lr_poly = make_pipeline(PolynomialFeatures(include_bias=False), 
+                          LinearRegression())
+lr_poly.fit(X_train, train)
+plt.plot(ppm.index, lr_poly.predict(X))
+ppm.plot()
+```
+]
+
+.center[![:scale 55%](images/quadratic model.png)]
+
+
+???
+
+---
+
+# Detrending with trend model
+
+.smaller[
+```python
+y_res = ppm - lr_poly.predict(X)
+y_res.plot()
+```]
+
+.center[![:scale 60%](images/detrending with trend model.png)]
+
+???
+
+---
+class: compact
+
+# AR model on residuals
+
+.left-column[
+.smaller[
+```python
+from statsmodels.tsa import ar_model
+ar_model_res = ar_model.AR(y_res[:500])
+res_res = ar_model_res.fit(maxlag=12)
+ar_pred_res = res_res.predict(
+        ppm.index[500], ppm.index[-1])
+pred_ar_res = ar_pred_res + 
+              r_poly.predict(X_test)
+res_res.params
+```
+```
+const              -0.008039
+L1.interpolated     0.922508
+L2.interpolated    -0.243015
+L3.interpolated    -0.101173
+L4.interpolated    -0.077538
+L5.interpolated     0.158073
+L6.interpolated    -0.006164
+L7.interpolated    -0.023890
+L8.interpolated    -0.126381
+L9.interpolated     0.092664
+L10.interpolated   -0.025640
+L11.interpolated    0.414180
+L12.interpolated   -0.018078
+dtype: float64
+```
+]
+]
+
+.right-column[
+.center[![:scale 120%](images/ar model residuals.png)]
+
+]
+
+
+???
+FIXME - Note: Couldn't decrease size further
+
+
+---
+
+# Just Linear Regression
+
+.smaller[
+```python
+X_month = pd.concat([X, pd.DataFrame({'month': X.index.month},index=X.index)],
+		         		axis=1)
+X_month.head()
+```
+]
+.center[![:scale 25%](images/linear regression.png)]
+.smaller[
+```python
+X_train_month = X_month[:500]
+X_test_month = X_month[500:]
+lr_poly_month = make_pipeline(PolynomialFeatures(include_bias=False), 
+								LinearRegression())
+lr_poly_month.fit(X_train_month, train)
+X_test_month.shape # (209,2)
+```
+
+]
+
+???
+
+---
+
+.center[![:scale 90%](images/arma month.png)]
+
+???
+
+---
+
+.smaller[
+```python
+from sklearn.preprocessing import OneHotEncoder
+lr_poly_month_ohe = make_pipeline(OneHotEncoder(categorical_features=[1], 
+												 sparse=False),
+                                  PolynomialFeatures(include_bias=False), 
+                                  LinearRegression())
+lr_poly_month_ohe.fit(X_train_month, train)
+```
+.center[![:scale 45%](images/arma res.png)]
+```python
+from sklearn.metrics import mean_squared_error
+mean_squared_error(ppm[500:], lr_poly_month_ohe.predict(X_test_month)) #0.505
+mean_squared_error(ppm[500:], pred_arma_res) #0.577
+```
+]
+
+???
+
+---
+class: spacious
+
+# General Autoregressors
+
+- https://github.com/scikit-learn/scikit-learn/pull/6029
+- Trees work well (as always)
+- Can take explanatory variables
+
+???
+
+---
+
+# Multivariate Timeseries
+
+.smaller[
+- energy data from https://archive.ics.uci.edu/ml/datasets/Appliances+energy+prediction
+
+```python
+energy = pd.read_csv("energydata_complete.csv", parse_dates=['date'], 
+                      index_col="date")
+energy.head()
+```
+.center[![:scale 75%](images/multivariate timeseries.png)]
+
+]
+
+???
+
+---
+
+# Exploration
+
+.smaller[
+```python
+energy.Appliances.plot()
+```
+]
+.center[![:scale 65%](images/exploration.png)]
+
+???
+
+---
+
+# Weekly trends
+
+.smaller[
+```python
+week = energy.Appliances.groupby([energy.index.dayofweek, 
+									energy.index.hour]).mean()
+week.head(30)
+```
+]
+
+.wide-left-column[
+.center[![:scale 90%](images/weekly trends.png)]
+]
+
+.narrow-right-column[
+.smaller[
+```
+0  0      53.684211
+   1      52.719298
+   2      50.964912
+   3      50.175439
+   4      50.438596
+   5      54.824561
+   6      56.228070
+   7      71.403509
+   8      94.035088
+   9      96.052632
+   10    151.842105
+   11    178.421053
+   12    154.561404
+   13    177.982456
+   14    151.228070
+   15    166.052632
+   16    144.736842
+   17    190.166667
+   18    189.083333
+   19    144.833333
+   20    148.916667
+   21    100.000000
+   22     76.166667
+   23     63.333333
+1  0      66.083333
+   1      56.250000
+   2      49.083333
+   3      47.083333
+   4      48.833333
+   5      59.833333
+Name: Appliances, dtype: float64
+```
+]]
+
+???
+FIXME Note: Couldn't decrease size further
+
+---
+class: middle
+# Questions ?
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script>
+    // Config Remark
+    remark.macros['scale'] = function (percentage) {
+        var url = this;
+        return '<img src="' + url + '" style="width: ' + percentage + '" />';
+    };
+    config_remark = {
+        highlightStyle: 'magula',
+        highlightSpans: true,
+        highlightLines: true,
+        ratio: "16:9"
+    };
+      var slideshow = remark.create(config_remark);
+    // Configure MathJax
+    MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'] /* removed 'code' entry*/
+    }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
