@@ -118,59 +118,8 @@ class: center, middle
 Andreas C. Müller
 
 ???
-
----
-class: spacious
-
-#What's different ?
-
-- Not iid
-
-
-???
-
----
-
-
-# Equally spaced & not equally spaced
-
-`$$ (x_{t_1}, y_{t_1}), ... (x_{t_m}, y_{t_m})  \quad t_1 < t_2 < ... < t_m $$`
-
-Equally spaced:
-
-$$ t_{i+1} - t_i = const$$ 
-- 1 second, 1 day, 1 year
-
-Unevenly spaced:
-
-$$ t_{i+1} - t_i  \quad varies $$ 
-- Event time series (earthquake, trade, ...)
-
-
-???
-
----
-
-
-.left-column[
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Evenly spaced
-![:scale 95%](images/evenly spaced data.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CO2 Measurements
-- Today only evenly spaced
-
-]
-.right-column[
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unevenly spaced
-![:scale 100%](images/unevenly spaced data.png)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Volcanic Eruption Deaths
-- For uneven: sometimes aggregates over fixed periods make sense
-]
-
-???
-
 ---
 class: center, middle
-
 # Tasks 
 
 ???
@@ -183,6 +132,8 @@ class: center, middle
 
 ???
 
+- 1d time-series forecasting
+  - Number of customers (naive)
 ---
 
 # Nd Forecasting
@@ -190,7 +141,8 @@ class: center, middle
 .center[![:scale 80%](images/nd forecasting.png)]
 
 ???
-
+- Multivariate time-series -- forecast all
+  - Stock market
 ---
 class: spacious
 
@@ -199,7 +151,8 @@ class: spacious
 .center[![:scale 80%](images/feature based forecasting.png)]
 
 ???
-
+- Multivariate time-series -- forecast one
+  - Number of customers (with features)
 ---
 
 # Time Series Classification
@@ -208,22 +161,62 @@ class: spacious
 
 ???
 
----
 
-
-# Tasks
-
-- 1d time-series forecasting
-  - Number of customers (naive)
-- Multivariate time-series -- forecast all
-  - Stock market
-- Multivariate time-series -- forecast one
-  - Number of customers (with features)
 - Time-series classification (1d or Nd)
   - Activity from smart phone sensors
+---
+class: spacious
+
+# What's different?
+
+- Forecasting: Not iid
+- Classification: Not necessarily same length
+
 
 ???
+---
+class: middle
+# Preliminaries
+---
 
+# Measurement frequencies
+
+`$$ (x_{t_1}, y_{t_1}), ... (x_{t_m}, y_{t_m})  \quad t_1 < t_2 < ... < t_m $$`
+
+Equally spaced:
+
+$$ t_{i+1} - t_i = const$$ 
+
+--
+Unevenly spaced:
+
+$$ t_{i+1} - t_i  \quad varies $$ 
+
+
+
+???
+Equally:
+- 1 second, 1 day, 1 year
+Unevenly:
+- Event time series (earthquake, trade, ...)
+---
+# Examples
+
+.left-column[
+.center[Evenly spaced
+![:scale 100%](images/evenly spaced data.png)
+CO2 Measurements]
+
+]
+.right-column[
+.center[Unevenly spaced
+![:scale 100%](images/unevenly spaced data.png)
+Volcanic Eruption Deaths]
+]
+
+???
+Today only evenly spaced.
+For uneven: sometimes aggregates over fixed periods make sense
 ---
 class: center, middle
 
@@ -280,22 +273,28 @@ maunaloa.head()
 ```
 ]
 
-.center[![:scale 80%](images/time series index.png)]
+.center[![:scale 90%](images/time series index.png)]
 
-- Can also use set_index if we already read the data it.
 
 ???
+- Can also use set_index if we already read the data it.
 
 ---
 class: spacious
+# Mauna Loa CO2 Dataset
 
-.left-column[
+.wide-left-column[
 
+.center[![:scale 100%](images/maunaloa plot.png)]
+
+]
+
+.narrow-right-column[
 .smaller[
 ```python
 maunaloa.co2.head()
 ```
-```python
+```
 year_month_day
 1974-05-19    333.34
 1974-05-26    332.95
@@ -305,11 +304,6 @@ year_month_day
 Name: co2, dtype: float64
 ```
 ]
-]
-
-.right-column[
-
-.center[![:scale 120%](images/maunaloa plot.png)]
 
 ]
 
@@ -343,20 +337,23 @@ class: compact
 # Resampling
 
 .left-column[
-.smaller[
+.smallest[
 ```python
 # resampling is lazy
-resampled_co2 = 
-maunaloa.co2.resample("MS")
-print(resampled_co2)
-resampled_co2.mean().head()
+resampled_co2 = maunaloa.co2.resample("MS")
+resampled_co2
 ```
 ```
 DatetimeIndexResampler 
 [freq=<MonthBegin>, axis=0, 
   closed=left, label=left, 
   convention=start, base=0]
-Out[209]:
+```
+```python
+resampled_co2.mean().head()
+```
+```
+
 year_month_day
 1974-05-01    333.1450
 1974-06-01    332.0280
@@ -365,18 +362,19 @@ year_month_day
 1974-09-01    327.3240
 Freq: MS, Name: co2, dtype: float64
 
-http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
 ```
 ]
 ]
 
 .right-column[
 
-.center[![:scale 80%](images/resampling 1.png)]
+.center[![:scale 75%](images/resampling 1.png)]
 .center[![:scale 70%](images/resampling 2.png)]
 
 ]
-
+.reset-column[.smaller[
+http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases]
+]
 
 
 ???
@@ -397,7 +395,7 @@ maunaloa.co2.resample("3AS").mean().plot(marker="o")
 ---
 class: center, middle
 
-# Basic Analysis
+# 1d Forecasting Basics
 
 ???
 
@@ -412,12 +410,12 @@ class: spacious
 - Covariance of two observations k steps apart independent of time
 
 ???
-
+FIXME formulas
 ---
 
 .center[![:scale 75%](images/stationarity.png)]
 
-- Mean changes --> not stationary, there is a trend
+- Mean changes -> not stationary, there is a trend
 
 ???
 
@@ -443,28 +441,24 @@ class: spacious
 
 $$ R(s,t) = \frac{\operatorname{E}[(X_t - \mu_t)(X_s - \mu_s)]}{\sigma_t\sigma_s} $$
 
-???
+--
 
----
-
-.smaller[
 ```python
 ppm.autocorr()
-#0.9989
-ppm.autocorr(lag=12)
-#0.99973
-from pandas.tools.plotting import autocorrelation_plot
-autocorrelation_plot(ppm)
 ```
-]
-
-.center[![:scale 65%](images/autocorr.png)]
-
+```
+0.9989
+```
+```python
+ppm.autocorr(lag=12)
+```
+```
+0.9997
+```
 
 ???
-
 ---
-
+# Autocorrelation function
 .smaller[
 ```python
 from statsmodels.tsa.stattools import acf
@@ -476,24 +470,36 @@ plt.plot(autocorrelation)
 .center[![:scale 65%](images/autocorr 2.png)]
 
 ???
-Note - 1 slide split into 3 slides (1)
+Fixme axis labels
 
 ---
 
 .smaller[
 ```python
+from pandas.tools.plotting import autocorrelation_plot
+autocorrelation_plot(ppm)
+```
+]
+
+.center[![:scale 80%](images/autocorr.png)]
+
+
+???
+
+---
+# Autocorrelation of differenced series
+
+.left-column[
+.smallest[
+```python
 autocorrelation_plot(ppm.diff()[1:])
 ```
 ]
 
-.center[![:scale 65%](images/autocorr 3.png)]
-
-???
-Note - 1 slide split into 3 slides (2)
-
----
-
-.smaller[
+.center[![:scale 100%](images/autocorr 3.png)]
+]
+.right-column[
+.smallest[
 ```python
 from statsmodels.tsa.stattools import acf
 autocorrelation = acf(ppm.diff()[1:])
@@ -501,29 +507,29 @@ plt.plot(autocorrelation)
 ```
 ]
 
-.center[![:scale 65%](images/autocorr 4.png)]
+.center[![:scale 100%](images/autocorr 4.png)]
 
+]
 ???
-Note - 1 slide split into 3 slides (3)
 
 ---
 class: compact
-
+# Seasonal model for CO2
 .smaller[
-- Seasonal model for CO2
+
 ```python
 from statsmodels.tsa.seasonal import seasonal_decompose
 decomposition = seasonal_decompose(ppm, model='additive')
 fig = decomposition.plot()
-#fig.set_figheight(6)
-fig.tight_layout()
+
 ```
 ]
 
-.center[![:scale 55%](images/seasonal model.png)]
+.center[![:scale 65%](images/seasonal model.png)]
 
 
 ???
+Only for analysis, not prediction.
 
 ---
 class: spacious
@@ -575,7 +581,6 @@ dtype: float64
 ppm[300:].plot(label="true")
 res.predict(ppm.index[500], 
   ppm.index[-1]).plot(label="predict")
-plt.legend(loc="best")
 ```
 ]
 .center[![:scale 100%](images/ar model with statsmodel.png)]
@@ -594,9 +599,6 @@ ar6 = ar_model.AR(ppm[:500])
 res = ar6.fit(maxlag=6)
 ar_pred = res.predict(ppm.index[500], 
                       ppm.index[-1])
-ppm[300:].plot(label="true")
-ar_pred.plot(label="AR predict")
-plt.legend(loc="best")
 ```
 ]
 .center[![:scale 90%](images/impact of order 1.png)]
@@ -609,9 +611,6 @@ ar25 = ar_model.AR(ppm[:500])
 res = ar25.fit(maxlag=25)
 ar_pred = res.predict(ppm.index[500], 
                       ppm.index[-1])
-ppm[300:].plot(label="true")
-ar_pred.plot(label="AR predict")
-plt.legend(loc="best")
 ```
 ]
 .center[![:scale 90%](images/impact of order 2.png)]
@@ -620,8 +619,7 @@ plt.legend(loc="best")
 ???
 
 ---
-
-# ARIMA
+# Autoregressive integrated moving average (ARIMA)
 
 .smaller[
 ```python
@@ -629,28 +627,20 @@ from statsmodels import tsa
 arima_model = tsa.arima_model.ARIMA (ppm[:500], order=(12, 1, 0))
 res = arima_model.fit()
 arima_pred = res.predict(ppm.index[500], ppm.index[-1], typ="levels")
-ppm[300:].plot(label="true")
-arima_pred.plot(label="ARIMA predict")
-plt.legend(loc="best")
 ```
 ]
 
-.left-column[
 
-.center[![:scale 90%](images/arima.png)]
 
-]
+.center[![:scale 50%](images/arima.png)]
 
-.right-column[
+
+???
 
 - More complicated process model
 - Internally uses differencing
 - Also checkout SARIMAX (state space model)
 - Note: ```typ = "levels"``` !!
-
-]
-
-???
 
 ---
 
