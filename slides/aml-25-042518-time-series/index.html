@@ -118,6 +118,11 @@ class: center, middle
 Andreas C. Müller
 
 ???
+FIXME much more polish
+FIXME time series classification
+FIXME PCA / clustering on time series
+FIXME general autoregressive models.
+FIXME dynamic time warping
 ---
 class: center, middle
 # Tasks 
@@ -640,7 +645,7 @@ arima_pred = res.predict(ppm.index[500], ppm.index[-1], typ="levels")
 - More complicated process model
 - Internally uses differencing
 - Also checkout SARIMAX (state space model)
-- Note: ```typ = "levels"``` !!
+- Note: typ = "levels" !!
 
 ---
 
@@ -826,95 +831,38 @@ class: spacious
 - Trees work well (as always)
 - Can take explanatory variables
 
-???
 
+???
 ---
-
-# Multivariate Timeseries
-
-.smaller[
-- energy data from https://archive.ics.uci.edu/ml/datasets/Appliances+energy+prediction
-
-```python
-energy = pd.read_csv("energydata_complete.csv", parse_dates=['date'], 
-                      index_col="date")
-energy.head()
-```
-.center[![:scale 75%](images/multivariate timeseries.png)]
-
-]
-
+# Seasonal Forecasting with FBProphet
+- A piecewise linear or logistic growth curve trend. Prophet automatically detects changes in trends by selecting changepoints from the data.
+- A yearly seasonal component modeled using Fourier series.
+- A weekly seasonal component using dummy variables.
+- A user-provided list of important holidays.
 ???
-
+FIXME formulas
 ---
-
-# Exploration
-
-.smaller[
 ```python
-energy.Appliances.plot()
+from fbprophet import Prophet
+m = Prophet()
+m.fit(fb_ppm[:500])
+forecast = m.predict(fb_ppm)
 ```
+.center[
+![:scale 60%](images/prophet_forecast.png)
 ]
-.center[![:scale 65%](images/exploration.png)]
-
-???
-
 ---
-
-# Weekly trends
-
-.smaller[
-```python
-week = energy.Appliances.groupby([energy.index.dayofweek, 
-									energy.index.hour]).mean()
-week.head(30)
-```
+# Uncertainty prediction
+.center[
+![:scale 100%](images/prophet_forecast_uncertainty.png)
 ]
-
-.wide-left-column[
-.center[![:scale 90%](images/weekly trends.png)]
+---
+# Seasonal Components
+.center[
+![:scale 100%](images/prophet_forecast_components.png)
 ]
-
-.narrow-right-column[
-.smaller[
-```
-0  0      53.684211
-   1      52.719298
-   2      50.964912
-   3      50.175439
-   4      50.438596
-   5      54.824561
-   6      56.228070
-   7      71.403509
-   8      94.035088
-   9      96.052632
-   10    151.842105
-   11    178.421053
-   12    154.561404
-   13    177.982456
-   14    151.228070
-   15    166.052632
-   16    144.736842
-   17    190.166667
-   18    189.083333
-   19    144.833333
-   20    148.916667
-   21    100.000000
-   22     76.166667
-   23     63.333333
-1  0      66.083333
-   1      56.250000
-   2      49.083333
-   3      47.083333
-   4      48.833333
-   5      59.833333
-Name: Appliances, dtype: float64
-```
-]]
-
 ???
-FIXME Note: Couldn't decrease size further
-
+detected that there are no daily or weekly trends!
 ---
 class: middle
 # Questions ?
