@@ -723,6 +723,9 @@ print(grid.best_score_)
 {'alpha': 0.0001, 'l1_ratio': 0.01}
 0.718
 ```
+???
+Here is me doing a grid search. If you have two parameters for the grid search it will do all possible combinations. Here I do a logarithmic space for alpha and for the l1_ratio, I use something that’s very close to zero and something that's very close to one and some stuff in between.
+If you want to analyze the output of a 2D grid search a little bit harder we can’t do the nice curve anymore. 
 
 ---
 class: smaller
@@ -735,6 +738,16 @@ res = pd.pivot_table(pd.DataFrame(grid.cv_results_),
 .center[
 ![:scale 60%](images/elasticnet_search.png)
 ]
+???
+The way that I like to do it is, here's the grip.cv results. And I put it in a data frame and then I'll make a pivot table where the values are test score, the index is one parameter and the columns are the other parameter. It allows me to visualize the grid search nicely.
+This is alpha and this is l1_ratio and you can see that if the l1_ratio is pretty high, there are some pretty good results, if you set the alpha accordingly. So here's like the diagonal of pretty good things. This is the model that did best. There's a slight caveat here that right now I did this with cross-validation and so this is the cross-validation accuracy. 
+Last time I said, this is not really a good measure of generalization performance. So here, I searched way more parameters, I tried like 5 or 10 times as many models. So it's likely that by chance, I'll get better results. 
+I didn't do this here in particular, because the data set is small and very noisy but in practice, if you want to compare models, you should evaluate it on a test set and see which of the models actually are better on the test. 
+One more thing, why this is helpful is if the best value is on the edge of this graph that means my ranges were too small. 
+Question is why we're using r square instead of the squared loss, one of the answers is that's the default in scikit-learn and the other answer is it's nice to know the range so you know that perfect prediction is one and you have some idea of what 0.5 means, the RMSE (the other norm that you usually use is the RMSE) depends on the scale of the output. So for example for the housing prices, it might be interesting to see what is the standard error in terms of dollars. If you want, like something that is in the units of the output, RMSE is good or mean absolute error might even be better. If you want something that is independent of the units of the output r square is pretty good because you know it's going to be between zero and one and it's measure something like the correlation and so if it's like 0.9, you know it’s a pretty good model. If my RMSE is 10,000 I don't know if have a good model or a bad model depends on what the range of the outputs is. 
+The last thing I want to talk about today is this was basically changing the regularization parts. The two most times regularization we looked at is Ridge which is L2 penalty, Lasso which is an L1 penalty and combining two of them which is Elastic Net.
+So now I want to talk about changing the first part, which was the squared loss of the predictions, basically. 
+
 ---
 
 # Robust Regression
